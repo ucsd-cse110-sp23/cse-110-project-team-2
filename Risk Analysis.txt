@@ -1,0 +1,36 @@
+﻿Team/Project Risks
+
+
+Risk: Availability
+Description: Our schedules don’t align perfectly
+Severity: High
+Resolution: Settle on specific mandatory days to meet and discuss compromises for other days
+Status: Resolved 
+
+
+Risk: Software and equipment up to date 
+Description: We need to have our computers up to date and running smoothly to minimize obstruction
+Severity: High
+Resolution: Get together and update everyone's computers to work properly
+Status: Resolved
+
+
+Risk: Place to meet on campus
+Description: Finding a meeting spot on/off campus that is private and quiet
+Severity: Low
+Resolution: Reserve a room every week to meet
+Status: Resolved
+
+
+Risk: Github experience
+Description: Lack of GitHub knowledge/experience except for the mandatory labs
+Severity: Medium
+Resolution: Learn how to efficiently use Github for this project
+Status: In progress
+
+
+Risk: Experience with Desktop application development
+Description: None of us have worked with applications outside of those with terminal input/output
+Severity: High
+Resolution: Look into what options are available for GUI
+Status: In Progress

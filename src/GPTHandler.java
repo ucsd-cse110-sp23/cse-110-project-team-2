@@ -1,6 +1,6 @@
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
+//import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -16,7 +16,7 @@ import org.json.JSONObject;
  * and then uses the string version so we don't repeat code.
  */
 
-public class GPTHandler{
+public class GPTHandler {
     //TODO Make DRYer
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private String API_KEY;
@@ -32,9 +32,9 @@ public class GPTHandler{
     /**
      * @param query - The question to be aksed to ChatGPT
      * @return ChatGPT's response to the question
-     * TODO: ERROR HANDLING
      */
-    public String askQuestion(String query){
+    // TODO: handle exception elsewhere
+    public String askQuestion(String query) throws Exception { // temporary exception
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest GPTRequest = buildGPTHttpRequest(query);
 
@@ -56,8 +56,9 @@ public class GPTHandler{
      * @param Audio - Audio of user's question
      * @return
      */
-    public String askQuestion(File Audio){
-        String transcribedAudio = WhisperHandler.transcribeAudio(Audio);
+    // TODO: handle exception elsewhere
+    public String askQuestion(File Audio) throws Exception { // temporary exception
+        String transcribedAudio = Whisper.transcribeAudio(Audio);
         return askQuestion(transcribedAudio);
     }
 
@@ -66,7 +67,8 @@ public class GPTHandler{
      * @param prompt - the question to ask ChatGPT
      * @return
      */
-    private HttpRequest buildGPTHttpRequest(String prompt){
+    // TODO: handle exception elsewhere
+    private HttpRequest buildGPTHttpRequest(String prompt) throws Exception { // temporary exception
         //Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL);

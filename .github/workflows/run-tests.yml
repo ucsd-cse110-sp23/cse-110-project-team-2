@@ -28,7 +28,7 @@ jobs:
 
       # build everything (includes running unit tests)
       - name: Execute Gradle build
-        run: ./gradlew build
+        run: ./bin/gradlew build
 
       # report the results
       - name: Publish Test Report

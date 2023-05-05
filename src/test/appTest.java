@@ -13,6 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class appTest {
     @Test
     void testNothing() {
-
+        assertEquals(2,2);
     }
 }

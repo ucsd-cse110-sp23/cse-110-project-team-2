@@ -1,4 +1,3 @@
-package main;
 
 // gui libraries
 import java.awt.BorderLayout;

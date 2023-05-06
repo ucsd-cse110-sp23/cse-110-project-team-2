@@ -1,6 +1,7 @@
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 //import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,11 +24,9 @@ public class GPTHandler {
     private String API_KEY;
     private static final String MODEL = "text-davinci-003";
     private static final int MAX_TOKENS = 100; 
-    private WhisperHandler Whisper;
 
     public GPTHandler(String API_KEY){
         this.API_KEY = API_KEY;
-        this.Whisper = new WhisperHandler(API_KEY);
     }
 
     /**
@@ -52,24 +51,12 @@ public class GPTHandler {
     }
 
     /**
-     * Audio version of askQuestion, delegate to the String version after
-     * transcribing the audio. 
-     * @param Audio - Audio of user's question
-     * @return
-     */
-    // TODO: handle exception elsewhere
-    public String askQuestion(File Audio) throws Exception { // temporary exception
-        String transcribedAudio = Whisper.transcribeAudio(Audio);
-        return askQuestion(transcribedAudio);
-    }
-
-    /**
      * Builds the HTTPRequest for the ChatGPT API
      * @param prompt - the question to ask ChatGPT
      * @return
      */
     // TODO: handle exception elsewhere
-    private HttpRequest buildGPTHttpRequest(String prompt) throws Exception { // temporary exception
+    private HttpRequest buildGPTHttpRequest(String prompt){ // temporary exception
         //Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL);
@@ -80,14 +67,19 @@ public class GPTHandler {
         HttpClient client = HttpClient.newHttpClient();
 
         //Create the request object
-        HttpRequest request = HttpRequest
-        .newBuilder()
-        .uri(new URI(API_ENDPOINT))
-        .header("Content-Type", "application/json")
-        .header("Authorization", String.format("Bearer %s", API_KEY))
-        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
-        .build();
+        try{
+            HttpRequest request = HttpRequest
+            .newBuilder()
+            .uri(new URI(API_ENDPOINT))
+            .header("Content-Type", "application/json")
+            .header("Authorization", String.format("Bearer %s", API_KEY))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+            .build();
+    
+            return request; 
 
-        return request; 
+        }catch(URISyntaxException e){
+            return null;
+        }
     }
 }

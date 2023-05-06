@@ -40,7 +40,7 @@ public class AudioHandler {
         );
     }
 
-    
+
     /*
      * Taken from Lab 5 Exercise 4
      */
@@ -48,8 +48,9 @@ public class AudioHandler {
         Thread recordingThread = new Thread(
           () -> {
             try {
+;  
               // the format of the TargetDataLine
-              DataLine.Info dataLineInfo = new DataLine.Info(
+            DataLine.Info dataLineInfo = new DataLine.Info(
                 TargetDataLine.class,
                 audioFormat
               );

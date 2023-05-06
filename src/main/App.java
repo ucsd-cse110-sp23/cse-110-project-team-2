@@ -50,12 +50,20 @@ class TempPanel extends JPanel {
         return stopButton;
     }
 
+    public void hideRecording(){
+        recordingLabel.setVisible(false);
+    }
+    public void showRecording(){
+        recordingLabel.setVisible(true);
+    }
+
 }
 
 
 class AppFrame extends JFrame {
 
     private AudioHandler audioHandler;
+
     private JButton startButton;
     private JButton stopButton;
     
@@ -74,7 +82,7 @@ class AppFrame extends JFrame {
         this.add(tempPanel);
 
         startButton = tempPanel.getStartButton();
-        stopButton = tempPanel.getStartButton();
+        stopButton = tempPanel.getStopButton();
         addListeners();
     }
 
@@ -83,13 +91,17 @@ class AppFrame extends JFrame {
     public void addListeners() {
         startButton.addActionListener(
           (ActionEvent e) -> {
+              System.out.println("START PRESSED");
               audioHandler.startRecording();
+              tempPanel.showRecording();
           }
         );
         stopButton.addActionListener(
         (ActionEvent e) -> {
+            System.out.println("STOP PRESSED");
             audioHandler.stopRecording();
-            }
+            tempPanel.hideRecording();
+          }
         );
     }
 }

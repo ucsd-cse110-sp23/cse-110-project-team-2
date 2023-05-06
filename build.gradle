@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test']
+        }
+    }
+}
+
+dependencies {
+    def junitVersion = '5.8.1'
+
+    // This provides the JUnit API.
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    // This provides the TestEngine to actually run the tests.
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+
+    implementation "org.json:json:20210307"
+}
+
+test {
+    useJUnitPlatform()
+}

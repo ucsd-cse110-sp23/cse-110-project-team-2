@@ -23,11 +23,75 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+
+
+class TempPanel extends JPanel {
+    private JButton startButton;
+    private JButton stopButton;
+    private JLabel recordingLabel;
+    TempPanel(){
+        startButton = new JButton("Start");
+        this.add(startButton);
+
+        stopButton = new JButton("Stop");
+        this.add(stopButton); 
+        recordingLabel = new JLabel("Recording");
+        recordingLabel.setForeground(Color.RED);
+        recordingLabel.setPreferredSize(new Dimension(20, 20));
+        recordingLabel.setVisible(false);
+        this.add(recordingLabel);
+
+    }
+
+    public JButton getStartButton(){
+        return startButton;
+    }
+
+    public JButton getStopButton(){
+        return stopButton;
+    }
+
+}
+
+
 class AppFrame extends JFrame {
+
+    private AudioHandler audioHandler;
+    private JButton startButton;
+    private JButton stopButton;
+    
+    private TempPanel tempPanel;
+
     AppFrame() {
-        this.setSize(600, 600); // 400 width and 600 height
+        setTitle("Application");
+        setLayout(new BorderLayout());
+        this.setSize(600, 1200); // 400 width and 600 height
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
         this.setVisible(true); // Make visible
+
+        audioHandler = new AudioHandler();
+
+        tempPanel = new TempPanel();
+        this.add(tempPanel);
+
+        startButton = tempPanel.getStartButton();
+        stopButton = tempPanel.getStartButton();
+        addListeners();
+    }
+
+    
+
+    public void addListeners() {
+        startButton.addActionListener(
+          (ActionEvent e) -> {
+              audioHandler.startRecording();
+          }
+        );
+        stopButton.addActionListener(
+        (ActionEvent e) -> {
+            audioHandler.stopRecording();
+            }
+        );
     }
 }
 

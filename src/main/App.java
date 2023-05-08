@@ -141,6 +141,10 @@ class QnaPanel extends JPanel {
                 System.out.println("response...");
                 qnaDisplay.setQNASection(gptPrompt);
 
+                //TODO: save the prompt
+                FileWriter history = new FileWriter("history.txt", true);
+                history.write(whisperResponse + '\n' + gptResponse + '\n'); // end every write with a newline for the next save
+                history.close();
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());
             }
@@ -236,6 +240,7 @@ class QnaDisplay extends JPanel {
 
 class HistoryList extends JPanel {
     private ArrayList<QNA> qnas;
+    //TODO: use ArrayList to initialize JList
 
 
 }

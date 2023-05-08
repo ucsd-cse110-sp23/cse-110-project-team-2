@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,gradle,visualstudiocode,intellij,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,gradle,visualstudiocode,intellij,eclipse
 
+
+#Environment Variables
+.env
+
 ### Eclipse ###
 .metadata
 bin/

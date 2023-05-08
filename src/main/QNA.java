@@ -1,8 +1,8 @@
-public class Question {
+public class QNA {
     private String question;
     private String answer;
 
-    public Question(String question, String answer){
+    public QNA(String question, String answer){
         this.question = question;
         this.answer = answer;
     }

@@ -1,4 +1,4 @@
-
+import java.io.*;
 // gui libraries
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,9 +30,11 @@ class RecordPanel extends JPanel {
     private JButton stopButton;
     private JLabel recordingLabel;
     
-    private AudioHandler audioHandler;
+    
     
     private Border emptyBorder = BorderFactory.createEmptyBorder();
+
+    
 
     RecordPanel(){
         this.setPreferredSize(new Dimension(600, 200));
@@ -52,26 +54,12 @@ class RecordPanel extends JPanel {
         recordingLabel.setVisible(false);
         this.add(recordingLabel);
 
-        audioHandler = new AudioHandler();
-        addListeners();
     }
 
-    public void addListeners() {
-        startButton.addActionListener(
-          (ActionEvent e) -> {
-              System.out.println("START PRESSED");
-              audioHandler.startRecording();
-              this.showRecording();
-          }
-        );
-        stopButton.addActionListener(
-        (ActionEvent e) -> {
-            System.out.println("STOP PRESSED");
-            audioHandler.stopRecording();
-            this.hideRecording();
-          }
-        );
-    }
+
+    //TODO: Move listeners to QNA panel class possibly.
+    
+    
 
     public JButton getStartButton(){
         return startButton;
@@ -90,53 +78,169 @@ class RecordPanel extends JPanel {
 }
 
 class QnaPanel extends JPanel {
+
+    JButton startButton;
+    JButton stopButton;
+
+    //TODO: REFACTOR TO USE THIS STYLE (IMPORTANT)
+    QnaDisplay qnaDisplay;
+    RecordPanel recordPanel;
+
+    private AudioHandler audioHandler;
+    private GPTHandler gptHandler;
+    private WhisperHandler whisperHandler;
+    private static String APIKey = "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";
+
     QnaPanel() {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
 
-        this.add(new QnaDisplay(), BorderLayout.CENTER);
-        this.add(new RecordPanel(), BorderLayout.SOUTH);
+        qnaDisplay = new QnaDisplay();
+        recordPanel = new RecordPanel();
+        this.add(qnaDisplay, BorderLayout.CENTER);
+        this.add(recordPanel, BorderLayout.SOUTH);
+
+        startButton = recordPanel.getStartButton();
+        stopButton = recordPanel.getStopButton();
+
+        audioHandler = new AudioHandler();
+        gptHandler = new GPTHandler(APIKey);
+        whisperHandler = new WhisperHandler(APIKey);
+
+        addListeners();
+    }
+
+
+    public void addListeners() {
+        startButton.addActionListener(
+          (ActionEvent e) -> {
+              System.out.println("START PRESSED");
+              audioHandler.startRecording();
+              recordPanel.showRecording();
+          }
+        );
+        stopButton.addActionListener(
+        (ActionEvent e) -> {
+            System.out.println("STOP PRESSED");
+            audioHandler.stopRecording();
+            recordPanel.hideRecording();
+            //Note: change spot recording is saved
+            File newFile = new File("recording.wav");
+            String whisperResponse;
+            String gptResponse;
+            try {
+                
+                System.out.println("getting API responses...");
+                //TODO: maybe multithread?
+                whisperResponse = whisperHandler.transcribeAudio(newFile);
+                gptResponse = gptHandler.askQuestion(whisperResponse);
+                System.out.println(gptResponse);
+
+                QNA gptPrompt = new QNA(whisperResponse, gptResponse);
+                System.out.println("response...");
+                qnaDisplay.setQNASection(gptPrompt);
+
+                //TODO: save the prompt
+                FileWriter history = new FileWriter("history.txt", true);
+                history.write(whisperResponse + '\n' + gptResponse + '\n'); // end every write with a newline for the next save
+                history.close();
+            } catch (Exception exception) {
+                System.out.println(exception.getStackTrace());
+            }
+            
+          }
+        );
     }
 }
 
 class ContentPanel extends JPanel {
+
+    private String title;
+    private String content;
+    private TextPanel titlePanel;
+    private TextPanel contentPanel;
+
+
     ContentPanel(String title, String content, Color titleColor, Color contentColor) {
         this.setPreferredSize(new Dimension(600, 300));
         this.setLayout(new BorderLayout());
 
-        TextPanel titlePanel = new TextPanel(title, titleColor);
-        TextPanel contentPanel = new TextPanel(content, contentColor);
+        this.title = title;
+        this.content = content;
+
+        titlePanel = new TextPanel(title, titleColor);
+        contentPanel = new TextPanel(content, contentColor);
 
         this.add(titlePanel, BorderLayout.NORTH);
         this.add(contentPanel, BorderLayout.CENTER);
     }
+
+    public void setContent(String content){
+        this.content = content;
+        contentPanel.setText(content);
+    }
+
+    public String getContent(){
+        return content;
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+        titlePanel.setText(title);
+    }
+
+
+    public String getTitle(){
+        return title;
+    }
 }
 
 class TextPanel extends JPanel {
+
+    private JLabel textLabel;
+
     TextPanel(String text, Color color) {
         this.setBackground(color);
-        JLabel textLabel = new JLabel(text);
+        textLabel = new JLabel(text);
         textLabel.setHorizontalAlignment(JLabel.CENTER);
 
         this.add(textLabel);
+    }
+
+    //FIX XD
+    public void setText(String text){
+        textLabel.setText(text);
     }
 }
 
 class QnaDisplay extends JPanel {
 
+    //Refactor maybe?
+    ContentPanel questionContentPanel;
+    ContentPanel answerContentPanel;
     QnaDisplay() {
         this.setPreferredSize(new Dimension(600, 600));
         this.setLayout(new GridLayout(2, 1));
         this.setBackground(Color.GREEN);
 
-        this.add(new ContentPanel("Question", "MOCK_QUESTION", Color.RED, Color.BLUE));
-        this.add(new ContentPanel("Answer", "MOCK_ANSWER", Color.CYAN, Color.PINK));
+        questionContentPanel = new ContentPanel("Question", "MOCK_QUESTION", Color.RED, Color.BLUE);
+        answerContentPanel =  new ContentPanel("Answer", "MOCK_ANSWER", Color.CYAN, Color.PINK);
+        this.add(questionContentPanel);
+        this.add(answerContentPanel);
+        
+    }
+
+    public void setQNASection(QNA qna){
+        questionContentPanel.setContent(qna.getQuestion());
+        answerContentPanel.setContent(qna.getAnswer());
+        
     }
 }
 
 class HistoryList extends JPanel {
     private ArrayList<QNA> qnas;
+    //TODO: use ArrayList to initialize JList
 
 
 }

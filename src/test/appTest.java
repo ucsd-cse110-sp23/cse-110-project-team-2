@@ -93,8 +93,8 @@ public class appTest {
         // Record audio and convert to QNA object
         mockAPIHandler.startRecording();
         Thread.sleep(1000);
-        QNA qna = mockAPIHandler.audioToAnswer();
         mockAPIHandler.stopRecording();
+        QNA qna = mockAPIHandler.audioToAnswer();
 
         // Assert that the returned QNA object contains the expected question and one of the expected answers
         assertEquals(expectedQuestion, qna.getQuestion());

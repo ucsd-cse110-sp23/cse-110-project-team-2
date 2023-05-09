@@ -1,8 +1,20 @@
-Shalom, how are you?
+This is a question.,,,
 
+That is a statement, not a question.,,,Question.,,,FindByName("D2");
+        var expectedResult = new List<string>
+        {
+            "A2",
+            "B2",
+            "D2"
+        };
+        // Assert
+        Assert.Equal(expectedResult, result);
+    }
 
-I'm doing well - Shalom to you! How can I help?
-Hey, what's up?
+    [Fact]
+    public void FindByName_WithDneName_ReturnsEmptyList()
+    {
+        // Arrange
+        var questionItemsInt =,,,What's your favorite color?,,,
 
-
-Not much, just trying to finish up some stuff before the weekend. How about you?
+My favorite color is blue.,,,

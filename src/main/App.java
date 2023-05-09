@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 // gui libraries
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -80,6 +81,7 @@ class QnaPanel extends JPanel {
 
     //TODO: REFACTOR TO USE THIS STYLE (IMPORTANT)
     QnaDisplay qnaDisplay;
+    public HistoryList historyList;
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
@@ -111,6 +113,13 @@ class QnaPanel extends JPanel {
         addListeners();
     }
 
+    public QnaDisplay getQnaDisplay(){
+        return qnaDisplay;
+    }
+
+    public void setHistoryList(HistoryList hl){
+        historyList = hl;
+    }
 
     public void addListeners() {
         startButton.addActionListener(
@@ -155,6 +164,18 @@ class QnaPanel extends JPanel {
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());
             }
+            QNA qna = new QNA(gptPrompt.getQuestion(),gptPrompt.getAnswer());
+            Prompt prompt = new Prompt(qna);
+            historyList.add(prompt);
+            JButton selectButton = prompt.getSelectButton();
+            selectButton.addActionListener(
+            (ActionEvent e2) -> {
+                //TODO: update qnadisplay to show the selected prompt and answer
+                prompt.changeState(); // Change color of task
+                qnaDisplay.setQNASection(qna);
+                revalidate(); // Updates the frame
+            }
+            );
           }
         );
     }
@@ -231,8 +252,8 @@ class QnaDisplay extends JPanel {
         this.setLayout(new GridLayout(2, 1));
         this.setBackground(Color.GREEN);
 
-        questionContentPanel = new ContentPanel("Question", "MOCK_QUESTION", Color.RED, Color.BLUE);
-        answerContentPanel =  new ContentPanel("Answer", "MOCK_ANSWER", Color.CYAN, Color.PINK);
+        questionContentPanel = new ContentPanel("Question", "", Color.RED, Color.BLUE);
+        answerContentPanel =  new ContentPanel("Answer", "", Color.CYAN, Color.PINK);
         this.add(questionContentPanel);
         this.add(answerContentPanel);
         
@@ -248,41 +269,63 @@ class QnaDisplay extends JPanel {
 //SHOULD ONLY DISPLAY QUESTIONS
 // TODO: Separate class for managing history (keep business logic out of gui)
 class HistoryList extends JPanel {
-    private ArrayList<QNA> qnas;
-    private JList<String> jl;
-    /*
-    //TODO: use ArrayList to initialize JList
+    public QnaDisplay qnaDisplay;
+    Color backgroundColor = new Color(240, 248, 255);
+
     HistoryList(){
-        try{
-            //Populating qnas ArrayList
-            FileReader history = new FileReader("history.txt");
-            BufferedReader br = new BufferedReader(history);
-            while(br.ready()){
-                String q = br.readLine();
-                String a = br.readLine(); //Should be no errors with reading two lines at a time in theory
-                QNA newQNA = new QNA(q,a);
-                qnas.add(newQNA);
+        GridLayout layout = new GridLayout(10, 1);
+        layout.setVgap(5); // Vertical gap
+
+        this.setLayout(layout); // 10 tasks
+        this.setPreferredSize(new Dimension(100, 500));
+        this.setBackground(backgroundColor);
+        loadHistory();
+    }
+
+    public void setQnaDisplay(QnaDisplay qd){
+        qnaDisplay = qd;
+    }
+
+    private void loadHistory(){
+        String tempQuestion;
+        String tempAnswer;
+        ArrayList<QNA> qnalist = new ArrayList<QNA>();
+        try {
+            FileReader file = new FileReader("history.txt");
+            BufferedReader br = new BufferedReader(file);
+            Scanner sr = new Scanner(br);
+            sr.useDelimiter(",,,");
+            while (sr.hasNext()) {
+                tempQuestion = sr.next();
+                tempAnswer = sr.next();
+                qnalist.add(new QNA(tempQuestion,tempAnswer));
             }
+            sr.close();
+            br.close();
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception ex){
-            System.out.println(exception.getStackTrace());
+        for(QNA qna : qnalist){
+            Prompt prompt = new Prompt(qna);
+            this.add(prompt);
+            JButton selectButton = prompt.getSelectButton();
+            selectButton.addActionListener(
+            (ActionEvent e2) -> {
+                //TODO: update qnadisplay to show the selected prompt and answer
+                prompt.changeState(); // Change color of task
+                qnaDisplay.setQNASection(qna);
+                revalidate(); // Updates the frame
+            }
+          );
         }
     }
-    */
 }
 
 class HistoryPanel extends JPanel {
     private JPanel historyFooter;
     private JPanel historyButtonPanel;
-    private JPanel historyList;
-
-    private String[] questionList = {
-        "This is an example question",
-        "This is another question",
-        "question 3",
-        "question 4",
-        "question 5"
-    };
+    private HistoryList historyList;
 
     HistoryPanel() {
         this.setPreferredSize(new Dimension(200, 800));
@@ -293,14 +336,19 @@ class HistoryPanel extends JPanel {
 
         this.add(headerPanel, BorderLayout.NORTH);
 
-        historyList = new JPanel();
-        historyList.setPreferredSize(new Dimension(100, 500));
-        historyList.setBackground(Color.MAGENTA);
-        historyList.add(new JList<String>(questionList));
+        historyList = new HistoryList();
         this.add(historyList, BorderLayout.CENTER);
 
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
+    }
+
+    public void setQnaDisplay(QnaDisplay qd){
+        historyList.setQnaDisplay(qd);
+    }
+
+    public HistoryList getHistoryList(){
+        return historyList;
     }
 }
 
@@ -331,11 +379,77 @@ class AppFrame extends JFrame {
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
-
-        this.add(new HistoryPanel(), BorderLayout.WEST);
-        this.add(new QnaPanel(), BorderLayout.CENTER);
-        
+        HistoryPanel hp = new HistoryPanel();
+        QnaPanel qp = new QnaPanel();
+        hp.getHistoryList().qnaDisplay = qp.getQnaDisplay();
+        this.add(hp, BorderLayout.WEST);
+        this.add(qp, BorderLayout.CENTER);
+        qp.setHistoryList(hp.getHistoryList());
         this.setVisible(true); // Make visible
+    }
+}
+
+class Prompt extends JPanel {
+
+    JLabel qtext;
+    JButton selectButton;
+  
+    Color gray = new Color(218, 229, 234);
+    Color green = new Color(188, 226, 158);
+  
+    private boolean selected;
+    private QNA qna;
+  
+    Prompt(QNA qna) {
+      this.qna = qna;
+      this.setPreferredSize(new Dimension(400, 20)); // set size of task
+      this.setBackground(gray); // set background color of task
+  
+      this.setLayout(new BorderLayout()); // set layout of task
+  
+      //markedDone = false;
+  
+      qtext = new JLabel(qna.getQuestion()); // create index label
+      qtext.setPreferredSize(new Dimension(150, 20)); // set size of index label
+      qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
+      this.add(qtext, BorderLayout.WEST); // add index label to task
+  
+      selectButton = new JButton("Select");
+      selectButton.setPreferredSize(new Dimension(80, 20));
+      selectButton.setBorder(BorderFactory.createEmptyBorder());
+      selectButton.setFocusPainted(false);
+  
+      this.add(selectButton, BorderLayout.EAST);
+    }
+  
+    public void changeIndex(int num) {
+      this.qtext.setText(num + ""); // num to String
+      this.revalidate(); // refresh
+    }
+
+    public QNA getQNA(){
+      return qna;
+    }
+  
+    public JButton getSelectButton() {
+      return selectButton;
+    }
+  
+    public boolean getState() {
+      return selected;
+    }
+  
+    // TODO: deselect every time we select a new one
+    public void changeState() {
+      if(!this.getState()){
+        this.setBackground(green);
+        selected = true;
+      }
+      else{
+        this.setBackground(gray);
+        selected = false;
+      }
+      revalidate();
     }
 }
 

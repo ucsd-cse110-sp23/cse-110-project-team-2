@@ -81,25 +81,28 @@ public class appTest {
     //     assertTrue(new File("testrecording.wav").exists());
     // }
 
-    // @Test
-    // public void testAudioToAnswer() {
-    //     // Create a mock API handler
-    //     MockAPIHandler mockAPIHandler = new MockAPIHandler();
+    @Test
+    public void testUserStory1() throws InterruptedException {
+        // Create a mock API handler
+        MockAPIHandler mockAPIHandler = new MockAPIHandler();
 
-    //     // Set the expected question and answer
-    //     String expectedQuestion = "What is the meaning of life?";
-    //     String[] expectedAnswers = {"42", "The meaning of life is 42", "42 is the meaning of life"};
+        // Set the expected question and answer
+        String expectedQuestion = "What is the meaning of life?";
+        String[] expectedAnswers = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
-    //     // Record audio and convert to QNA object
-    //     mockAPIHandler.startRecording();
-    //     QNA qna = mockAPIHandler.audioToAnswer();
-    //     mockAPIHandler.stopRecording();
+        // Record audio and convert to QNA object
+        mockAPIHandler.startRecording();
+        Thread.sleep(3000);
+        mockAPIHandler.stopRecording();
+        QNA qna = mockAPIHandler.audioToAnswer();
 
-    //     // Assert that the returned QNA object contains the expected question and one of the expected answers
-    //     assertEquals(expectedQuestion, qna.getQuestion());
-    //     assertTrue(Arrays.asList(expectedAnswers).contains(qna.getAnswer()));
-    // }
+        // Assert that the returned QNA object contains the expected question and one of the expected answers
+        assertEquals(expectedQuestion, qna.getQuestion());
+        assertTrue(Arrays.asList(expectedAnswers).contains(qna.getAnswer()));
+    }
     
+
+
 }
 
 

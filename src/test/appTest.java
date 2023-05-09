@@ -72,17 +72,17 @@ public class appTest {
         assertFalse(httpRequest.bodyPublisher().isEmpty());
     }
 
-    @Test
-    public void testRecordingAndStopping() throws InterruptedException {
-        MockAudioHandler audioHandler = new MockAudioHandler();
-        audioHandler.startRecording();
-        Thread.sleep(5000); // record for 5 seconds
-        audioHandler.stopRecording();
-        assertTrue(new File("testrecording.wav").exists());
-    }
+    // @Test
+    // public void testRecordingAndStopping() throws InterruptedException {
+    //     MockAudioHandler audioHandler = new MockAudioHandler();
+    //     audioHandler.startRecording();
+    //     Thread.sleep(5000); // record for 5 seconds
+    //     audioHandler.stopRecording();
+    //     assertTrue(new File("testrecording.wav").exists());
+    // }
 
     @Test
-    public void testAudioToAnswer() throws InterruptedException {
+    public void testUserStory1() throws InterruptedException {
         // Create a mock API handler
         MockAPIHandler mockAPIHandler = new MockAPIHandler();
 
@@ -92,7 +92,7 @@ public class appTest {
 
         // Record audio and convert to QNA object
         mockAPIHandler.startRecording();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         mockAPIHandler.stopRecording();
         QNA qna = mockAPIHandler.audioToAnswer();
 

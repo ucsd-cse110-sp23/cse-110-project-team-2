@@ -150,7 +150,7 @@ class QnaPanel extends JPanel {
 
                 //TODO: save the prompt
                 FileWriter history = new FileWriter("history.txt", true);
-                history.write(gptPrompt.getQuestion() + ',,,' + gptPrompt.getAnswer() + ',,,');
+                history.write(gptPrompt.getQuestion() + ",,," + gptPrompt.getAnswer() + ",,,");
                 history.close();
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());

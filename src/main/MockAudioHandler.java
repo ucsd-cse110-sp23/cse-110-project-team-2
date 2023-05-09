@@ -88,11 +88,6 @@ public class MockAudioHandler {
         targetDataLine.close();
       }
 
-    public File getAudioFile() {
-        return new File("testrecording.wav");
-    }
-
-
 
     
 }

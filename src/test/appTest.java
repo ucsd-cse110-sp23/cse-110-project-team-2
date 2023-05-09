@@ -78,7 +78,8 @@ public class appTest {
         audioHandler.startRecording();
         Thread.sleep(5000); // record for 5 seconds
         audioHandler.stopRecording();
-        assertTrue(audioHandler.getAudioFile().exists());
+        File audioFile = new File("testrecording.wav");
+        assertTrue(audioFile.exists());
     }
 
     @Test

@@ -3,9 +3,9 @@ import java.io.File;
 
 public class MockAPIHandler {
 
-    private MockAudioHandler audioHandler;
-    private MockGPT gptHandler;
-    private MockWhisper whisperHandler;
+    public MockAudioHandler audioHandler;
+    public MockGPT gptHandler;
+    public MockWhisper whisperHandler;
     //private String MOCK_API_KEY = "f90q324j0j4359f90w";
     String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 

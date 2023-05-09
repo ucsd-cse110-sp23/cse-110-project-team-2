@@ -4,8 +4,8 @@ import javax.sound.sampled.*;
 
 public class MockAudioHandler {
 
-    private AudioFormat audioFormat;
-    private TargetDataLine targetDataLine;
+    public AudioFormat audioFormat;
+    public TargetDataLine targetDataLine;
 
     public MockAudioHandler(){
         audioFormat = getAudioFormat();

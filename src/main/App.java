@@ -143,12 +143,11 @@ class QnaPanel extends JPanel {
 
                 //TODO: save the prompt
                 FileWriter history = new FileWriter("history.txt", true);
-                history.write(whisperResponse + '\n' + gptResponse + '\n'); // end every write with a newline for the next save
+                history.write(whisperResponse + ",,," + gptResponse + ",,,");
                 history.close();
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());
             }
-            
           }
         );
     }
@@ -238,11 +237,29 @@ class QnaDisplay extends JPanel {
     }
 }
 
+//SHOULD ONLY DISPLAY QUESTIONS
 class HistoryList extends JPanel {
     private ArrayList<QNA> qnas;
+    private JList<String> jl;
+    /*
     //TODO: use ArrayList to initialize JList
-
-
+    HistoryList(){
+        try{
+            //Populating qnas ArrayList
+            FileReader history = new FileReader("history.txt");
+            BufferedReader br = new BufferedReader(history);
+            while(br.ready()){
+                String q = br.readLine();
+                String a = br.readLine(); //Should be no errors with reading two lines at a time in theory
+                QNA newQNA = new QNA(q,a);
+                qnas.add(newQNA);
+            }
+        }
+        catch(Exception ex){
+            System.out.println(exception.getStackTrace());
+        }
+    }
+    */
 }
 
 class HistoryPanel extends JPanel {

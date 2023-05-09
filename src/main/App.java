@@ -30,11 +30,7 @@ class RecordPanel extends JPanel {
     private JButton stopButton;
     private JLabel recordingLabel;
     
-    
-    
     private Border emptyBorder = BorderFactory.createEmptyBorder();
-
-    
 
     RecordPanel(){
         this.setPreferredSize(new Dimension(600, 200));
@@ -86,11 +82,13 @@ class QnaPanel extends JPanel {
     QnaDisplay qnaDisplay;
     RecordPanel recordPanel;
 
+    APIHandler apiHandler;
+/*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
-
+*/
     QnaPanel() {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
@@ -104,10 +102,12 @@ class QnaPanel extends JPanel {
         startButton = recordPanel.getStartButton();
         stopButton = recordPanel.getStopButton();
 
+        apiHandler = new APIHandler();
+/*     
         audioHandler = new AudioHandler();
         gptHandler = new GPTHandler(APIKey);
         whisperHandler = new WhisperHandler(APIKey);
-
+*/
         addListeners();
     }
 
@@ -116,34 +116,41 @@ class QnaPanel extends JPanel {
         startButton.addActionListener(
           (ActionEvent e) -> {
               System.out.println("START PRESSED");
-              audioHandler.startRecording();
+              //audioHandler.startRecording();
               recordPanel.showRecording();
+              apiHandler.startRecording();
           }
         );
         stopButton.addActionListener(
         (ActionEvent e) -> {
             System.out.println("STOP PRESSED");
-            audioHandler.stopRecording();
             recordPanel.hideRecording();
+            apiHandler.stopRecording();
+            //audioHandler.stopRecording();
+            QNA gptPrompt = apiHandler.audioToAnswer();
             //Note: change spot recording is saved
-            File newFile = new File("recording.wav");
-            String whisperResponse;
-            String gptResponse;
+            qnaDisplay.setQNASection(gptPrompt);
+            //File newFile = new File("recording.wav");
+            revalidate();
+
+// TODO: Separate class for managing history (keep business logic out of gui)
+
             try {
                 
-                System.out.println("getting API responses...");
+                //System.out.println("getting API responses...");
                 //TODO: maybe multithread?
+                /*
                 whisperResponse = whisperHandler.transcribeAudio(newFile);
                 gptResponse = gptHandler.askQuestion(whisperResponse);
                 System.out.println(gptResponse);
 
                 QNA gptPrompt = new QNA(whisperResponse, gptResponse);
                 System.out.println("response...");
-                qnaDisplay.setQNASection(gptPrompt);
+                */
 
                 //TODO: save the prompt
                 FileWriter history = new FileWriter("history.txt", true);
-                history.write(whisperResponse + '\n' + gptResponse + '\n'); // end every write with a newline for the next save
+                history.write(gptPrompt.getQuestion() + '\n' + gptPrompt.getAnswer() + '\n'); // end every write with a newline for the next save
                 history.close();
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());
@@ -169,8 +176,8 @@ class ContentPanel extends JPanel {
         this.title = title;
         this.content = content;
 
-        titlePanel = new TextPanel(title, titleColor);
-        contentPanel = new TextPanel(content, contentColor);
+        titlePanel = new TextPanel(title, titleColor, new Dimension(600,50));
+        contentPanel = new TextPanel(content, contentColor, new Dimension(600,250));
 
         this.add(titlePanel, BorderLayout.NORTH);
         this.add(contentPanel, BorderLayout.CENTER);
@@ -200,8 +207,9 @@ class TextPanel extends JPanel {
 
     private JLabel textLabel;
 
-    TextPanel(String text, Color color) {
+    TextPanel(String text, Color color, Dimension size) {
         this.setBackground(color);
+        this.setPreferredSize(size);
         textLabel = new JLabel(text);
         textLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -238,6 +246,8 @@ class QnaDisplay extends JPanel {
     }
 }
 
+
+// TODO: Separate class for managing history (keep business logic out of gui)
 class HistoryList extends JPanel {
     private ArrayList<QNA> qnas;
     //TODO: use ArrayList to initialize JList
@@ -263,7 +273,7 @@ class HistoryPanel extends JPanel {
         this.setBackground(Color.BLUE);
         this.setLayout(new BorderLayout());
 
-        TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY);
+        TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY, new Dimension(200, 50));
 
         this.add(headerPanel, BorderLayout.NORTH);
 

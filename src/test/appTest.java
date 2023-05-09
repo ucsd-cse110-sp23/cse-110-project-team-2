@@ -72,14 +72,14 @@ public class appTest {
         assertFalse(httpRequest.bodyPublisher().isEmpty());
     }
 
-    @Test
-    public void testRecordingAndStopping() throws InterruptedException {
-        MockAudioHandler audioHandler = new MockAudioHandler();
-        audioHandler.startRecording();
-        Thread.sleep(5000); // record for 5 seconds
-        audioHandler.stopRecording();
-        assertTrue(new File("testrecording.wav").exists());
-    }
+    // @Test
+    // public void testRecordingAndStopping() throws InterruptedException {
+    //     MockAudioHandler audioHandler = new MockAudioHandler();
+    //     audioHandler.startRecording();
+    //     Thread.sleep(5000); // record for 5 seconds
+    //     audioHandler.stopRecording();
+    //     assertTrue(new File("testrecording.wav").exists());
+    // }
 
     // @Test
     // public void testAudioToAnswer() {

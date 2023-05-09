@@ -16,11 +16,11 @@ public class MockAPIHandler {
     }
 
     public void startRecording() {
-        audioHandler.startRecording();
+        //audioHandler.startRecording();
     }
 
     public void stopRecording() {
-        audioHandler.stopRecording();
+        //audioHandler.stopRecording();
     }
 
     private String audioToQuestion() {

@@ -159,7 +159,7 @@ class QnaPanel extends JPanel {
 
                 //TODO: save the prompt
                 FileWriter history = new FileWriter("history.txt", true);
-                history.write(gptPrompt.getQuestion() + ",,," + gptPrompt.getAnswer() + ",,,"); // end every write with a newline for the next save
+                history.write(gptPrompt.getQuestion() + ",,," + gptPrompt.getAnswer() + ",,,");
                 history.close();
             } catch (Exception exception) {
                 System.out.println(exception.getStackTrace());
@@ -266,7 +266,7 @@ class QnaDisplay extends JPanel {
     }
 }
 
-
+//SHOULD ONLY DISPLAY QUESTIONS
 // TODO: Separate class for managing history (keep business logic out of gui)
 class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;

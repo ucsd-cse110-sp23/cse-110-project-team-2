@@ -1,17 +1,18 @@
 
 import java.io.File;
 
-public class APIHandler {
+public class MockAPIHandler {
 
-    private AudioHandler audioHandler;
-    private GPTHandler gptHandler;
-    private WhisperHandler whisperHandler;
-    private static String APIKey = "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";
+    private MockAudioHandler audioHandler;
+    private MockGPT gptHandler;
+    private MockWhisper whisperHandler;
+    //private String MOCK_API_KEY = "f90q324j0j4359f90w";
+    String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
-    APIHandler() {
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
+    MockAPIHandler() {
+        audioHandler = new MockAudioHandler();
+        gptHandler = new MockGPT(answerSet);
+        whisperHandler = new MockWhisper("What is the meaning of life?");
     }
 
     public void startRecording() {

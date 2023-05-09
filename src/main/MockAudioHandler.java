@@ -2,12 +2,12 @@
 import java.io.*;
 import javax.sound.sampled.*;
 
-public class AudioHandler {
+public class MockAudioHandler {
 
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
 
-    public AudioHandler(){
+    public MockAudioHandler(){
         audioFormat = getAudioFormat();
     }
 
@@ -69,7 +69,7 @@ public class AudioHandler {
               AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
         
               // the file that will contain the audio data
-              File audioFile = new File("recording.wav");
+              File audioFile = new File("testrecording.wav");
               AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, audioFile);
             } catch (Exception ex) {
               ex.printStackTrace();

@@ -23,4 +23,8 @@ public class QNA {
     public String getAnswer(){ 
         return answer;
     }
+
+    public String toString(){
+        return this.question + " " + this.answer;
+    }
 }

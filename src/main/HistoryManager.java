@@ -30,6 +30,9 @@ public class HistoryManager {
     
     private void readFileIntoArrayList(){
         //Read the file into the ArrayList
+
+        //might not be good 
+        historyList.clear();
         String tempQuestion;
         String tempAnswer;
 
@@ -60,13 +63,10 @@ public class HistoryManager {
             FileWriter history = new FileWriter(historyFile, true);
             history.write(question.getQuestion() + ",,," + question.getAnswer() + ",,,");
             history.close();
+            historyList.add(question);
         } catch(Exception e){
             e.printStackTrace();
         }
-        return;
-    }
-
-    public void editHistory(QNA question){
         return;
     }
 

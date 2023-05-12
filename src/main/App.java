@@ -86,13 +86,14 @@ class QnaPanel extends JPanel {
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
+    HistoryManager historyManager;
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
 */
-    QnaPanel(GUIMediator guiM) {
+    QnaPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
@@ -108,6 +109,8 @@ class QnaPanel extends JPanel {
         stopButton = recordPanel.getStopButton();
 
         apiHandler = new APIHandler();
+        historyManager = histManager;
+
 /*     
         audioHandler = new AudioHandler();
         gptHandler = new GPTHandler(APIKey);
@@ -146,27 +149,12 @@ class QnaPanel extends JPanel {
 
             revalidate();
 // TODO: Separate class for managing history (keep business logic out of gui)
-
-            try {
                 
                 //System.out.println("getting API responses...");
                 //TODO: maybe multithread?
-                /*
-                whisperResponse = whisperHandler.transcribeAudio(newFile);
-                gptResponse = gptHandler.askQuestion(whisperResponse);
-                System.out.println(gptResponse);
+            historyManager.addToHistory(gptPrompt);
 
-                QNA gptPrompt = new QNA(whisperResponse, gptResponse);
-                System.out.println("response...");
-                */
-
-                //TODO: save the prompt
-                FileWriter history = new FileWriter("history.txt", true);
-                history.write(gptPrompt.getQuestion() + ",,," + gptPrompt.getAnswer() + ",,,");
-                history.close();
-            } catch (Exception exception) {
-                System.out.println(exception.getStackTrace());
-            }
+            //TODO addPrompt
             QNA qna = new QNA(gptPrompt.getQuestion(),gptPrompt.getAnswer());
             Prompt prompt = new Prompt(qna);
             historyList.add(prompt);
@@ -276,8 +264,9 @@ class QnaDisplay extends JPanel {
 class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
     Color backgroundColor = new Color(240, 248, 255);
+    HistoryManager historyManager;
 
-    HistoryList(GUIMediator guiM){
+    HistoryList(GUIMediator guiM, HistoryManager histManager){
         GridLayout layout = new GridLayout(10, 1);
         layout.setVgap(5); // Vertical gap
 
@@ -286,7 +275,7 @@ class HistoryList extends JPanel {
         this.setBackground(backgroundColor);
 
         guiM.setHistoryList(this);
-
+        this.historyManager = histManager;
         loadHistory();
     }
 
@@ -297,23 +286,8 @@ class HistoryList extends JPanel {
     private void loadHistory(){
         String tempQuestion;
         String tempAnswer;
-        ArrayList<QNA> qnalist = new ArrayList<QNA>();
-        try {
-            FileReader file = new FileReader("history.txt");
-            BufferedReader br = new BufferedReader(file);
-            Scanner sr = new Scanner(br);
-            sr.useDelimiter(",,,");
-            while (sr.hasNext()) {
-                tempQuestion = sr.next();
-                tempAnswer = sr.next();
-                qnalist.add(new QNA(tempQuestion,tempAnswer));
-            }
-            sr.close();
-            br.close();
-            file.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ArrayList<QNA> qnalist = historyManager.getHistoryList();
+
         for(QNA qna : qnalist){
             Prompt prompt = new Prompt(qna);
             this.add(prompt);
@@ -334,8 +308,9 @@ class HistoryPanel extends JPanel {
     private JPanel historyFooter;
     private JPanel historyButtonPanel;
     private HistoryList historyList;
+    private HistoryManager historyManager;
 
-    HistoryPanel(GUIMediator guiM) {
+    HistoryPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(200, 800));
         this.setBackground(Color.BLUE);
         this.setLayout(new BorderLayout());
@@ -343,11 +318,13 @@ class HistoryPanel extends JPanel {
         TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY, new Dimension(200, 50));
         this.add(headerPanel, BorderLayout.NORTH);
 
-        historyList = new HistoryList(guiM);
+        historyList = new HistoryList(guiM, histManager);
         this.add(historyList, BorderLayout.CENTER);
 
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
+
+        this.historyManager = histManager;
 
     }
 
@@ -390,9 +367,10 @@ class AppFrame extends JFrame {
 
 
         GUIMediator guiMediator =  new GUIMediator();
+        HistoryManager historyManager = new HistoryManager("history.txt");
 
-        HistoryPanel hp = new HistoryPanel(guiMediator);
-        QnaPanel qp = new QnaPanel(guiMediator);
+        HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
+        QnaPanel qp = new QnaPanel(guiMediator, historyManager);
         hp.getHistoryList().qnaDisplay = qp.getQnaDisplay();
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);

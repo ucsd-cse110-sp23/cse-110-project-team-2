@@ -84,6 +84,7 @@ class QnaPanel extends JPanel {
     
     public HistoryList historyList;
     RecordPanel recordPanel;
+    
 
     APIHandler apiHandler;
     HistoryManager historyManager;
@@ -144,11 +145,11 @@ class QnaPanel extends JPanel {
             //TODO: maybe multithread?
             recordPanel.hideRecording();
             apiHandler.stopRecording();
-            QNA gptPrompt = apiHandler.audioToAnswer();
+            QNA gptQNA = apiHandler.audioToAnswer();
 
-            guiMediator.changeQnaDisplayText(gptPrompt);
-            historyManager.addToHistory(gptPrompt);
-            guiMediator.addHistoryListPrompt(gptPrompt);            
+            guiMediator.changeQnaDisplayText(gptQNA);
+            Prompt newPrompt = historyManager.addToHistory(gptQNA);
+            guiMediator.addHistoryListPrompt(newPrompt);            
             revalidate();                
           }
         );
@@ -268,15 +269,14 @@ class HistoryList extends JPanel {
         qnaDisplay = qd;
     }
 
-    public void addPrompt(QNA qna){
-        Prompt prompt = new Prompt(qna);
+    public void addPrompt(Prompt prompt){
         this.add(prompt);
         JButton selectButton = prompt.getSelectButton();
         selectButton.addActionListener(
         (ActionEvent e2) -> {
             //TODO: update qnadisplay to show the selected prompt and answer
-            prompt.changeState(); // Change color of task
-            guiMediator.changeQnaDisplayText(qna);
+            historyManager.setSelected(prompt);
+            guiMediator.changeQnaDisplayText(prompt.getQNA());
             revalidate(); // Updates the frame
         }
         );
@@ -284,9 +284,9 @@ class HistoryList extends JPanel {
     }
 
     private void loadHistory(){
-        ArrayList<QNA> qnalist = historyManager.getHistoryList();
-        for(QNA qna : qnalist){
-            addPrompt(qna);
+        ArrayList<Prompt> promptList = historyManager.getHistoryList();
+        for(Prompt prompt : promptList){
+            addPrompt(prompt);
         }
     }
 }
@@ -339,6 +339,14 @@ class HistoryButtonPanel extends JPanel {
         this.setPreferredSize(new Dimension(200, 100));
         this.add(deleteAll, BorderLayout.CENTER);
         this.add(deleteSingle, BorderLayout.CENTER);
+    }
+
+    public JButton getDeleteAllButton(){
+        return deleteAll;
+    }
+
+    public JButton getDeleteSingleButton(){
+        return deleteSingle;
     }
 
 }
@@ -397,6 +405,10 @@ class Prompt extends JPanel {
       selectButton.setFocusPainted(false);
   
       this.add(selectButton, BorderLayout.EAST);
+    }
+
+    public boolean equals(Prompt otherPrompt){
+        return this.qna.equals(otherPrompt.getQNA());
     }
   
     public void changeIndex(int num) {

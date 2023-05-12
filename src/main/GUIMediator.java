@@ -18,7 +18,7 @@ public class GUIMediator {
         qnaDisplay.setQNASection(qna);
     }
 
-    public void addHistoryListPrompt(QNA prompt){
+    public void addHistoryListPrompt(Prompt prompt){
         historyList.addPrompt(prompt);
     }
 

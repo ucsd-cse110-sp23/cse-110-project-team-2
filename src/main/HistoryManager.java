@@ -6,16 +6,18 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Scanner;
 import java.io.File;
+import javax.swing.JButton;
+import java.awt.event.ActionEvent;
 
 public class HistoryManager {
-    private ArrayList<QNA> historyList;
+    private ArrayList<Prompt> historyList;
     private File historyFile;
+    private Prompt selected; 
 
     public HistoryManager(String historyFilePath){
-        historyList = new ArrayList<QNA>();
+        historyList = new ArrayList<Prompt>();
         historyFile = new File("history.txt");
-        historyList = new ArrayList<QNA>();
-        
+        selected = null;
         //Load a history file into a variable, build the readers/writers.
         try{
             if(!historyFile.exists()){
@@ -27,6 +29,21 @@ public class HistoryManager {
         }
         
     }
+
+    public void setSelected(Prompt select){
+        if(selected != null){
+            selected.changeState();
+        }
+
+        selected = select;
+        selected.changeState();
+    }
+
+    public void getSelectedToDelete(){
+        Prompt temp = selected;
+        historyList.remove(selected);
+    }
+    
     
     private void readFileIntoArrayList(){
         //Read the file into the ArrayList
@@ -35,6 +52,8 @@ public class HistoryManager {
         historyList.clear();
         String tempQuestion;
         String tempAnswer;
+        QNA tempQNA;
+        Prompt temptPrompt;
 
         try{
             FileReader fr = new FileReader(historyFile);
@@ -44,7 +63,8 @@ public class HistoryManager {
             while (sr.hasNext()) {
                 tempQuestion = sr.next();
                 tempAnswer = sr.next();
-                historyList.add(new QNA(tempQuestion,tempAnswer));
+                tempQNA = new QNA(tempQuestion, tempAnswer);
+                historyList.add(new Prompt(tempQNA));
             }
             sr.close();
             br.close();
@@ -54,20 +74,24 @@ public class HistoryManager {
         }
     }
     
-    public ArrayList<QNA> getHistoryList(){
+    public ArrayList<Prompt> getHistoryList(){
         return historyList;
     }
 
-    public void addToHistory(QNA question){
+    public Prompt addToHistory(QNA question){
+        Prompt newPrompt = new Prompt(question);
+        setSelected(newPrompt);
+
         try{
             FileWriter history = new FileWriter(historyFile, true);
             history.write(question.getQuestion() + ",,," + question.getAnswer() + ",,,");
             history.close();
-            historyList.add(question);
+            historyList.add(newPrompt);
         } catch(Exception e){
             e.printStackTrace();
         }
-        return;
+
+        return newPrompt;
     }
 
     public void deleteFromHistory(QNA question){

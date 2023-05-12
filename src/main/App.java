@@ -277,10 +277,16 @@ class HistoryList extends JPanel {
             //TODO: update qnadisplay to show the selected prompt and answer
             historyManager.setSelected(prompt);
             guiMediator.changeQnaDisplayText(prompt.getQNA());
+            setQnaDisplay(qnaDisplay);
             revalidate(); // Updates the frame
         }
         );
 
+    }
+
+    public void removePrompt(Prompt prompt){
+        this.remove(prompt);
+        //repaint();
     }
 
     private void loadHistory(){
@@ -293,9 +299,11 @@ class HistoryList extends JPanel {
 
 class HistoryPanel extends JPanel {
     private JPanel historyFooter;
-    private JPanel historyButtonPanel;
+    private HistoryButtonPanel historyButtonPanel;
     private HistoryList historyList;
     private HistoryManager historyManager;
+    private JButton deleteSingleButton;
+    private JButton deleteAllButton;
 
     HistoryPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(200, 800));
@@ -311,7 +319,11 @@ class HistoryPanel extends JPanel {
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
 
+        this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
+        this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
+
         this.historyManager = histManager;
+        addListeners();
 
     }
 
@@ -321,6 +333,18 @@ class HistoryPanel extends JPanel {
 
     public HistoryList getHistoryList(){
         return historyList;
+    }
+
+    public void addListeners(){
+        deleteSingleButton.addActionListener(
+            (ActionEvent e) -> {
+                Prompt toDelete = historyManager.getSelectedToDelete();
+                System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+                historyList.remove(toDelete);
+                repaint();
+                revalidate();
+            }
+        );
     }
 }
 
@@ -333,7 +357,7 @@ class HistoryButtonPanel extends JPanel {
         deleteAll = new JButton("Delete All");
         deleteAll.setPreferredSize(new Dimension(80, 20));
 
-        deleteSingle = new JButton("Delete One");
+        deleteSingle = new JButton("D.O");
         deleteSingle.setPreferredSize(new Dimension(80, 20));
 
         this.setPreferredSize(new Dimension(200, 100));
@@ -348,6 +372,8 @@ class HistoryButtonPanel extends JPanel {
     public JButton getDeleteSingleButton(){
         return deleteSingle;
     }
+
+
 
 }
 

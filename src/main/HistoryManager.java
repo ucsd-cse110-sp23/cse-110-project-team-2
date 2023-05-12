@@ -39,9 +39,11 @@ public class HistoryManager {
         selected.changeState();
     }
 
-    public void getSelectedToDelete(){
+    public Prompt getSelectedToDelete(){
         Prompt temp = selected;
-        historyList.remove(selected);
+        historyList.remove(temp);
+
+        return temp;
     }
     
     
@@ -51,7 +53,7 @@ public class HistoryManager {
         //might not be good 
         historyList.clear();
         String tempQuestion;
-        String tempAnswer;
+        String tempAnswer = "";
         QNA tempQNA;
         Prompt temptPrompt;
 
@@ -63,14 +65,14 @@ public class HistoryManager {
             while (sr.hasNext()) {
                 tempQuestion = sr.next();
                 tempAnswer = sr.next();
-                tempQNA = new QNA(tempQuestion, tempAnswer);
+                tempQNA = new QNA(tempAnswer,tempQuestion);
                 historyList.add(new Prompt(tempQNA));
             }
             sr.close();
             br.close();
             fr.close();
         } catch(Exception e){
-            e.printStackTrace();
+            System.out.println("");
         }
     }
     

@@ -138,19 +138,13 @@ class QnaPanel extends JPanel {
             System.out.println("STOP PRESSED");
             recordPanel.hideRecording();
             apiHandler.stopRecording();
-            //audioHandler.stopRecording();
             QNA gptPrompt = apiHandler.audioToAnswer();
 
 
-
-            //Note: change spot recording is saved
-            //TODO: CHANGE TO REFACTOR
             qnaDisplay.setQNASection(gptPrompt);
 
 
-            //File newFile = new File("recording.wav");
             revalidate();
-
 // TODO: Separate class for managing history (keep business logic out of gui)
 
             try {

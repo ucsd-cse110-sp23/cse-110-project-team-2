@@ -81,6 +81,7 @@ class QnaPanel extends JPanel {
 
     //TODO: REFACTOR TO USE THIS STYLE (IMPORTANT)
     QnaDisplay qnaDisplay;
+    
     public HistoryList historyList;
     RecordPanel recordPanel;
 
@@ -91,15 +92,17 @@ class QnaPanel extends JPanel {
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
 */
-    QnaPanel() {
+    QnaPanel(GUIMediator guiM) {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
 
-        qnaDisplay = new QnaDisplay();
+
+        qnaDisplay = new QnaDisplay(guiM);
         recordPanel = new RecordPanel();
         this.add(qnaDisplay, BorderLayout.CENTER);
         this.add(recordPanel, BorderLayout.SOUTH);
+
 
         startButton = recordPanel.getStartButton();
         stopButton = recordPanel.getStopButton();
@@ -137,8 +140,14 @@ class QnaPanel extends JPanel {
             apiHandler.stopRecording();
             //audioHandler.stopRecording();
             QNA gptPrompt = apiHandler.audioToAnswer();
+
+
+
             //Note: change spot recording is saved
+            //TODO: CHANGE TO REFACTOR
             qnaDisplay.setQNASection(gptPrompt);
+
+
             //File newFile = new File("recording.wav");
             revalidate();
 
@@ -247,7 +256,7 @@ class QnaDisplay extends JPanel {
     //Refactor maybe?
     ContentPanel questionContentPanel;
     ContentPanel answerContentPanel;
-    QnaDisplay() {
+    QnaDisplay(GUIMediator guiM) {
         this.setPreferredSize(new Dimension(600, 600));
         this.setLayout(new GridLayout(2, 1));
         this.setBackground(Color.GREEN);
@@ -256,6 +265,8 @@ class QnaDisplay extends JPanel {
         answerContentPanel =  new ContentPanel("Answer", "", Color.CYAN, Color.PINK);
         this.add(questionContentPanel);
         this.add(answerContentPanel);
+
+        guiM.setQnaDisplay(this);
         
     }
 
@@ -272,13 +283,16 @@ class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
     Color backgroundColor = new Color(240, 248, 255);
 
-    HistoryList(){
+    HistoryList(GUIMediator guiM){
         GridLayout layout = new GridLayout(10, 1);
         layout.setVgap(5); // Vertical gap
 
         this.setLayout(layout); // 10 tasks
         this.setPreferredSize(new Dimension(100, 500));
         this.setBackground(backgroundColor);
+
+        guiM.setHistoryList(this);
+
         loadHistory();
     }
 
@@ -327,20 +341,20 @@ class HistoryPanel extends JPanel {
     private JPanel historyButtonPanel;
     private HistoryList historyList;
 
-    HistoryPanel() {
+    HistoryPanel(GUIMediator guiM) {
         this.setPreferredSize(new Dimension(200, 800));
         this.setBackground(Color.BLUE);
         this.setLayout(new BorderLayout());
 
         TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY, new Dimension(200, 50));
-
         this.add(headerPanel, BorderLayout.NORTH);
 
-        historyList = new HistoryList();
+        historyList = new HistoryList(guiM);
         this.add(historyList, BorderLayout.CENTER);
 
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
+
     }
 
     public void setQnaDisplay(QnaDisplay qd){
@@ -379,8 +393,12 @@ class AppFrame extends JFrame {
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
-        HistoryPanel hp = new HistoryPanel();
-        QnaPanel qp = new QnaPanel();
+
+
+        GUIMediator guiMediator =  new GUIMediator();
+
+        HistoryPanel hp = new HistoryPanel(guiMediator);
+        QnaPanel qp = new QnaPanel(guiMediator);
         hp.getHistoryList().qnaDisplay = qp.getQnaDisplay();
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);

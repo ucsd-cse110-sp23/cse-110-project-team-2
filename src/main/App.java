@@ -87,6 +87,7 @@ class QnaPanel extends JPanel {
 
     APIHandler apiHandler;
     HistoryManager historyManager;
+    GUIMediator guiMediator; 
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
@@ -110,6 +111,7 @@ class QnaPanel extends JPanel {
 
         apiHandler = new APIHandler();
         historyManager = histManager;
+        guiMediator = guiM;
 
 /*     
         audioHandler = new AudioHandler();
@@ -139,34 +141,15 @@ class QnaPanel extends JPanel {
         stopButton.addActionListener(
         (ActionEvent e) -> {
             System.out.println("STOP PRESSED");
+            //TODO: maybe multithread?
             recordPanel.hideRecording();
             apiHandler.stopRecording();
             QNA gptPrompt = apiHandler.audioToAnswer();
 
-
-            qnaDisplay.setQNASection(gptPrompt);
-
-
-            revalidate();
-// TODO: Separate class for managing history (keep business logic out of gui)
-                
-                //System.out.println("getting API responses...");
-                //TODO: maybe multithread?
+            guiMediator.changeQnaDisplayText(gptPrompt);
             historyManager.addToHistory(gptPrompt);
-
-            //TODO addPrompt
-            QNA qna = new QNA(gptPrompt.getQuestion(),gptPrompt.getAnswer());
-            Prompt prompt = new Prompt(qna);
-            historyList.add(prompt);
-            JButton selectButton = prompt.getSelectButton();
-            selectButton.addActionListener(
-            (ActionEvent e2) -> {
-                //TODO: update qnadisplay to show the selected prompt and answer
-                prompt.changeState(); // Change color of task
-                qnaDisplay.setQNASection(qna);
-                revalidate(); // Updates the frame
-            }
-            );
+            guiMediator.addHistoryListPrompt(gptPrompt);            
+            revalidate();                
           }
         );
     }
@@ -265,6 +248,7 @@ class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
     Color backgroundColor = new Color(240, 248, 255);
     HistoryManager historyManager;
+    GUIMediator guiMediator;
 
     HistoryList(GUIMediator guiM, HistoryManager histManager){
         GridLayout layout = new GridLayout(10, 1);
@@ -276,6 +260,7 @@ class HistoryList extends JPanel {
 
         guiM.setHistoryList(this);
         this.historyManager = histManager;
+        this.guiMediator = guiM;
         loadHistory();
     }
 
@@ -283,23 +268,25 @@ class HistoryList extends JPanel {
         qnaDisplay = qd;
     }
 
-    private void loadHistory(){
-        String tempQuestion;
-        String tempAnswer;
-        ArrayList<QNA> qnalist = historyManager.getHistoryList();
+    public void addPrompt(QNA qna){
+        Prompt prompt = new Prompt(qna);
+        this.add(prompt);
+        JButton selectButton = prompt.getSelectButton();
+        selectButton.addActionListener(
+        (ActionEvent e2) -> {
+            //TODO: update qnadisplay to show the selected prompt and answer
+            prompt.changeState(); // Change color of task
+            guiMediator.changeQnaDisplayText(qna);
+            revalidate(); // Updates the frame
+        }
+        );
 
+    }
+
+    private void loadHistory(){
+        ArrayList<QNA> qnalist = historyManager.getHistoryList();
         for(QNA qna : qnalist){
-            Prompt prompt = new Prompt(qna);
-            this.add(prompt);
-            JButton selectButton = prompt.getSelectButton();
-            selectButton.addActionListener(
-            (ActionEvent e2) -> {
-                //TODO: update qnadisplay to show the selected prompt and answer
-                prompt.changeState(); // Change color of task
-                qnaDisplay.setQNASection(qna);
-                revalidate(); // Updates the frame
-            }
-          );
+            addPrompt(qna);
         }
     }
 }

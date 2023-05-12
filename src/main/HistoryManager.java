@@ -42,7 +42,7 @@ public class HistoryManager {
     public Prompt getSelectedToDelete(){
         Prompt temp = selected;
         historyList.remove(temp);
-
+        deleteFromHistory(temp);
         return temp;
     }
     
@@ -96,7 +96,36 @@ public class HistoryManager {
         return newPrompt;
     }
 
-    public void deleteFromHistory(QNA question){
+    
+
+    public void deleteFromHistory(Prompt question){
+        FileWriter history;
+        try{
+            history = new FileWriter(historyFile);
+        }catch(Exception e){
+            return;
+        }
+
+        for(Prompt prompt: historyList){
+
+            if(prompt.equals(question)){
+                continue;
+            }
+
+            try{
+                QNA qna = prompt.getQNA();
+                history.write(qna.getQuestion() + ",,," + qna.getAnswer() + ",,,");
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        try{
+            history.close();
+        }catch(Exception e){
+
+        }
+
         return;
     }
 }

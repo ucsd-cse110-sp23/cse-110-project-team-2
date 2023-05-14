@@ -375,6 +375,7 @@ class HistoryButtonPanel extends JPanel {
 
     private JLabel deleteSelected; // Maybe implement when any delete is selected, label shows up
     HistoryButtonPanel() {
+        this.setLayout(new GridLayout(2, 1));
         deleteAll = new JButton("Delete All");
         deleteAll.setPreferredSize(new Dimension(80, 20));
 
@@ -412,7 +413,7 @@ class AppFrame extends JFrame {
 
 class Prompt extends JPanel {
 
-    JLabel qtext;
+    TextPane qtext;
     JButton selectButton;
   
     Color gray = new Color(218, 229, 234);
@@ -430,10 +431,13 @@ class Prompt extends JPanel {
   
       //markedDone = false;
   
-      qtext = new JLabel(qna.getQuestion()); // create index label
+      /*qtext = new JLabel(qna.getQuestion()); // create index label
       qtext.setPreferredSize(new Dimension(150, 20)); // set size of index label
       qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
-      this.add(qtext, BorderLayout.WEST); // add index label to task
+      this.add(qtext, BorderLayout.WEST); // add index label to task*/
+
+      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), Color.GRAY, Color.LIGHT_GRAY);
+      this.add(qtext, BorderLayout.WEST);
   
       selectButton = new JButton("Select");
       selectButton.setPreferredSize(new Dimension(80, 20));

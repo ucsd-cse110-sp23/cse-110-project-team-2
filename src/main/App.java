@@ -14,28 +14,33 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.Border;
 import javax.swing.JList;
-
-import java.util.ArrayList;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 
 class RecordPanel extends JPanel {
     private JButton startButton;
     private JButton stopButton;
     private JLabel recordingLabel;
     
-    private Border emptyBorder = BorderFactory.createEmptyBorder();
+    //private Border emptyBorder = BorderFactory.createEmptyBorder();
 
     RecordPanel(){
-        this.setPreferredSize(new Dimension(600, 200));
-        this.setBackground(Color.YELLOW);
+        this.setPreferredSize(new Dimension(600, 100));
+        this.setBackground(Color.PINK);
 
         startButton = new JButton("Start");
         startButton.setPreferredSize(new Dimension(80, 20));
@@ -108,11 +113,7 @@ class QnaPanel extends JPanel {
         stopButton = recordPanel.getStopButton();
 
         apiHandler = new APIHandler();
-/*     
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
-*/
+
         addListeners();
     }
 
@@ -186,29 +187,30 @@ class QnaPanel extends JPanel {
 
 class ContentPanel extends JPanel {
 
-    private String title;
-    private String content;
-    private TextPanel titlePanel;
-    private TextPanel contentPanel;
+    private String title, content;
+    private TextPane titlePane, contentPane;
 
-
-    ContentPanel(String title, String content, Color titleColor, Color contentColor) {
+    ContentPanel(String title, String content, 
+                 Color titleColor, Color titlePaneColor, 
+                 Color contentColor,  Color contentPaneColor) {
         this.setPreferredSize(new Dimension(600, 300));
         this.setLayout(new BorderLayout());
 
         this.title = title;
         this.content = content;
 
-        titlePanel = new TextPanel(title, titleColor, new Dimension(600,50));
-        contentPanel = new TextPanel(content, contentColor, new Dimension(600,250));
+        titlePane = new TextPane(title, new Dimension(600,50), titleColor, titlePaneColor);
+        contentPane = new TextPane(content, new Dimension(600,250), contentColor, contentPaneColor);
+        this.setTitle(title);
+        this.setContent(content);
 
-        this.add(titlePanel, BorderLayout.NORTH);
-        this.add(contentPanel, BorderLayout.CENTER);
+        this.add(titlePane, BorderLayout.NORTH);
+        this.add(contentPane, BorderLayout.CENTER);
     }
 
     public void setContent(String content){
         this.content = content;
-        contentPanel.setText(content);
+        contentPane.replace(content);
     }
 
     public String getContent(){
@@ -217,7 +219,7 @@ class ContentPanel extends JPanel {
 
     public void setTitle(String title){
         this.title = title;
-        titlePanel.setText(title);
+        titlePane.replace(title);
     }
 
 
@@ -226,22 +228,26 @@ class ContentPanel extends JPanel {
     }
 }
 
-class TextPanel extends JPanel {
-
-    private JLabel textLabel;
-
-    TextPanel(String text, Color color, Dimension size) {
-        this.setBackground(color);
+class TextPane extends JTextPane {   
+    TextPane(String text, Dimension size, Color textColor, Color paneColor) {
+        this.setEditable(false);
+        this.setBackground(paneColor);
         this.setPreferredSize(size);
-        textLabel = new JLabel(text);
-        textLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        this.add(textLabel);
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, textColor);
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "SansSerif");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_CENTER);
+        aset = sc.addAttribute(aset, StyleConstants.FontSize, 20);
+        this.setCharacterAttributes(aset, false);
+
+        this.replace(text);
     }
 
-    //FIX XD
-    public void setText(String text){
-        textLabel.setText(text);
+    public void replace(String msg) {
+        this.setEditable(true);
+        this.setText(msg);
+        this.setEditable(false);
     }
 }
 
@@ -255,8 +261,11 @@ class QnaDisplay extends JPanel {
         this.setLayout(new GridLayout(2, 1));
         this.setBackground(Color.GREEN);
 
-        questionContentPanel = new ContentPanel("Question", "", Color.RED, Color.BLUE);
-        answerContentPanel =  new ContentPanel("Answer", "", Color.CYAN, Color.PINK);
+        questionContentPanel = new ContentPanel("Question", "Select a question from the history list.", 
+                                                Color.BLACK, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.WHITE);
+        answerContentPanel =  new ContentPanel("Answer", "Or ask a question using the record button.",
+                                               Color.RED, Color.YELLOW, Color.BLUE, Color.GREEN);
+
         this.add(questionContentPanel);
         this.add(answerContentPanel);
 
@@ -340,7 +349,7 @@ class HistoryPanel extends JPanel {
         this.setBackground(Color.BLUE);
         this.setLayout(new BorderLayout());
 
-        TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY, new Dimension(200, 50));
+        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), Color.LIGHT_GRAY, Color.BLUE);
         this.add(headerPanel, BorderLayout.NORTH);
 
         historyList = new HistoryList(guiM);

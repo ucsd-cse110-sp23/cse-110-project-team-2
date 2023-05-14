@@ -199,8 +199,8 @@ class ContentPanel extends JPanel {
         this.title = title;
         this.content = content;
 
-        titlePane = new TextPane(title, new Dimension(600,50), titleColor, titlePaneColor);
-        contentPane = new TextPane(content, new Dimension(600,250), contentColor, contentPaneColor);
+        titlePane = new TextPane(title, new Dimension(600,50), 20, titleColor, titlePaneColor);
+        contentPane = new TextPane(content, new Dimension(600,250), 20, contentColor, contentPaneColor);
         this.setTitle(title);
         this.setContent(content);
 
@@ -229,7 +229,7 @@ class ContentPanel extends JPanel {
 }
 
 class TextPane extends JTextPane {   
-    TextPane(String text, Dimension size, Color textColor, Color paneColor) {
+    TextPane(String text, Dimension size, int fontSize, Color textColor, Color paneColor) {
         this.setEditable(false);
         this.setBackground(paneColor);
         this.setPreferredSize(size);
@@ -238,7 +238,7 @@ class TextPane extends JTextPane {
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, textColor);
         aset = sc.addAttribute(aset, StyleConstants.FontFamily, "SansSerif");
         aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_CENTER);
-        aset = sc.addAttribute(aset, StyleConstants.FontSize, 20);
+        aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
         this.setCharacterAttributes(aset, false);
 
         this.replace(text);
@@ -340,7 +340,6 @@ class HistoryList extends JPanel {
 }
 
 class HistoryPanel extends JPanel {
-    private JPanel historyFooter;
     private JPanel historyButtonPanel;
     private HistoryList historyList;
 
@@ -349,7 +348,7 @@ class HistoryPanel extends JPanel {
         this.setBackground(Color.BLUE);
         this.setLayout(new BorderLayout());
 
-        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), Color.LIGHT_GRAY, Color.BLUE);
+        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), 20, Color.LIGHT_GRAY, Color.BLUE);
         this.add(headerPanel, BorderLayout.NORTH);
 
         historyList = new HistoryList(guiM);

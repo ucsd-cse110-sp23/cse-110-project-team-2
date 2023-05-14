@@ -423,7 +423,7 @@ class Prompt extends JPanel {
   
     Prompt(QNA qna) {
       this.qna = qna;
-      this.setPreferredSize(new Dimension(400, 20)); // set size of task
+      this.setPreferredSize(new Dimension(200, 20)); // set size of task
       this.setBackground(gray); // set background color of task
   
       this.setLayout(new BorderLayout()); // set layout of task
@@ -435,11 +435,11 @@ class Prompt extends JPanel {
       qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
       this.add(qtext, BorderLayout.WEST); // add index label to task*/
 
-      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), Color.GRAY, Color.LIGHT_GRAY);
+      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), 16, Color.BLACK, Color.LIGHT_GRAY);
       this.add(qtext, BorderLayout.WEST);
   
       selectButton = new JButton("Select");
-      selectButton.setPreferredSize(new Dimension(80, 20));
+      selectButton.setPreferredSize(new Dimension(50, 20));
       selectButton.setBorder(BorderFactory.createEmptyBorder());
       selectButton.setFocusPainted(false);
   

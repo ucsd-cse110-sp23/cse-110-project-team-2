@@ -1,5 +1,4 @@
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 //import java.net.URISyntaxException;
@@ -10,16 +9,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Mostly copied and pasted from lab, only new methods are
+ * Mostly copied and pasted from lab 4, only new methods are
  * askQuestion(String query) which could be used to re-ask an already
  * transcribed question without using up tokens on another Whisper call.
  * 
- * And theres the audio version askQuestion(File Audio) which transcribes it
- * and then uses the string version so we don't repeat code.
  */
 
 public class GPTHandler {
-    //TODO Make DRYer
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private String API_KEY;
     private static final String MODEL = "text-davinci-003";

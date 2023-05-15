@@ -1,3 +1,7 @@
+
+/*
+ * GUImediator class that allows GUI components which call on other GUI components to interface with a mediator instead of carrying references to each other
+ */
 public class GUIMediator {
     private HistoryList historyList;
     private QnaDisplay qnaDisplay;

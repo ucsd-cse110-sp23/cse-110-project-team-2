@@ -1,13 +1,9 @@
 import java.util.ArrayList;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Scanner;
 import java.io.File;
-import javax.swing.JButton;
-import java.awt.event.ActionEvent;
 
 public class HistoryManager {
     private ArrayList<Prompt> historyList;

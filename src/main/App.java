@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 // gui libraries
 import java.awt.BorderLayout;
@@ -8,13 +7,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,18 +14,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.border.Border;
-import javax.swing.JList;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
-
-// Recording panel with buttons start and stop,with recording label
+/*
+ * Recording panel with buttons start and stop,with recording label
+ */
 class RecordPanel extends JPanel {
     private JButton startButton;
     private JButton stopButton;
@@ -71,11 +59,6 @@ class RecordPanel extends JPanel {
 
     }
 
-
-    //TODO: Move listeners to QNA panel class possibly.
-    
-    
-
     public JButton getStartButton(){
         return startButton;
     }
@@ -92,13 +75,14 @@ class RecordPanel extends JPanel {
     }
 }
 
-//  Total panel with the prompts/answers and the buttons?
+/*
+ * Total panel with the prompts/answers and the buttons?
+ */
 class QnaPanel extends JPanel {
 
     JButton startButton;
     JButton stopButton;
 
-    //TODO: REFACTOR TO USE THIS STYLE (IMPORTANT)
     QnaDisplay qnaDisplay;
     
     public HistoryList historyList;
@@ -113,12 +97,6 @@ class QnaPanel extends JPanel {
     Color green = new Color(162, 213, 171);
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
-/*
-    private AudioHandler audioHandler;
-    private GPTHandler gptHandler;
-    private WhisperHandler whisperHandler;
-    private static String APIKey = "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";
-*/
 
     QnaPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(600, 300));
@@ -140,51 +118,48 @@ class QnaPanel extends JPanel {
         historyManager = histManager;
         guiMediator = guiM;
 
-/*     
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
-*/
-
         addListeners();
     }
 
-    public QnaDisplay getQnaDisplay(){
-        return qnaDisplay;
-    }
-
-    public void setHistoryList(HistoryList hl){
-        historyList = hl;
-    }
-
+    /*
+     * Adds listeners for the start and stop recordings button
+     */
     public void addListeners() {
         startButton.addActionListener(
-          (ActionEvent e) -> {
-              System.out.println("START PRESSED");
-              //audioHandler.startRecording();
-              recordPanel.showRecording();
-              apiHandler.startRecording();
+            (ActionEvent e) -> {
+                System.out.println("START PRESSED");
+                
+                //show the recording text then start recording
+                recordPanel.showRecording();
+                apiHandler.startRecording();
           }
         );
         stopButton.addActionListener(
-        (ActionEvent e) -> {
-            System.out.println("STOP PRESSED");
-            //TODO: maybe multithread?
-            recordPanel.hideRecording();
-            apiHandler.stopRecording();
-            QNA gptQNA = apiHandler.audioToAnswer();
+            (ActionEvent e) -> {
+                System.out.println("STOP PRESSED");
 
-            guiMediator.changeQnaDisplayText(gptQNA);
-            Prompt newPrompt = historyManager.addToHistory(gptQNA);
-            guiMediator.addHistoryListPrompt(newPrompt);            
-            revalidate();                
-          }
+                //hide recording text stop recording
+                recordPanel.hideRecording();
+                apiHandler.stopRecording();
+
+                //use APi handler to get the response from chatGPT based on the audio file
+                QNA gptQNA = apiHandler.audioToAnswer();
+
+                //update the display to show the qna
+                guiMediator.changeQnaDisplayText(gptQNA);
+
+                //add the prompt to the history manager/get prompt to display in history
+                Prompt newPrompt = historyManager.addToHistory(gptQNA);
+                guiMediator.addHistoryListPrompt(newPrompt);            
+                revalidate();                
+            }
         );
     }
 }
 
-
-// Panel type to display content
+/*
+ * Panel type to generically display content
+ */
 class ContentPanel extends JPanel {
 
     private String title, content;
@@ -229,7 +204,9 @@ class ContentPanel extends JPanel {
 }
 
 
-// class to be used as a text pane
+/*
+ * class to be used as a text pane
+ */
 class TextPane extends JTextPane {   
 
     TextPane(String text, Dimension size, int fontSize, Color textColor, Color paneColor) {
@@ -260,7 +237,9 @@ class TextPane extends JTextPane {
 }
 
 
-// Display for the question and answer
+/*
+ * Display for the question and answer
+ */ 
 class QnaDisplay extends JPanel {
     Color yellow = new Color(229, 239, 193);
     Color green = new Color(162, 213, 171);
@@ -294,10 +273,10 @@ class QnaDisplay extends JPanel {
     }
 }
 
-//SHOULD ONLY DISPLAY QUESTIONS
-// TODO: Separate class for managing history (keep business logic out of gui)
+/*
+ * panel that holds all the prompts in the prompt history
+ */
 class HistoryList extends JPanel {
-    public QnaDisplay qnaDisplay;
     private GridLayout layout;
     private final int MIN_ROWS = 6;
 
@@ -325,31 +304,34 @@ class HistoryList extends JPanel {
         loadHistory();
     }
 
-    public void setQnaDisplay(QnaDisplay qd){
-        qnaDisplay = qd;
-    }
-
     public void updateLayout() {
         int numRows = (count < MIN_ROWS) ? MIN_ROWS : count;
         this.layout.setRows(numRows);
     }
 
+    /*
+     * Add a prompt to the history list
+     */
     public void addPrompt(Prompt prompt){
         count++;
         updateLayout();
         this.add(prompt);
         JButton selectButton = prompt.getSelectButton();
+
+        //Add a listener to the button on the prompt to select the prompt for viewing
         selectButton.addActionListener(
             (ActionEvent e2) -> {
                 //TODO: update qnadisplay to show the selected prompt and answer
                 historyManager.setSelected(prompt);
                 guiMediator.changeQnaDisplayText(prompt.getQNA());
-                setQnaDisplay(qnaDisplay);
                 revalidate(); // Updates the frame
             }
         );
     }
 
+    /*
+     * remove a prompt from the history list
+     */
     public void removePrompt(Prompt prompt){
         count--;
         updateLayout();
@@ -358,6 +340,9 @@ class HistoryList extends JPanel {
         //repaint();
     }
 
+    /*
+     * Load all the prompts from the history.txt file. delegates to history manager
+     */
     private void loadHistory(){
         ArrayList<Prompt> promptList = historyManager.getHistoryList();
         for(Prompt prompt : promptList){
@@ -368,7 +353,9 @@ class HistoryList extends JPanel {
 }
 
 
-// Entire panel for history
+/*
+ * Wrapper panel for history
+ */
 class HistoryPanel extends JPanel {
     //private JPanel historyFooter;
     private HistoryButtonPanel historyButtonPanel;
@@ -413,14 +400,9 @@ class HistoryPanel extends JPanel {
 
     }
 
-    public void setQnaDisplay(QnaDisplay qd){
-        historyList.setQnaDisplay(qd);
-    }
-
-    public HistoryList getHistoryList(){
-        return historyList;
-    }
-
+    /*
+     * add listeners to the delete selected, and the delete all buttons
+     */
     public void addListeners(){
         deleteSingleButton.addActionListener(
             (ActionEvent e) -> {
@@ -434,7 +416,7 @@ class HistoryPanel extends JPanel {
                 }
             }
         );
-
+    
         deleteAllButton.addActionListener(
             (ActionEvent e) -> {
                 for (Component prompt : historyList.getComponents()){
@@ -454,12 +436,13 @@ class HistoryPanel extends JPanel {
 }
 
 
-// Panel for buttons
+/*
+ * Panel for delete buttons
+ */ 
 class HistoryButtonPanel extends JPanel {
     private JButton deleteAll;
     private JButton deleteSingle;
 
-    private JLabel deleteSelected; // Maybe implement when any delete is selected, label shows up
     HistoryButtonPanel() {
         this.setLayout(new GridLayout(2, 1));
         deleteAll = new JButton("Delete All");
@@ -488,7 +471,9 @@ class HistoryButtonPanel extends JPanel {
 
 }
 
-// appframe
+/*
+ * Appframe that holds all the panels
+ */
 class AppFrame extends JFrame {
 
     AppFrame() {
@@ -504,16 +489,15 @@ class AppFrame extends JFrame {
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);
-        hp.getHistoryList().qnaDisplay = qp.getQnaDisplay();
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
-        qp.setHistoryList(hp.getHistoryList());
         this.setVisible(true); // Make visible
     }
 }
 
-
-// qna prompt in the list
+/*
+ * prompts that are added to the history list. Each one encodes a qna
+ */
 class Prompt extends JPanel {
 
     TextPane qtext;
@@ -532,13 +516,7 @@ class Prompt extends JPanel {
       this.setBackground(gray); // set background color of task
   
       this.setLayout(new BorderLayout()); // set layout of task
-  
-      //markedDone = false;
-  
-      /*qtext = new JLabel(qna.getQuestion()); // create index label
-      qtext.setPreferredSize(new Dimension(150, 20)); // set size of index label
-      qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
-      this.add(qtext, BorderLayout.WEST); // add index label to task*/
+
 
       qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), 16, Color.BLACK, yellow);
       this.add(qtext, BorderLayout.WEST);
@@ -572,8 +550,10 @@ class Prompt extends JPanel {
     public boolean getState() {
       return selected;
     }
-  
-    // TODO: deselect every time we select a new one
+    
+    /*
+     * Change the color depending on if the prompt is selected
+     */
     public void changeState() {
       if(!this.getState()){
         this.qtext.setBackground(green);
@@ -588,7 +568,9 @@ class Prompt extends JPanel {
 }
 
 
-
+/*
+ * Run the app!
+ */
 public class App {
     public static void main(String[] args) throws Exception {
         new AppFrame();

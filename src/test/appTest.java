@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.IOException;
 
 public class appTest {
 
@@ -71,6 +72,21 @@ public class appTest {
 
         // Assert that the HTTP request body is not empty
         assertFalse(httpRequest.bodyPublisher().isEmpty());
+    }
+
+    @Test
+    public void testAskQuestion() {
+        // Create a MockGPT instance with a set of predefined answers
+        String[] answerSet = {"Answer 1", "Answer 2", "Answer 3"};
+        MockGPT mockGPT = new MockGPT(answerSet);
+
+        // Test asking three questions and checking the responses
+        assertEquals("Answer 1", mockGPT.askQuestion("Question 1"));
+        assertEquals("Answer 2", mockGPT.askQuestion("Question 2"));
+        assertEquals("Answer 3", mockGPT.askQuestion("Question 3"));
+
+        // Test asking a fourth question (wraps around to the first answer)
+        assertEquals("Answer 1", mockGPT.askQuestion("Question 4"));
     }
 
     // THIS TEST ONLY WORKS ON LOCAL MACHINES WITH MICROPHONES
@@ -152,6 +168,100 @@ public class appTest {
 
         // Cleanup: Delete the file created during the test
         File historyFile = new File(historyFilePath);
+        historyFile.delete();
+    }
+
+    @Test
+    public void testClearHistory() throws IOException {
+        String historyFilePath = "testhistory.txt";
+        HistoryManager historyManager = new HistoryManager(historyFilePath);
+
+        // Create sample QNAs
+        QNA qna1 = new QNA("Answer 1", "Question 1");
+        QNA qna2 = new QNA("Answer 2", "Question 2");
+        QNA qna3 = new QNA("Answer 3", "Question 3");
+
+        // Add sample QNAs to the history
+        historyManager.addToHistory(qna1);
+        historyManager.addToHistory(qna2);
+        historyManager.addToHistory(qna3);
+
+        // Clear the history
+        historyManager.clearHistory();
+
+        // Get the updated history list
+        ArrayList<Prompt> historyList = historyManager.getHistoryList();
+
+        // Ensure the history list is empty
+        assertTrue(historyList.isEmpty());
+
+        // Ensure the selected prompt is null
+        assertNull(historyManager.getSelectedToDelete());
+
+        // Ensure the history file is empty
+        File historyFile = new File(historyFilePath);
+        assertEquals(0, historyFile.length());
+
+        // Cleanup: Delete the file created during the test
+        historyFile.delete();
+    }
+
+    @Test
+    public void testUserStory2() {
+        
+    }
+
+    @Test
+    public void testUserStory3() {
+        String historyFilePath = "testhistory.txt";
+        HistoryManager historyManager = new HistoryManager(historyFilePath);
+
+        // Create sample QNAs
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
+        QNA qna1 = new QNA("Answer 1", "Question 1");
+        QNA qna2 = new QNA("Answer 2", "Question 2");
+        QNA qna3 = new QNA("Answer 3", "Question 3");
+
+        // Add the sample QNA to the history
+        Prompt addedPrompt = historyManager.addToHistory(sampleQNA);
+
+        // Add sample QNAs to the history
+        historyManager.addToHistory(qna1);
+        Prompt promptToDelete = historyManager.addToHistory(qna2);
+        historyManager.addToHistory(qna3);
+
+        // Get the history list
+        ArrayList<Prompt> historyList = historyManager.getHistoryList();
+
+        // Ensure the prompt was added to the history list
+        assertTrue(historyList.contains(addedPrompt));
+
+        // Delete the prompt from the history
+        historyManager.deleteFromHistory(promptToDelete);
+
+        // Get the updated history list
+        historyList = historyManager.getHistoryList();
+
+        // Ensure the prompt was removed from the history list
+        assertFalse(historyList.contains(promptToDelete));
+
+        // Clear the history
+        historyManager.clearHistory();
+
+        // Get the updated history list
+        historyList = historyManager.getHistoryList();
+
+        // Ensure the history list is empty
+        assertTrue(historyList.isEmpty());
+
+        // Ensure the selected prompt is null
+        assertNull(historyManager.getSelectedToDelete());
+
+        // Ensure the history file is empty
+        File historyFile = new File(historyFilePath);
+        assertEquals(0, historyFile.length());
+
+        // Cleanup: Delete the file created during the test
         historyFile.delete();
     }
 }

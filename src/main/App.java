@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.Border;
 import javax.swing.JList;
@@ -170,6 +171,8 @@ class QnaPanel extends JPanel {
             }
             QNA qna = new QNA(gptPrompt.getQuestion(),gptPrompt.getAnswer());
             Prompt prompt = new Prompt(qna);
+            historyList.qnalist.add(qna);
+            historyList.updateLayout();
             historyList.add(prompt);
             JButton selectButton = prompt.getSelectButton();
             selectButton.addActionListener(
@@ -180,6 +183,7 @@ class QnaPanel extends JPanel {
                 revalidate(); // Updates the frame
             }
             );
+            selectButton.doClick();
           }
         );
     }
@@ -284,14 +288,15 @@ class QnaDisplay extends JPanel {
 // TODO: Separate class for managing history (keep business logic out of gui)
 class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
-    Color backgroundColor = new Color(240, 248, 255);
+    private Color backgroundColor = new Color(240, 248, 255);
+    private GridLayout layout;
+    ArrayList<QNA> qnalist;
 
     HistoryList(GUIMediator guiM){
-        GridLayout layout = new GridLayout(10, 1);
+        layout = new GridLayout();
         layout.setVgap(5); // Vertical gap
-
         this.setLayout(layout); // 10 tasks
-        this.setPreferredSize(new Dimension(100, 500));
+        //this.setPreferredSize(new Dimension(100, 500));
         this.setBackground(backgroundColor);
 
         guiM.setHistoryList(this);
@@ -303,10 +308,14 @@ class HistoryList extends JPanel {
         qnaDisplay = qd;
     }
 
+    public void updateLayout() {
+        this.layout.setRows(qnalist.size());
+    }
+
     private void loadHistory(){
         String tempQuestion;
         String tempAnswer;
-        ArrayList<QNA> qnalist = new ArrayList<QNA>();
+        qnalist = new ArrayList<QNA>();
         try {
             FileReader file = new FileReader("history.txt");
             BufferedReader br = new BufferedReader(file);
@@ -323,6 +332,7 @@ class HistoryList extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        updateLayout();
         for(QNA qna : qnalist){
             Prompt prompt = new Prompt(qna);
             this.add(prompt);
@@ -352,7 +362,10 @@ class HistoryPanel extends JPanel {
         this.add(headerPanel, BorderLayout.NORTH);
 
         historyList = new HistoryList(guiM);
-        this.add(historyList, BorderLayout.CENTER);
+        JScrollPane sp = new JScrollPane(historyList);
+        sp.setPreferredSize(new Dimension(200, 670));
+        this.setAutoscrolls(true);
+        this.add(sp, BorderLayout.CENTER);
 
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
@@ -423,7 +436,7 @@ class Prompt extends JPanel {
   
     Prompt(QNA qna) {
       this.qna = qna;
-      this.setPreferredSize(new Dimension(200, 20)); // set size of task
+      this.setPreferredSize(new Dimension(200, 75)); // set size of task
       this.setBackground(gray); // set background color of task
   
       this.setLayout(new BorderLayout()); // set layout of task

@@ -11,6 +11,7 @@ public class MockWhisper {
         this.transcription = transcription;
     }
 
+    
     public String transcribeAudio(File Audio){
         return transcription;
     }

@@ -6,7 +6,6 @@ public class GUIMediator {
     public GUIMediator(){
 
     }
-
     public void setHistoryList(HistoryList hl){
         historyList = hl;
     }
@@ -20,7 +19,12 @@ public class GUIMediator {
     }
 
     public void addHistoryListPrompt(Prompt prompt){
-        historyList.add(prompt);
+        historyList.addPrompt(prompt);
+    }
+
+    public void clearQNADisplayText(){
+        QNA qna = new QNA("","");
+        qnaDisplay.setQNASection(qna);
     }
 
 }

@@ -14,6 +14,8 @@ public class HistoryManager {
     private File historyFile;
     private Prompt selected; 
 
+    private final String DELIMITER = "%%%%%%%";
+
     public HistoryManager(String historyFilePath){
         historyList = new ArrayList<Prompt>();
         historyFile = new File(historyFilePath);
@@ -40,6 +42,8 @@ public class HistoryManager {
     }
 
     public Prompt getSelectedToDelete(){
+        if (selected == null) return null;
+
         Prompt temp = selected;
         historyList.remove(temp);
         deleteFromHistory(temp);
@@ -61,18 +65,18 @@ public class HistoryManager {
             FileReader fr = new FileReader(historyFile);
             BufferedReader br = new BufferedReader(fr);
             Scanner sr = new Scanner(br);
-            sr.useDelimiter(",,,");
+            sr.useDelimiter(DELIMITER);
             while (sr.hasNext()) {
                 tempQuestion = sr.next();
                 tempAnswer = sr.next();
-                tempQNA = new QNA(tempAnswer,tempQuestion);
+                tempQNA = new QNA(tempQuestion,tempAnswer);
                 historyList.add(new Prompt(tempQNA));
             }
             sr.close();
             br.close();
             fr.close();
         } catch(Exception e){
-            System.out.println("");
+            e.printStackTrace();
         }
     }
     
@@ -86,7 +90,7 @@ public class HistoryManager {
 
         try{
             FileWriter history = new FileWriter(historyFile, true);
-            history.write(question.getQuestion() + ",,," + question.getAnswer() + ",,,");
+            history.write(question.getQuestion() + DELIMITER + question.getAnswer() + DELIMITER);
             history.close();
             historyList.add(newPrompt);
         } catch(Exception e){
@@ -96,10 +100,10 @@ public class HistoryManager {
         return newPrompt;
     }
 
-    
-
     public void deleteFromHistory(Prompt question){
+        selected = null;
         FileWriter history;
+        boolean deleted = false;
         try{
             history = new FileWriter(historyFile);
         }catch(Exception e){
@@ -108,13 +112,14 @@ public class HistoryManager {
 
         for(Prompt prompt: historyList){
 
-            if(prompt.equals(question)){
+            if(prompt.equals(question) && !deleted){
+                deleted = true;
                 continue;
             }
 
             try{
                 QNA qna = prompt.getQNA();
-                history.write(qna.getQuestion() + ",,," + qna.getAnswer() + ",,,");
+                history.write(qna.getQuestion() + DELIMITER + qna.getAnswer() + DELIMITER);
             } catch(Exception e){
                 e.printStackTrace();
             }

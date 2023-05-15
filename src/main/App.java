@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.Border;
 import javax.swing.JList;
@@ -230,6 +231,7 @@ class ContentPanel extends JPanel {
 
 // class to be used as a text pane
 class TextPane extends JTextPane {   
+
     TextPane(String text, Dimension size, int fontSize, Color textColor, Color paneColor) {
         this.setEditable(false);
         this.setBackground(paneColor);
@@ -250,6 +252,10 @@ class TextPane extends JTextPane {
         this.setEditable(true);
         this.setText(msg);
         this.setEditable(false);
+    }
+
+    public void setBG(Color paneColor) {
+        this.setBackground(paneColor);
     }
 }
 
@@ -292,20 +298,25 @@ class QnaDisplay extends JPanel {
 // TODO: Separate class for managing history (keep business logic out of gui)
 class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
+    private GridLayout layout;
+    private final int MIN_ROWS = 6;
+
     Color backgroundColor = new Color(240, 248, 255);
     HistoryManager historyManager;
     GUIMediator guiMediator;
+    int count;
     Color yellow = new Color(229, 239, 193);
     Color green = new Color(162, 213, 171);
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
 
     HistoryList(GUIMediator guiM, HistoryManager histManager){
-        GridLayout layout = new GridLayout(10, 1);
+        layout = new GridLayout(0, 1);
         layout.setVgap(5); // Vertical gap
+        layout.setColumns(1);
 
         this.setLayout(layout); // 10 tasks
-        this.setPreferredSize(new Dimension(100, 500));
+        //this.setPreferredSize(new Dimension(100, 500));
         this.setBackground(green);
 
         guiM.setHistoryList(this);
@@ -318,23 +329,32 @@ class HistoryList extends JPanel {
         qnaDisplay = qd;
     }
 
+    public void updateLayout() {
+        int numRows = (count < MIN_ROWS) ? MIN_ROWS : count;
+        this.layout.setRows(numRows);
+    }
+
     public void addPrompt(Prompt prompt){
+        count++;
+        updateLayout();
         this.add(prompt);
         JButton selectButton = prompt.getSelectButton();
         selectButton.addActionListener(
-        (ActionEvent e2) -> {
-            //TODO: update qnadisplay to show the selected prompt and answer
-            historyManager.setSelected(prompt);
-            guiMediator.changeQnaDisplayText(prompt.getQNA());
-            setQnaDisplay(qnaDisplay);
-            revalidate(); // Updates the frame
-        }
+            (ActionEvent e2) -> {
+                //TODO: update qnadisplay to show the selected prompt and answer
+                historyManager.setSelected(prompt);
+                guiMediator.changeQnaDisplayText(prompt.getQNA());
+                setQnaDisplay(qnaDisplay);
+                revalidate(); // Updates the frame
+            }
         );
-
     }
 
     public void removePrompt(Prompt prompt){
+        count--;
+        updateLayout();
         this.remove(prompt);
+        revalidate();
         //repaint();
     }
 
@@ -343,13 +363,14 @@ class HistoryList extends JPanel {
         for(Prompt prompt : promptList){
             addPrompt(prompt);
         }
+        count = promptList.size();
     }
 }
 
 
 // Entire panel for history
 class HistoryPanel extends JPanel {
-    private JPanel historyFooter;
+    //private JPanel historyFooter;
     private HistoryButtonPanel historyButtonPanel;
     private HistoryList historyList;
     private HistoryManager historyManager;
@@ -372,7 +393,12 @@ class HistoryPanel extends JPanel {
         this.add(headerPanel, BorderLayout.NORTH);
 
         historyList = new HistoryList(guiM, histManager);
-        this.add(historyList, BorderLayout.CENTER);
+        //this.add(historyList, BorderLayout.CENTER);
+
+        JScrollPane sp = new JScrollPane(historyList);
+        sp.setPreferredSize(new Dimension(200, 670));
+        this.setAutoscrolls(true);
+        this.add(sp, BorderLayout.CENTER);
 
         historyButtonPanel = new HistoryButtonPanel();
         this.add(historyButtonPanel, BorderLayout.SOUTH);
@@ -399,11 +425,13 @@ class HistoryPanel extends JPanel {
         deleteSingleButton.addActionListener(
             (ActionEvent e) -> {
                 Prompt toDelete = historyManager.getSelectedToDelete();
-                System.out.println("Deleting prompt" + toDelete.getQNA().toString());
-                historyList.remove(toDelete);
-                guiM.clearQNADisplayText();
-                repaint();
-                revalidate();
+                if (toDelete != null) {
+                    System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+                    historyList.removePrompt(toDelete);
+                    guiM.clearQNADisplayText();
+                    repaint();
+                    revalidate();
+                }
             }
         );
 
@@ -411,7 +439,7 @@ class HistoryPanel extends JPanel {
             (ActionEvent e) -> {
                 for (Component prompt : historyList.getComponents()){
                     if (prompt instanceof Prompt) {
-                        historyList.remove(prompt);
+                        historyList.removePrompt((Prompt) prompt);
                         repaint();
                         revalidate();
                     }
@@ -500,7 +528,7 @@ class Prompt extends JPanel {
   
     Prompt(QNA qna) {
       this.qna = qna;
-      this.setPreferredSize(new Dimension(200, 20)); // set size of task
+      this.setPreferredSize(new Dimension(200, 75)); // set size of task
       this.setBackground(gray); // set background color of task
   
       this.setLayout(new BorderLayout()); // set layout of task
@@ -548,11 +576,11 @@ class Prompt extends JPanel {
     // TODO: deselect every time we select a new one
     public void changeState() {
       if(!this.getState()){
-        this.setBackground(green);
+        this.qtext.setBackground(green);
         selected = true;
       }
       else{
-        this.setBackground(gray);
+        this.qtext.setBackground(yellow);
         selected = false;
       }
       revalidate();

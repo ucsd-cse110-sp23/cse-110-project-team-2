@@ -22,4 +22,9 @@ public class GUIMediator {
         historyList.addPrompt(prompt);
     }
 
+    public void clearQNADisplayText(){
+        QNA qna = new QNA("","");
+        qnaDisplay.setQNASection(qna);
+    }
+
 }

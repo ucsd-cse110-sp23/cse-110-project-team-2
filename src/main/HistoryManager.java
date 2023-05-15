@@ -128,4 +128,16 @@ public class HistoryManager {
         readFileIntoArrayList();
         return;
     }
+
+    public void clearHistory() {
+        try{
+            FileWriter history = new FileWriter(historyFile);
+            history.write("");
+            history.close();
+            historyList.clear();
+            selected = null;
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }

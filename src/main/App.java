@@ -304,6 +304,7 @@ class HistoryPanel extends JPanel {
     private HistoryManager historyManager;
     private JButton deleteSingleButton;
     private JButton deleteAllButton;
+    private GUIMediator guiM;
 
     HistoryPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(200, 800));
@@ -321,6 +322,8 @@ class HistoryPanel extends JPanel {
 
         this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
         this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
+
+        this.guiM = guiM;
 
         this.historyManager = histManager;
         addListeners();
@@ -341,6 +344,23 @@ class HistoryPanel extends JPanel {
                 Prompt toDelete = historyManager.getSelectedToDelete();
                 System.out.println("Deleting prompt" + toDelete.getQNA().toString());
                 historyList.remove(toDelete);
+                guiM.clearQNADisplayText();
+                repaint();
+                revalidate();
+            }
+        );
+
+        deleteAllButton.addActionListener(
+            (ActionEvent e) -> {
+                for (Component prompt : historyList.getComponents()){
+                    if (prompt instanceof Prompt) {
+                        historyList.remove(prompt);
+                        repaint();
+                        revalidate();
+                    }
+                }
+                historyManager.clearHistory();
+                guiM.clearQNADisplayText();
                 repaint();
                 revalidate();
             }

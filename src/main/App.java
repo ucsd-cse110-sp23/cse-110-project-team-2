@@ -31,28 +31,40 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
+
+// Recording panel with buttons start and stop,with recording label
 class RecordPanel extends JPanel {
     private JButton startButton;
     private JButton stopButton;
     private JLabel recordingLabel;
+
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
     
     //private Border emptyBorder = BorderFactory.createEmptyBorder();
 
     RecordPanel(){
         this.setPreferredSize(new Dimension(600, 100));
-        this.setBackground(Color.PINK);
+        this.setBackground(blue);
 
         startButton = new JButton("Start");
         startButton.setPreferredSize(new Dimension(80, 20));
+        startButton.setFont(new Font("Verdana", 0, 15));
+        //startButton.setBackground(blue);
         this.add(startButton);
         stopButton = new JButton("Stop");
         stopButton.setPreferredSize(new Dimension(80, 20));
+        stopButton.setFont(new Font("Verdana", 0, 15));
+        //stopButton.setBackground(blue);
         this.add(stopButton); 
 
         recordingLabel = new JLabel("Recording");
         recordingLabel.setVerticalAlignment(JLabel.CENTER);
         recordingLabel.setForeground(Color.RED);
         recordingLabel.setPreferredSize(new Dimension(100, 20));
+        recordingLabel.setFont(new Font("Verdana", 0, 15));
         recordingLabel.setVisible(false);
         this.add(recordingLabel);
 
@@ -79,6 +91,7 @@ class RecordPanel extends JPanel {
     }
 }
 
+//  Total panel with the prompts/answers and the buttons?
 class QnaPanel extends JPanel {
 
     JButton startButton;
@@ -91,6 +104,11 @@ class QnaPanel extends JPanel {
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
+
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
@@ -98,9 +116,9 @@ class QnaPanel extends JPanel {
     private static String APIKey = "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";
 */
     QnaPanel(GUIMediator guiM) {
-        this.setPreferredSize(new Dimension(600, 800));
+        this.setPreferredSize(new Dimension(600, 300));
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.RED);
+        this.setBackground(yellow);
 
 
         qnaDisplay = new QnaDisplay(guiM);
@@ -185,6 +203,8 @@ class QnaPanel extends JPanel {
     }
 }
 
+
+// Panel type to display content
 class ContentPanel extends JPanel {
 
     private String title, content;
@@ -228,15 +248,18 @@ class ContentPanel extends JPanel {
     }
 }
 
+
+// class to be used as a text pane
 class TextPane extends JTextPane {   
     TextPane(String text, Dimension size, int fontSize, Color textColor, Color paneColor) {
         this.setEditable(false);
         this.setBackground(paneColor);
         this.setPreferredSize(size);
+        //this.setFont(new Font("Open Sans", 0, size));
 
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, textColor);
-        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "SansSerif");
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Verdana");
         aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_CENTER);
         aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
         this.setCharacterAttributes(aset, false);
@@ -251,7 +274,13 @@ class TextPane extends JTextPane {
     }
 }
 
+
+// Display for the question and answer
 class QnaDisplay extends JPanel {
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
 
     //Refactor maybe?
     ContentPanel questionContentPanel;
@@ -262,9 +291,9 @@ class QnaDisplay extends JPanel {
         this.setBackground(Color.GREEN);
 
         questionContentPanel = new ContentPanel("Question", "Select a question from the history list.", 
-                                                Color.BLACK, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.WHITE);
+                                                Color.BLACK, turquoise, Color.DARK_GRAY, yellow);
         answerContentPanel =  new ContentPanel("Answer", "Or ask a question using the record button.",
-                                               Color.RED, Color.YELLOW, Color.BLUE, Color.GREEN);
+                                               Color.BLACK, turquoise, Color.BLUE, yellow);
 
         this.add(questionContentPanel);
         this.add(answerContentPanel);
@@ -285,6 +314,10 @@ class QnaDisplay extends JPanel {
 class HistoryList extends JPanel {
     public QnaDisplay qnaDisplay;
     Color backgroundColor = new Color(240, 248, 255);
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
 
     HistoryList(GUIMediator guiM){
         GridLayout layout = new GridLayout(10, 1);
@@ -292,7 +325,7 @@ class HistoryList extends JPanel {
 
         this.setLayout(layout); // 10 tasks
         this.setPreferredSize(new Dimension(100, 500));
-        this.setBackground(backgroundColor);
+        this.setBackground(green);
 
         guiM.setHistoryList(this);
 
@@ -339,16 +372,22 @@ class HistoryList extends JPanel {
     }
 }
 
+
+// Entire panel for history
 class HistoryPanel extends JPanel {
     private JPanel historyButtonPanel;
     private HistoryList historyList;
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
 
     HistoryPanel(GUIMediator guiM) {
         this.setPreferredSize(new Dimension(200, 800));
-        this.setBackground(Color.BLUE);
+        this.setBackground(green);
         this.setLayout(new BorderLayout());
 
-        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), 20, Color.LIGHT_GRAY, Color.BLUE);
+        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), 20, Color.LIGHT_GRAY, blue);
         this.add(headerPanel, BorderLayout.NORTH);
 
         historyList = new HistoryList(guiM);
@@ -368,6 +407,8 @@ class HistoryPanel extends JPanel {
     }
 }
 
+
+// Panel for buttons
 class HistoryButtonPanel extends JPanel {
     private JButton deleteAll;
     private JButton deleteSingle;
@@ -376,9 +417,11 @@ class HistoryButtonPanel extends JPanel {
     HistoryButtonPanel() {
         this.setLayout(new GridLayout(2, 1));
         deleteAll = new JButton("Delete All");
+        deleteAll.setFont(new Font("Verdana", 0, 15));
         deleteAll.setPreferredSize(new Dimension(80, 20));
 
         deleteSingle = new JButton("Delete One");
+        deleteSingle.setFont(new Font("Verdana", 0, 15));
         deleteSingle.setPreferredSize(new Dimension(80, 20));
 
         this.setPreferredSize(new Dimension(200, 100));
@@ -388,6 +431,7 @@ class HistoryButtonPanel extends JPanel {
 
 }
 
+// appframe
 class AppFrame extends JFrame {
 
     AppFrame() {
@@ -410,6 +454,8 @@ class AppFrame extends JFrame {
     }
 }
 
+
+// qna prompt in the list
 class Prompt extends JPanel {
 
     TextPane qtext;
@@ -417,6 +463,7 @@ class Prompt extends JPanel {
   
     Color gray = new Color(218, 229, 234);
     Color green = new Color(188, 226, 158);
+    Color yellow = new Color(229, 239, 193);
   
     private boolean selected;
     private QNA qna;
@@ -435,11 +482,12 @@ class Prompt extends JPanel {
       qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
       this.add(qtext, BorderLayout.WEST); // add index label to task*/
 
-      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), 16, Color.BLACK, Color.LIGHT_GRAY);
+      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), 16, Color.BLACK, yellow);
       this.add(qtext, BorderLayout.WEST);
   
       selectButton = new JButton("Select");
       selectButton.setPreferredSize(new Dimension(50, 20));
+      selectButton.setFont(new Font("Verdana", 0, 15));
       selectButton.setBorder(BorderFactory.createEmptyBorder());
       selectButton.setFocusPainted(false);
   

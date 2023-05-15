@@ -16,7 +16,7 @@ public class HistoryManager {
 
     public HistoryManager(String historyFilePath){
         historyList = new ArrayList<Prompt>();
-        historyFile = new File("history.txt");
+        historyFile = new File(historyFilePath);
         selected = null;
         //Load a history file into a variable, build the readers/writers.
         try{
@@ -125,7 +125,7 @@ public class HistoryManager {
         }catch(Exception e){
 
         }
-
+        readFileIntoArrayList();
         return;
     }
 }

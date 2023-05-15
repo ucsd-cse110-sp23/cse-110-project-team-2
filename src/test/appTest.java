@@ -1,5 +1,6 @@
 
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.json.JSONObject;
@@ -72,6 +73,8 @@ public class appTest {
         assertFalse(httpRequest.bodyPublisher().isEmpty());
     }
 
+    // THIS TEST ONLY WORKS ON LOCAL MACHINES WITH MICROPHONES
+    // THIS WILL NOT WORK ON THE CI/CD PIPELINE
     // @Test
     // public void testRecordingAndStopping() throws InterruptedException {
     //     MockAudioHandler audioHandler = new MockAudioHandler();
@@ -101,8 +104,58 @@ public class appTest {
         assertTrue(Arrays.asList(expectedAnswers).contains(qna.getAnswer()));
     }
     
+    @Test
+    public void testAddToHistory() {
+        String historyFilePath = "testhistory.txt";
+        HistoryManager historyManager = new HistoryManager(historyFilePath);
 
+        // Create a sample QNA
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
 
+        // Add the sample QNA to the history
+        Prompt addedPrompt = historyManager.addToHistory(sampleQNA);
+
+        // Get the history list
+        ArrayList<Prompt> historyList = historyManager.getHistoryList();
+
+        // Ensure the prompt was added to the history list
+        assertTrue(historyList.contains(addedPrompt));
+
+        // Cleanup: Delete the file created during the test
+        File historyFile = new File(historyFilePath);
+        historyFile.delete();
+    }
+
+    @Test
+    public void testDeleteFromHistory() {
+        String historyFilePath = "testhistory.txt";
+        HistoryManager historyManager = new HistoryManager(historyFilePath);
+
+        // Create sample QNAs
+        QNA qna1 = new QNA("Answer 1", "Question 1");
+        QNA qna2 = new QNA("Answer 2", "Question 2");
+        QNA qna3 = new QNA("Answer 3", "Question 3");
+
+        // Add sample QNAs to the history
+        historyManager.addToHistory(qna1);
+        Prompt promptToDelete = historyManager.addToHistory(qna2);
+        historyManager.addToHistory(qna3);
+
+        // Delete the prompt from the history
+        historyManager.deleteFromHistory(promptToDelete);
+
+        // Get the updated history list
+        ArrayList<Prompt> historyList = historyManager.getHistoryList();
+
+        // Ensure the prompt was removed from the history list
+        assertFalse(historyList.contains(promptToDelete));
+
+        // Cleanup: Delete the file created during the test
+        File historyFile = new File(historyFilePath);
+        historyFile.delete();
+    }
 }
+    
+
 
 

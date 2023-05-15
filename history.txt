@@ -1,7 +1,9 @@
-Bye.,,,
 
-Goodbye. Have a nice day.,,,Hello?,,,
 
-Hi, how can I help you?,,,Hello.,,,
+Goodbye. Have a nice day.,,,Bye.,,,
 
-Hi! How are you?,,,
+Hi, how can I help you?,,,Hello?,,,Is this fixed?,,,
+
+Yes, this problem should be fixed now.,,,still works, right?,,,
+			
+Yes, it still works.,,,

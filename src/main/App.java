@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 
 import java.util.ArrayList;
 
@@ -85,6 +86,7 @@ class QnaPanel extends JPanel {
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
+    EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
@@ -137,6 +139,31 @@ class QnaPanel extends JPanel {
             apiHandler.stopRecording();
             //audioHandler.stopRecording();
             QNA gptPrompt = apiHandler.audioToAnswer();
+            System.out.println(gptPrompt.getQuestion());
+
+
+            if(gptPrompt.getQuestion().toUpperCase().equals("SETUP EMAIL.") ||
+                gptPrompt.getQuestion().toUpperCase().equals("SET UP EMAIL.") ||
+                gptPrompt.getQuestion().toUpperCase().equals("SET UP EMAIL") ||
+                gptPrompt.getQuestion().toUpperCase().equals("SETUP EMAIL"))
+            {
+                //TODO OPEN THE EMAIL SETUP WINDOW
+                System.out.println("Email setup command received");
+
+                int result = JOptionPane.showConfirmDialog(null, emailSetupPanel, "setup email", JOptionPane.OK_CANCEL_OPTION);
+                
+                if(result == JOptionPane.OK_OPTION){
+                    System.out.println(emailSetupPanel.getSmtpHostFieldContent());
+                    System.out.println(emailSetupPanel.getSmtpPortFieldContent());
+                    System.out.println(emailSetupPanel.getEmailFieldContent());
+                    System.out.println(emailSetupPanel.getPasswordFieldContent());
+                } else{
+                    System.out.println("The user canceled email setup");
+                }
+
+                return;
+            }
+
             //Note: change spot recording is saved
             qnaDisplay.setQNASection(gptPrompt);
             //File newFile = new File("recording.wav");
@@ -220,6 +247,46 @@ class ContentPanel extends JPanel {
 
     public String getTitle(){
         return title;
+    }
+}
+
+class EmailSetupPanel extends JPanel{
+    private JTextField smtpHostField;
+    private JTextField smtpPortField;
+    private JTextField emailField;
+    private JTextField passwordField;
+
+    public EmailSetupPanel(){
+        this.setLayout(new GridLayout(4,1));
+        smtpHostField = new JTextField(20);
+        smtpPortField = new JTextField(20);
+        emailField = new JTextField(20);
+        passwordField = new JTextField(20);
+
+        this.add(new JLabel("SMTP HOST"));
+        this.add(smtpHostField);
+        this.add(new JLabel("SMTP PORT"));
+        this.add(smtpPortField);
+        this.add(new JLabel("YOUR EMAIL"));
+        this.add(emailField);
+        this.add(new JLabel("YOUR EMAIL PASSWORD"));
+        this.add(passwordField);
+    }
+
+    public String getSmtpHostFieldContent(){
+        return smtpHostField.getText();
+    }
+
+    public String getSmtpPortFieldContent(){
+        return smtpPortField.getText();
+    }
+
+    public String getEmailFieldContent(){
+        return emailField.getText();
+    }
+
+    public String getPasswordFieldContent(){
+        return passwordField.getText();
     }
 }
 

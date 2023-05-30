@@ -257,7 +257,7 @@ class QnaDisplay extends JPanel {
         this.setLayout(new BorderLayout());
         this.setBackground(Color.GREEN);
         
-        commandContentPanel = new ContentPanel("Command", "DEFAULT_COMMMAND",
+        commandContentPanel = new ContentPanel("Command", "DEFAULT_COMMAND",
                                                 Color.BLACK, turquoise, Color.BLACK, yellow,
                                                 HEIGHT/4, WIDTH);
         questionContentPanel = new ContentPanel("Question", "DEFAULT_QUESTION", 
@@ -279,6 +279,7 @@ class QnaDisplay extends JPanel {
     }
 
     public void setQNASection(QNA qna){
+        commandContentPanel.setContent(qna.getCommand().toString());
         questionContentPanel.setContent(qna.getQuestion());
         answerContentPanel.setContent(qna.getAnswer());
     }
@@ -528,8 +529,8 @@ class Prompt extends JPanel {
   
       this.setLayout(new BorderLayout()); // set layout of task
 
-
-      qtext = new TextPane(qna.getQuestion(), new Dimension(150, 20), 16, Color.BLACK, yellow);
+      String promptText = qna.getCommand().toString() + "\n" + qna.getQuestion();
+      qtext = new TextPane(promptText, new Dimension(150, 20), 16, Color.BLACK, yellow);
       this.add(qtext, BorderLayout.WEST);
   
       selectButton = new JButton("Select");

@@ -69,18 +69,20 @@ public class APIHandler {
     public QNA audioToAnswer() {
         String question = audioToQuestion();
         String answer = questionToAnswer(question);
-        return new QNA(question, answer);
+        return new QNA(question, answer, PromptType.QUESTION);
     }
 
     public QNA questionPromptType(String promptString){
         String[] strArr = promptString.split(" ", 2);
 
         if (strArr.length == 1 || strArr[1].equals("")){
-            return new QNA("", "Your question was empty, please try asking the quesiton again.");
+            return new QNA("", 
+                "Your question was empty, please try asking the question again.", 
+                PromptType.QUESTION);
         }
         String questionT = strArr[1];
         String answer = questionToAnswer(questionT);
-        return new QNA(questionT,answer);
+        return new QNA(questionT,answer,PromptType.QUESTION);
 
     }
 
@@ -89,7 +91,7 @@ public class APIHandler {
     public QNA audioToReply(){
         String promptString = audioToQuestion();
         if (promptString.equals("")){
-            return new QNA("", "Your prompt was blank, please check your microphone and try again.");
+            return new QNA("", "Your prompt was blank, please check your microphone and try again.", PromptType.NOCOMMAND);
         }
         PromptType pType = promptParser(promptString);
 
@@ -101,7 +103,7 @@ public class APIHandler {
         }
         
 
-        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString);
+        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
     }
 
 
@@ -109,7 +111,7 @@ public class APIHandler {
     //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
     public PromptType promptParser(String transcriptionString){
 
-        String[] strArr = transcriptionString.split(" ", 2);
+        String[] strArr = transcriptionString.split(" ", 4);
         if (strArr.length == 0 || transcriptionString.equals("")){
             System.out.println("Empty string voice input");
             return null;

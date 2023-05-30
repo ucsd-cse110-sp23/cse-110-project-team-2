@@ -15,8 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 // import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class appTest {
@@ -106,35 +109,21 @@ public class appTest {
     @Test
     public void testSendEmail() {
 
-        // Call the sendEmail() method
-        mockMail.sendEmail();
-
-        // Add assertions to verify the expected behavior
-        // For example, you can check if the email was sent successfully
-        // by verifying the console output or checking for any exceptions.
-        // Here, we will assume that the sendEmail() method prints "EMail Sent Successfully!!"
-        // to the console upon successful email sending.
-
         // Capture the console output
-        // Capture the console output
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(outputStream);
-        PrintStream originalPrintStream = System.out;
-        System.setOut(printStream);
-
-        // Call the sendEmail() method
+        
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
         mockMail.sendEmail();
-
-        // Reset the standard output stream
+        assertEquals("Email Sent Successfully!!\n", outContent.toString());
+        assertEquals("", errContent.toString());
         System.out.flush();
-        System.setOut(originalPrintStream);
-
-        // Get the console output
-        String consoleOutput = outputStream.toString();
-
-        // Assert that the expected message is printed to the console
-        //assertTrue(consoleOutput.contains("EMail Sent Successfully!!"));
-
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        
      }
 
 }

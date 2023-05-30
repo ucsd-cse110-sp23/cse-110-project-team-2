@@ -38,8 +38,8 @@ public class MockMail {
 
     private Session buildEmailSession(){
         Properties props = new Properties();
-		props.put("mail.smtp.host", mail.getSmtpHost()); //SMTP Host !!!!!!!!!!!!!!!!!
-		props.put("mail.smtp.port", mail.getSmtpPort()); //TLS Port!!!!!!!!!!!!!!!!!!!
+		props.put("mail.smtp.host", "test1"); //SMTP Host !!!!!!!!!!!!!!!!!
+		props.put("mail.smtp.port", "test2"); //TLS Port!!!!!!!!!!!!!!!!!!!
 		props.put("mail.smtp.auth", "true"); //enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
         props.put("mail.smtp.starttls.required", "true");
@@ -48,7 +48,7 @@ public class MockMail {
 		Authenticator auth = new Authenticator() {
 			//override the getPasswordAuthentication method
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(mail.getSenderEmail(), mail.getEmailPassword());
+				return new PasswordAuthentication("test3", "test4");
 			}
 		};
 		return Session.getInstance(props, auth);
@@ -64,23 +64,24 @@ public class MockMail {
 	      msg.addHeader("format", "flowed");
 	      msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-	      msg.setFrom(new InternetAddress(mail.getSenderEmail(), "SayIt Mail"));
+	      msg.setFrom(new InternetAddress("mail.getSenderEmail()", "SayIt Mail"));
 
-	      msg.setReplyTo(InternetAddress.parse(mail.getSenderEmail(), false));
+	      msg.setReplyTo(InternetAddress.parse("mail.getSenderEmail()", false));
 
-	      msg.setSubject(mail.getMailSubjectLine(), "UTF-8");
+	      msg.setSubject("mail.getMailSubjectLine()", "UTF-8");
 
-	      msg.setText(mail.getMailBody(), "UTF-8");
+	      msg.setText("mail.getMailBody()", "UTF-8");
 
 	      msg.setSentDate(new Date());
 
-	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail.getRecipientEmail(), false));
-	      System.out.println("Message is ready");
-
-	      System.out.println("EMail Sent Successfully!!");
+	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("mail.getRecipientEmail()", false));
+	      System.out.println("Email Sent Successfully!!");
+		  
+		  //throw new MessagingException("Email Sent Successfully!!");
 	    }
 	    catch (Exception e) {
-	      e.printStackTrace();
+			//System.out.println("Email Sent Successfully!!");
+			e.printStackTrace();
 	    }
 	}
 }

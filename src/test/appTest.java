@@ -31,7 +31,7 @@ public class appTest {
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
      MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
-     private MockAPIHandler mockAPIHandler = new MockAPIHandler();
+     MockAPIHandler mockAPIHandler = new MockAPIHandler();
      private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
      String MOCK_API_KEY = "f90q324j0j4359f90w";
      private static final String MODEL = "text-davinci-003";
@@ -264,6 +264,33 @@ public class appTest {
         // Cleanup: Delete the file created during the test
         historyFile.delete();
     }
+
+
+    // US 4 tests
+    @Test
+    public void testPromptParser() {
+        // Test case for empty prompt
+        PromptType promptTypeEmpty = mockAPIHandler.promptParser("");
+        assertNull(promptTypeEmpty);
+
+        // Test case for question prompt
+        PromptType promptTypeQuestion = mockAPIHandler.promptParser("question What is the capital of France?");
+        assertEquals(PromptType.QUESTION, promptTypeQuestion);
+
+        // Test case for no command prompt
+        PromptType promptTypeOther = mockAPIHandler.promptParser("create email");
+        assertEquals(PromptType.NOCOMMAND, promptTypeOther);
+    }
+
+    @Test
+    public void testAudioToReply() {
+        QNA qna = mockAPIHandler.audioToReply();
+
+        // Assert that the returned QNA object contains the expected question and one of the expected answers
+        assertEquals("What is the meaning of life?", qna.getQuestion());
+        assertTrue(Arrays.asList("42", "The meaning of life is 42", "42 is the meaning of life").contains(qna.getAnswer()));
+    }
+
 }
     
 

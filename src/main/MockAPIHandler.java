@@ -51,6 +51,6 @@ public class MockAPIHandler {
     public QNA audioToAnswer() {
         String question = audioToQuestion();
         String answer = questionToAnswer(question);
-        return new QNA(question, answer);
+        return new QNA(question, answer, PromptType.QUESTION);
     }
 }

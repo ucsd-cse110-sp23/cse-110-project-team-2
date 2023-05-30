@@ -27,7 +27,7 @@ public class GUIMediator {
     }
 
     public void clearQNADisplayText(){
-        QNA qna = new QNA("","");
+        QNA qna = new QNA("","", PromptType.NOCOMMAND);
         qnaDisplay.setQNASection(qna);
     }
 

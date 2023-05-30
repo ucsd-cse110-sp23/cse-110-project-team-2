@@ -29,6 +29,8 @@ public class APIHandler {
      * in:
      * out: the return string from whisperAPI
      */
+    
+
     private String audioToQuestion() {
         File newFile = new File("recording.wav");
         String whisperResponse = "";
@@ -67,6 +69,69 @@ public class APIHandler {
     public QNA audioToAnswer() {
         String question = audioToQuestion();
         String answer = questionToAnswer(question);
-        return new QNA(question, answer);
+        return new QNA(question, answer, PromptType.QUESTION);
+    }
+
+    public QNA questionPromptType(String promptString){
+        String[] strArr = promptString.split(" ", 2);
+
+        if (strArr.length == 1 || strArr[1].equals("")){
+            return new QNA("", 
+                "Your question was empty, please try asking the question again.", 
+                PromptType.QUESTION);
+        }
+        String questionT = strArr[1];
+        String answer = questionToAnswer(questionT);
+        return new QNA(questionT,answer,PromptType.QUESTION);
+
+    }
+
+
+
+    public QNA audioToReply(){
+        String promptString = audioToQuestion();
+        if (promptString.equals("")){
+            return new QNA("", "Your prompt was blank, please check your microphone and try again.", PromptType.NOCOMMAND);
+        }
+        PromptType pType = promptParser(promptString);
+
+        switch (pType){
+            case QUESTION:
+                return questionPromptType(promptString);
+            default:
+                break;
+        }
+        
+
+        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
+    }
+
+
+
+    //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
+    public PromptType promptParser(String transcriptionString){
+
+        String[] strArr = transcriptionString.split(" ", 4);
+        if (strArr.length == 0 || transcriptionString.equals("")){
+            System.out.println("Empty string voice input");
+            return null;
+        }
+        strArr[0] = strArr[0].toLowerCase();
+        
+        //Question prompt case
+        if (strArr[0].equals("question") || strArr[0].equals("question,") || strArr[0].equals("question.")){
+            return PromptType.QUESTION;
+        }
+
+
+        
+        if(strArr.length > 1 ){
+            strArr[1] = strArr[1].toLowerCase();
+        }
+        //two/three word length prompt cases
+        
+
+        return PromptType.NOCOMMAND;
+        
     }
 }

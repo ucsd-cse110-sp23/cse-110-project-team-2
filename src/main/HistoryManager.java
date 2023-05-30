@@ -65,7 +65,8 @@ public class HistoryManager {
             while (sr.hasNext()) {
                 tempQuestion = sr.next();
                 tempAnswer = sr.next();
-                tempQNA = new QNA(tempQuestion,tempAnswer);
+                //TODO: Store command too now
+                tempQNA = new QNA(tempQuestion,tempAnswer, PromptType.NOCOMMAND);
                 historyList.add(new Prompt(tempQNA));
             }
             sr.close();

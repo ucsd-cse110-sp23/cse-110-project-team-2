@@ -1,6 +1,8 @@
 public class QNA {
+    //REFACTOR QNA TO INCLUDE PROMPT
     private String question;
     private String answer;
+    private PromptType promptType = null;
 
     public QNA(String question, String answer){
         this.question = question;

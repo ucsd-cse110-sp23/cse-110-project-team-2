@@ -143,7 +143,7 @@ class QnaPanel extends JPanel {
                 apiHandler.stopRecording();
 
                 //use APi handler to get the response from chatGPT based on the audio file
-                QNA gptQNA = apiHandler.audioToAnswer();
+                QNA gptQNA = apiHandler.audioToReply();
 
                 //update the display to show the qna
                 guiMediator.changeQnaDisplayText(gptQNA);

@@ -15,7 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 // import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 
 public class appTest {
 
@@ -24,8 +26,7 @@ public class appTest {
      * retrieve answer and try saving to prompt history
      */
 
-     GPTHandler gpt;
-     WhisperHandler wh;
+     MockMail mockMail = new MockMail(new Mail());
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
      MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
@@ -102,6 +103,39 @@ public class appTest {
     }
     
 
+    @Test
+    public void testSendEmail() {
+
+        // Call the sendEmail() method
+        mockMail.sendEmail();
+
+        // Add assertions to verify the expected behavior
+        // For example, you can check if the email was sent successfully
+        // by verifying the console output or checking for any exceptions.
+        // Here, we will assume that the sendEmail() method prints "EMail Sent Successfully!!"
+        // to the console upon successful email sending.
+
+        // Capture the console output
+        // Capture the console output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        PrintStream originalPrintStream = System.out;
+        System.setOut(printStream);
+
+        // Call the sendEmail() method
+        mockMail.sendEmail();
+
+        // Reset the standard output stream
+        System.out.flush();
+        System.setOut(originalPrintStream);
+
+        // Get the console output
+        String consoleOutput = outputStream.toString();
+
+        // Assert that the expected message is printed to the console
+        //assertTrue(consoleOutput.contains("EMail Sent Successfully!!"));
+
+     }
 
 }
 

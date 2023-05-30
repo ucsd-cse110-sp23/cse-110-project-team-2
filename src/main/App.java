@@ -161,21 +161,22 @@ class QnaPanel extends JPanel {
  * Panel type to generically display content
  */
 class ContentPanel extends JPanel {
-
+    private static final int MIN_HEIGHT = 35;
     private String title, content;
     private TextPane titlePane, contentPane;
 
     ContentPanel(String title, String content, 
                  Color titleColor, Color titlePaneColor, 
-                 Color contentColor,  Color contentPaneColor) {
-        this.setPreferredSize(new Dimension(600, 300));
+                 Color contentColor,  Color contentPaneColor, 
+                 int height, int width) {
+        this.setPreferredSize(new Dimension(width, height));
         this.setLayout(new BorderLayout());
 
         this.title = title;
         this.content = content;
 
-        titlePane = new TextPane(title, new Dimension(600,50), 20, titleColor, titlePaneColor);
-        contentPane = new TextPane(content, new Dimension(600,250), 20, contentColor, contentPaneColor);
+        titlePane = new TextPane(title, new Dimension(width, MIN_HEIGHT), 20, titleColor, titlePaneColor);
+        contentPane = new TextPane(content, new Dimension(width, height-MIN_HEIGHT), 20, contentColor, contentPaneColor);
         this.setTitle(title);
         this.setContent(content);
 
@@ -241,26 +242,37 @@ class TextPane extends JTextPane {
  * Display for the question and answer
  */ 
 class QnaDisplay extends JPanel {
+    private static final int WIDTH = 600, HEIGHT = 600;
+
     Color yellow = new Color(229, 239, 193);
     Color green = new Color(162, 213, 171);
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
 
-    //Refactor maybe?
+    ContentPanel commandContentPanel;
     ContentPanel questionContentPanel;
     ContentPanel answerContentPanel;
     QnaDisplay(GUIMediator guiM) {
-        this.setPreferredSize(new Dimension(600, 600));
-        this.setLayout(new GridLayout(2, 1));
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        this.setLayout(new BorderLayout());
         this.setBackground(Color.GREEN);
+        
+        commandContentPanel = new ContentPanel("Command", "DEFAULT_COMMMAND",
+                                                Color.BLACK, turquoise, Color.BLACK, yellow,
+                                                HEIGHT/4, WIDTH);
+        questionContentPanel = new ContentPanel("Question", "DEFAULT_QUESTION", 
+                                                Color.BLACK, turquoise, Color.DARK_GRAY, yellow,
+                                                HEIGHT/4, WIDTH);
+        answerContentPanel =  new ContentPanel("Answer", "DEFAULT_ANSWER",
+                                               Color.BLACK, turquoise, Color.BLUE, yellow,
+                                               HEIGHT/2, WIDTH);
 
-        questionContentPanel = new ContentPanel("Question", "Select a question from the history list.", 
-                                                Color.BLACK, turquoise, Color.DARK_GRAY, yellow);
-        answerContentPanel =  new ContentPanel("Answer", "Or ask a question using the record button.",
-                                               Color.BLACK, turquoise, Color.BLUE, yellow);
+        JPanel qc = new JPanel(new GridLayout(2,1));
+        qc.add(commandContentPanel);
+        qc.add(questionContentPanel);
 
-        this.add(questionContentPanel);
-        this.add(answerContentPanel);
+        this.add(qc, BorderLayout.NORTH);
+        this.add(answerContentPanel, BorderLayout.CENTER);
 
         guiM.setQnaDisplay(this);
         
@@ -269,7 +281,6 @@ class QnaDisplay extends JPanel {
     public void setQNASection(QNA qna){
         questionContentPanel.setContent(qna.getQuestion());
         answerContentPanel.setContent(qna.getAnswer());
-        
     }
 }
 

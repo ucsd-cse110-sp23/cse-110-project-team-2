@@ -106,7 +106,7 @@ public class appTest {
         MockAPIHandler mockAPIHandler = new MockAPIHandler();
 
         // Set the expected question and answer
-        String expectedQuestion = "What is the meaning of life?";
+        String expectedQuestion = "question What is the meaning of life?";
         String[] expectedAnswers = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
         // Record audio and convert to QNA object

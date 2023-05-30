@@ -1,6 +1,8 @@
 
 import java.io.File;
 
+
+//API Handler class that serves as an interface for the 3 different API's we use
 public class APIHandler {
 
     private AudioHandler audioHandler;
@@ -22,6 +24,11 @@ public class APIHandler {
         audioHandler.stopRecording();
     }
 
+    /*
+     *  Sends the audio to whisper API, then recieves the transcription. Delegates to whisper API handler
+     * in:
+     * out: the return string from whisperAPI
+     */
     private String audioToQuestion() {
         File newFile = new File("recording.wav");
         String whisperResponse = "";
@@ -35,6 +42,11 @@ public class APIHandler {
         return whisperResponse;
     }
 
+    /*
+     * Sends the question transcription to GPT API and recieves the response
+     * in: transcription String
+     * out: answer String
+     */
     private String questionToAnswer(String transcription) {
         String gptResponse = "";
         try {
@@ -47,6 +59,11 @@ public class APIHandler {
         return gptResponse;
     }
 
+    /*
+     * Goes from recording file to transcription to GPT answer. 
+     * in: transcription String
+     * out: answer String
+     */
     public QNA audioToAnswer() {
         String question = audioToQuestion();
         String answer = questionToAnswer(question);

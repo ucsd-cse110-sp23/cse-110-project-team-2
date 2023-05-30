@@ -1,18 +1,19 @@
-## Getting Started
+# SayIt Assistant
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+![example workflow](https://github.com/ucsd-cse110-sp23/cse-110-project-team-2/actions/workflows/run-tests.yml/badge.svg)
 
-## Folder Structure
+## How to Run
+1. Download the zip
+2. Unzip
+3. Open the folder in the IDE of your choice
+    - Make sure you are in the correct directory
+4. On the command line type `./run.sh`
+5. Enjoy!
 
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## How to Use
+1. Press the record button and record your question
+    - You can also select a past prompt with the select button
+2. When finished with the question, press stop
+3. Wait for the AI to respond
+4. Read your response!
+    - You can also delete a past prompt (or every prompt) with the delete buttons

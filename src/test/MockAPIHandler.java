@@ -1,35 +1,27 @@
 
 import java.io.File;
 
+public class MockAPIHandler {
 
-//API Handler class that serves as an interface for the 3 different API's we use
-public class APIHandler {
+    public MockAudioHandler audioHandler;
+    public MockGPT gptHandler;
+    public MockWhisper whisperHandler;
+    //private String MOCK_API_KEY = "f90q324j0j4359f90w";
+    String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
-    private AudioHandler audioHandler;
-    private GPTHandler gptHandler;
-    private WhisperHandler whisperHandler;
-    private static String APIKey = "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";
-
-    APIHandler() {
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
+    MockAPIHandler() {
+        audioHandler = new MockAudioHandler();
+        gptHandler = new MockGPT(answerSet);
+        whisperHandler = new MockWhisper("question What is the meaning of life?");
     }
 
     public void startRecording() {
-        audioHandler.startRecording();
+        //audioHandler.startRecording();
     }
 
     public void stopRecording() {
-        audioHandler.stopRecording();
+        //audioHandler.stopRecording();
     }
-
-    /*
-     *  Sends the audio to whisper API, then recieves the transcription. Delegates to whisper API handler
-     * in:
-     * out: the return string from whisperAPI
-     */
-    
 
     private String audioToQuestion() {
         File newFile = new File("recording.wav");
@@ -44,11 +36,6 @@ public class APIHandler {
         return whisperResponse;
     }
 
-    /*
-     * Sends the question transcription to GPT API and recieves the response
-     * in: transcription String
-     * out: answer String
-     */
     private String questionToAnswer(String transcription) {
         String gptResponse = "";
         try {
@@ -61,11 +48,6 @@ public class APIHandler {
         return gptResponse;
     }
 
-    /*
-     * Goes from recording file to transcription to GPT answer. 
-     * in: transcription String
-     * out: answer String
-     */
     public QNA audioToAnswer() {
         String question = audioToQuestion();
         String answer = questionToAnswer(question);
@@ -76,16 +58,13 @@ public class APIHandler {
         String[] strArr = promptString.split(" ", 2);
 
         if (strArr.length == 1 || strArr[1].equals("")){
-            return new QNA("", 
-                "Your question was empty, please try asking the question again.", 
-                PromptType.QUESTION);
+            return new QNA("", "Your question was empty, please try asking the quesiton again.", PromptType.QUESTION);
         }
         String questionT = strArr[1];
         String answer = questionToAnswer(questionT);
-        return new QNA(questionT,answer,PromptType.QUESTION);
+        return new QNA(questionT,answer, PromptType.QUESTION);
 
     }
-
 
 
     public QNA audioToReply(){
@@ -111,7 +90,7 @@ public class APIHandler {
     //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
     public PromptType promptParser(String transcriptionString){
 
-        String[] strArr = transcriptionString.split(" ", 4);
+        String[] strArr = transcriptionString.split(" ", 2);
         if (strArr.length == 0 || transcriptionString.equals("")){
             System.out.println("Empty string voice input");
             return null;

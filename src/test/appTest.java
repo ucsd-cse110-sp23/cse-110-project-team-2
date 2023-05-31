@@ -31,7 +31,7 @@ public class appTest {
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
      MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
-     private MockAPIHandler mockAPIHandler = new MockAPIHandler();
+     MockAPIHandler mockAPIHandler = new MockAPIHandler();
      private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
      String MOCK_API_KEY = "f90q324j0j4359f90w";
      private static final String MODEL = "text-davinci-003";
@@ -106,7 +106,7 @@ public class appTest {
         MockAPIHandler mockAPIHandler = new MockAPIHandler();
 
         // Set the expected question and answer
-        String expectedQuestion = "What is the meaning of life?";
+        String expectedQuestion = "question What is the meaning of life?";
         String[] expectedAnswers = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
         // Record audio and convert to QNA object
@@ -126,7 +126,7 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create a sample QNA
-        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
 
         // Add the sample QNA to the history
         Prompt addedPrompt = historyManager.addToHistory(sampleQNA);
@@ -148,9 +148,9 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add sample QNAs to the history
         historyManager.addToHistory(qna1);
@@ -177,9 +177,9 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add sample QNAs to the history
         historyManager.addToHistory(qna1);
@@ -217,10 +217,10 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add the sample QNA to the history
         Prompt addedPrompt = historyManager.addToHistory(sampleQNA);
@@ -264,6 +264,33 @@ public class appTest {
         // Cleanup: Delete the file created during the test
         historyFile.delete();
     }
+
+
+    // US 4 tests
+    @Test
+    public void testPromptParser() {
+        // Test case for empty prompt
+        PromptType promptTypeEmpty = mockAPIHandler.promptParser("");
+        assertNull(promptTypeEmpty);
+
+        // Test case for question prompt
+        PromptType promptTypeQuestion = mockAPIHandler.promptParser("question What is the capital of France?");
+        assertEquals(PromptType.QUESTION, promptTypeQuestion);
+
+        // Test case for no command prompt
+        PromptType promptTypeOther = mockAPIHandler.promptParser("create email");
+        assertEquals(PromptType.NOCOMMAND, promptTypeOther);
+    }
+
+    @Test
+    public void testAudioToReply() {
+        QNA qna = mockAPIHandler.audioToReply();
+
+        // Assert that the returned QNA object contains the expected question and one of the expected answers
+        assertEquals("What is the meaning of life?", qna.getQuestion());
+        assertTrue(Arrays.asList("42", "The meaning of life is 42", "42 is the meaning of life").contains(qna.getAnswer()));
+    }
+
 }
     
 

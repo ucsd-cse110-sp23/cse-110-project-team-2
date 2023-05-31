@@ -12,6 +12,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleContext;
@@ -90,6 +95,19 @@ class QnaPanel extends JPanel {
     
 
     APIHandler apiHandler;
+    EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
+/*
+    private AudioHandler audioHandler;
+    private GPTHandler gptHandler;
+    private WhisperHandler whisperHandler;
+    private static String APIKey = "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";
+*/
+    QnaPanel() {
+        this.setPreferredSize(new Dimension(600, 800));
+        this.setLayout(new BorderLayout());
+        this.setBackground(Color.RED);
+    }
+    
     HistoryManager historyManager;
     GUIMediator guiMediator; 
 
@@ -135,23 +153,36 @@ class QnaPanel extends JPanel {
           }
         );
         stopButton.addActionListener(
-            (ActionEvent e) -> {
-                System.out.println("STOP PRESSED");
+        (ActionEvent e) -> {
+            System.out.println("STOP PRESSED");
+            recordPanel.hideRecording();
+            apiHandler.stopRecording();
+            //audioHandler.stopRecording();
+            QNA gptPrompt = apiHandler.audioToAnswer();
+            System.out.println(gptPrompt.getQuestion());
 
-                //hide recording text stop recording
-                recordPanel.hideRecording();
-                apiHandler.stopRecording();
+            if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){
+                int result = JOptionPane.showConfirmDialog(null, emailSetupPanel, "setup email", JOptionPane.OK_CANCEL_OPTION);
+                
+                if(result == JOptionPane.OK_OPTION){
+                    System.out.println(emailSetupPanel.getSmtpHostFieldContent());
+                    System.out.println(emailSetupPanel.getSmtpPortFieldContent());
+                    System.out.println(emailSetupPanel.getEmailFieldContent());
+                    System.out.println(emailSetupPanel.getPasswordFieldContent());
+                } else{
+                    System.out.println("The user canceled email setup");
+                }
 
-                //use APi handler to get the response from chatGPT based on the audio file
-                QNA gptQNA = apiHandler.audioToReply();
+                return;
+            }
 
-                //update the display to show the qna
-                guiMediator.changeQnaDisplayText(gptQNA);
+            //update the display to show the qna
+            guiMediator.changeQnaDisplayText(gptPrompt);
 
-                //add the prompt to the history manager/get prompt to display in history
-                Prompt newPrompt = historyManager.addToHistory(gptQNA);
-                guiMediator.addHistoryListPrompt(newPrompt);            
-                revalidate();                
+            //add the prompt to the history manager/get prompt to display in history
+            Prompt newPrompt = historyManager.addToHistory(gptPrompt);
+            guiMediator.addHistoryListPrompt(newPrompt);            
+            revalidate();                
             }
         );
     }
@@ -204,6 +235,45 @@ class ContentPanel extends JPanel {
     }
 }
 
+class EmailSetupPanel extends JPanel{
+    private JTextField smtpHostField;
+    private JTextField smtpPortField;
+    private JTextField emailField;
+    private JTextField passwordField;
+
+    public EmailSetupPanel(){
+        this.setLayout(new GridLayout(4,1));
+        smtpHostField = new JTextField(20);
+        smtpPortField = new JTextField(20);
+        emailField = new JTextField(20);
+        passwordField = new JTextField(20);
+
+        this.add(new JLabel("SMTP HOST"));
+        this.add(smtpHostField);
+        this.add(new JLabel("SMTP PORT"));
+        this.add(smtpPortField);
+        this.add(new JLabel("YOUR EMAIL"));
+        this.add(emailField);
+        this.add(new JLabel("YOUR EMAIL PASSWORD"));
+        this.add(passwordField);
+    }
+
+    public String getSmtpHostFieldContent(){
+        return smtpHostField.getText();
+    }
+
+    public String getSmtpPortFieldContent(){
+        return smtpPortField.getText();
+    }
+
+    public String getEmailFieldContent(){
+        return emailField.getText();
+    }
+
+    public String getPasswordFieldContent(){
+        return passwordField.getText();
+    }
+}
 
 /*
  * class to be used as a text pane

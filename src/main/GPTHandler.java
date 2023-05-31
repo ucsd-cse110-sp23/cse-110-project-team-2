@@ -38,6 +38,8 @@ public class GPTHandler {
             GPTRequest,
             HttpResponse.BodyHandlers.ofString()
             );
+        
+
 
         String responseBody = response.body();
         JSONObject responseJson = new JSONObject(responseBody);

@@ -161,38 +161,28 @@ class QnaPanel extends JPanel {
             QNA gptPrompt = apiHandler.audioToAnswer();
             System.out.println(gptPrompt.getQuestion());
 
-
-            // if(gptPrompt.getQuestion().toUpperCase().equals("SETUP EMAIL.") ||
-            //     gptPrompt.getQuestion().toUpperCase().equals("SET UP EMAIL.") ||
-            //     gptPrompt.getQuestion().toUpperCase().equals("SET UP EMAIL") ||
-            //     gptPrompt.getQuestion().toUpperCase().equals("SETUP EMAIL"))
-            // {
-            //     //TODO OPEN THE EMAIL SETUP WINDOW
-            //     System.out.println("Email setup command received");
-
-            //     int result = JOptionPane.showConfirmDialog(null, emailSetupPanel, "setup email", JOptionPane.OK_CANCEL_OPTION);
+            if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){
+                int result = JOptionPane.showConfirmDialog(null, emailSetupPanel, "setup email", JOptionPane.OK_CANCEL_OPTION);
                 
-            //     if(result == JOptionPane.OK_OPTION){
-            //         System.out.println(emailSetupPanel.getSmtpHostFieldContent());
-            //         System.out.println(emailSetupPanel.getSmtpPortFieldContent());
-            //         System.out.println(emailSetupPanel.getEmailFieldContent());
-            //         System.out.println(emailSetupPanel.getPasswordFieldContent());
-            //     } else{
-            //         System.out.println("The user canceled email setup");
-            //     }
+                if(result == JOptionPane.OK_OPTION){
+                    System.out.println(emailSetupPanel.getSmtpHostFieldContent());
+                    System.out.println(emailSetupPanel.getSmtpPortFieldContent());
+                    System.out.println(emailSetupPanel.getEmailFieldContent());
+                    System.out.println(emailSetupPanel.getPasswordFieldContent());
+                } else{
+                    System.out.println("The user canceled email setup");
+                }
 
-            //     return;
-            // }
-                //use APi handler to get the response from chatGPT based on the audio file
-                QNA gptQNA = apiHandler.audioToReply();
+                return;
+            }
 
-                //update the display to show the qna
-                guiMediator.changeQnaDisplayText(gptPrompt);
+            //update the display to show the qna
+            guiMediator.changeQnaDisplayText(gptPrompt);
 
-                //add the prompt to the history manager/get prompt to display in history
-                Prompt newPrompt = historyManager.addToHistory(gptPrompt);
-                guiMediator.addHistoryListPrompt(newPrompt);            
-                revalidate();                
+            //add the prompt to the history manager/get prompt to display in history
+            Prompt newPrompt = historyManager.addToHistory(gptPrompt);
+            guiMediator.addHistoryListPrompt(newPrompt);            
+            revalidate();                
             }
         );
     }

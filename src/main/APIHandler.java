@@ -86,6 +86,12 @@ public class APIHandler {
 
     }
 
+    public QNA deletePromptType() {
+        String promptT = "";
+        String answer = "Your prompt was deleted.";
+        return new QNA(promptT,answer,PromptType.DELETEPROMPT);
+    }
+
 
 
     public QNA audioToReply(){
@@ -98,6 +104,8 @@ public class APIHandler {
         switch (pType){
             case QUESTION:
                 return questionPromptType(promptString);
+            case DELETEPROMPT:
+                return deletePromptType();
             default:
                 break;
         }
@@ -119,10 +127,9 @@ public class APIHandler {
         strArr[0] = strArr[0].toLowerCase();
         
         //Question prompt case
-        if (strArr[0].equals("question") || strArr[0].equals("question,") || strArr[0].equals("question.")){
+        if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
-
 
         
         if(strArr.length > 1 ){
@@ -130,8 +137,24 @@ public class APIHandler {
         }
         //two/three word length prompt cases
         
+        // Delete prompt case
+        if (checkPunctuationEquals(strArr[0], "delete") && checkPunctuationEquals(strArr[1], "prompt")){
+            return PromptType.DELETEPROMPT;
+        }
+
 
         return PromptType.NOCOMMAND;
         
+    }
+
+    public Boolean checkPunctuationEquals(String str1, String str2) {
+        if (str1.equals(str2)) {
+            return true;
+        }
+        if (str1.equals(str2 + ".") || str1.equals(str2 + ",") || str1.equals(str2 + "?") || str1.equals(str2 + "!")) {
+            return true;
+        }
+        return false;
+
     }
 }

@@ -87,6 +87,14 @@ public class APIHandler {
         return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
     }
 
+    public QNA createEmailPromptType(String promptString){
+        promptString = promptString + ", sign my name as QUANDALE";
+        QNA questionSubQNA = questionPromptType(promptString);
+        questionSubQNA.setCommand(PromptType.CREATEEMAIL);
+
+        return questionSubQNA;
+    }
+
     public QNA audioToReply(){
         String promptString = audioToQuestion(); //turn the current audio file into str
 
@@ -102,6 +110,8 @@ public class APIHandler {
                 return questionPromptType(promptString);
             case SETUPEMAIL:
                 return setupEmailPromptType(promptString); 
+            case CREATEEMAIL:
+                return createEmailPromptType(promptString);
             default:
                 break;
         }
@@ -126,7 +136,13 @@ public class APIHandler {
         if (strArr[0].equals("question") || strArr[0].equals("question,") || strArr[0].equals("question.")){
             return PromptType.QUESTION;
         }
-        //Email Setup prompt case
+        //Email Setup prompt case-
+        String wordTuple = strArr[0] + " " + strArr[1];
+        System.out.println("Wordtuple" + wordTuple);
+        if(wordTuple.toLowerCase().equals("create email")){
+            return PromptType.CREATEEMAIL;
+        }
+
 
         if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
             transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||

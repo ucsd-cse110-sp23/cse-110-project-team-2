@@ -106,10 +106,10 @@ public class MockAPIHandler {
         transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||
         transcriptionString.toUpperCase().equals("SET UP EMAIL") ||
         transcriptionString.toUpperCase().equals("SETUP EMAIL"))
-    {
-        //TODO OPEN THE EMAIL SETUP WINDOW
-         return PromptType.SETUPEMAIL;
-    }
+        {
+            //TODO OPEN THE EMAIL SETUP WINDOW
+            return PromptType.SETUPEMAIL;
+        }
 
         
         if(strArr.length > 1 ){

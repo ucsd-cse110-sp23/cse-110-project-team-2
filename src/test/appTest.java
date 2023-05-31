@@ -126,7 +126,7 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create a sample QNA
-        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
 
         // Add the sample QNA to the history
         Prompt addedPrompt = historyManager.addToHistory(sampleQNA);
@@ -148,9 +148,9 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add sample QNAs to the history
         historyManager.addToHistory(qna1);
@@ -177,9 +177,9 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add sample QNAs to the history
         historyManager.addToHistory(qna1);
@@ -217,10 +217,10 @@ public class appTest {
         HistoryManager historyManager = new HistoryManager(historyFilePath);
 
         // Create sample QNAs
-        QNA sampleQNA = new QNA("Sample Answer", "Sample Question");
-        QNA qna1 = new QNA("Answer 1", "Question 1");
-        QNA qna2 = new QNA("Answer 2", "Question 2");
-        QNA qna3 = new QNA("Answer 3", "Question 3");
+        QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
+        QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
+        QNA qna2 = new QNA("Answer 2", "Question 2", PromptType.QUESTION);
+        QNA qna3 = new QNA("Answer 3", "Question 3", PromptType.QUESTION);
 
         // Add the sample QNA to the history
         Prompt addedPrompt = historyManager.addToHistory(sampleQNA);

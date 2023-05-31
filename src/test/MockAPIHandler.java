@@ -90,7 +90,7 @@ public class MockAPIHandler {
     //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
     public PromptType promptParser(String transcriptionString){
 
-        String[] strArr = transcriptionString.split(" ", 2);
+        String[] strArr = transcriptionString.split(" ", 4);
         if (strArr.length == 0 || transcriptionString.equals("")){
             System.out.println("Empty string voice input");
             return null;
@@ -111,6 +111,11 @@ public class MockAPIHandler {
             return PromptType.SETUPEMAIL;
         }
 
+        //Email Setup prompt case-
+        String wordTuple = strArr[0] + " " + strArr[1];
+        if(wordTuple.toLowerCase().equals("create email")){
+            return PromptType.CREATEEMAIL;
+        }
         
         if(strArr.length > 1 ){
             strArr[1] = strArr[1].toLowerCase();

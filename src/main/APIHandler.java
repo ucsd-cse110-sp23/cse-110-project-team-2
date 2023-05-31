@@ -93,13 +93,13 @@ public class APIHandler {
 
         //TODO: ACTUALLY IMPLEMENT THIS WHEN DB STUFF IS DONE.
         if(!tempIsDisplayNameSetup){
-            return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.NOCOMMAND);
+            return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.SETUPEMAIL);
         }
 
         //this is just a fancy question type, asks gpt to generate
         //we also ask it to sign it using our name
         String displayName = "QUANDALE";
-        String signatureRequest = ", sign my name as" + displayName;
+        String signatureRequest = ", sign my name with Best Regards, and my first name" + displayName + ". DO NOT CREATE A SUBJECT LINE.";
         String signedPromptString = promptString + signatureRequest;
 
         QNA questionSubQNA = questionPromptType(signedPromptString);
@@ -154,7 +154,6 @@ public class APIHandler {
         }
         //Email Setup prompt case-
         String wordTuple = strArr[0] + " " + strArr[1];
-        System.out.println("Wordtuple" + wordTuple);
         if(wordTuple.toLowerCase().equals("create email")){
             return PromptType.CREATEEMAIL;
         }

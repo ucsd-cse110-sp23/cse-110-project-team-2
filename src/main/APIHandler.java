@@ -88,9 +88,25 @@ public class APIHandler {
     }
 
     public QNA createEmailPromptType(String promptString){
-        promptString = promptString + ", sign my name as QUANDALE";
-        QNA questionSubQNA = questionPromptType(promptString);
+
+        boolean tempIsDisplayNameSetup = true;
+
+        //TODO: ACTUALLY IMPLEMENT THIS WHEN DB STUFF IS DONE.
+        if(!tempIsDisplayNameSetup){
+            return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.NOCOMMAND);
+        }
+
+        //this is just a fancy question type, asks gpt to generate
+        //we also ask it to sign it using our name
+        String displayName = "QUANDALE";
+        String signatureRequest = ", sign my name as" + displayName;
+        String signedPromptString = promptString + signatureRequest;
+
+        QNA questionSubQNA = questionPromptType(signedPromptString);
+
+        //make sure the QNA does not have the fields that the creation method gives it
         questionSubQNA.setCommand(PromptType.CREATEEMAIL);
+        questionSubQNA.setQuestion(promptString);
 
         return questionSubQNA;
     }

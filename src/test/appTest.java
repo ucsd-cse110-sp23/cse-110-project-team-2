@@ -266,7 +266,8 @@ public class appTest {
     }
 
 
-    // US 4 tests
+    // US 4 / 6 tests
+    // We test for correct prompt type being parsed and returned
     @Test
     public void testPromptParser() {
         // Test case for empty prompt
@@ -277,10 +278,15 @@ public class appTest {
         PromptType promptTypeQuestion = mockAPIHandler.promptParser("question What is the capital of France?");
         assertEquals(PromptType.QUESTION, promptTypeQuestion);
 
+        // Test case for delete prompt
+        PromptType promptTypeDelete = mockAPIHandler.promptParser("delete prompt");
+        assertEquals(PromptType.DELETEPROMPT, promptTypeDelete);
+
         // Test case for no command prompt
-        PromptType promptTypeOther = mockAPIHandler.promptParser("create email");
+        PromptType promptTypeOther = mockAPIHandler.promptParser("this should return no command");
         assertEquals(PromptType.NOCOMMAND, promptTypeOther);
     }
+
 
     @Test
     public void testAudioToReply() {

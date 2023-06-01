@@ -416,11 +416,11 @@ class HistoryPanel extends JPanel {
         this.setAutoscrolls(true);
         this.add(sp, BorderLayout.CENTER);
 
-        historyButtonPanel = new HistoryButtonPanel();
-        this.add(historyButtonPanel, BorderLayout.SOUTH);
+        // historyButtonPanel = new HistoryButtonPanel();
+        // this.add(historyButtonPanel, BorderLayout.SOUTH);
 
-        this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
-        this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
+        // this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
+        // this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
 
         this.guiM = guiM;
 

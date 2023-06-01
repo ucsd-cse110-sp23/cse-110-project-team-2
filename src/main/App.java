@@ -174,9 +174,9 @@ class QnaPanel extends JPanel {
                 return;
             }
             else if(gptPrompt.getCommand() == PromptType.QUESTION) {
-                guiMediator.changeQnaDisplayText(gptQNA);
+                guiMediator.changeQnaDisplayText(gptPrompt);
                  //add the prompt to the history manager/get prompt to display in history
-                Prompt newPrompt = historyManager.addToHistory(gptQNA);
+                Prompt newPrompt = historyManager.addToHistory(gptPrompt);
                 guiMediator.addHistoryListPrompt(newPrompt);            
                 revalidate();  
                 return;
@@ -184,7 +184,7 @@ class QnaPanel extends JPanel {
             else if(gptPrompt.getCommand() == PromptType.DELETEPROMPT) {
                 guiMediator.clearQNADisplayText();
                 guiMediator.deletePrompt();
-                guiMediator.changeQnaDisplayText(gptQNA);
+                guiMediator.changeQnaDisplayText(gptPrompt);
                 return;
             }
                             

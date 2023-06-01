@@ -1,4 +1,3 @@
-
 import java.io.File;
 
 
@@ -67,9 +66,7 @@ public class APIHandler {
      * out: answer String
      */
     public QNA audioToAnswer() {
-        String question = audioToQuestion();
-        String answer = questionToAnswer(question);
-        return new QNA(question, answer, PromptType.QUESTION);
+        return audioToReply();
     }
 
     public QNA questionPromptType(String promptString){
@@ -93,12 +90,19 @@ public class APIHandler {
     }
 
 
+    public QNA setupEmailPromptType(String promptString){
+        return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
+    }
+
 
     public QNA audioToReply(){
-        String promptString = audioToQuestion();
+        String promptString = audioToQuestion(); //turn the current audio file into str
+
         if (promptString.equals("")){
             return new QNA("", "Your prompt was blank, please check your microphone and try again.", PromptType.NOCOMMAND);
         }
+
+        System.out.println("parsing the line:" + promptString);
         PromptType pType = promptParser(promptString);
 
         switch (pType){
@@ -106,6 +110,8 @@ public class APIHandler {
                 return questionPromptType(promptString);
             case DELETEPROMPT:
                 return deletePromptType();
+            case SETUPEMAIL:
+                return setupEmailPromptType(promptString); 
             default:
                 break;
         }
@@ -129,6 +135,16 @@ public class APIHandler {
         //Question prompt case
         if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
+        }
+        //Email Setup prompt case
+
+        if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
+            transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||
+            transcriptionString.toUpperCase().equals("SET UP EMAIL") ||
+            transcriptionString.toUpperCase().equals("SETUP EMAIL"))
+        {
+            //TODO OPEN THE EMAIL SETUP WINDOW
+             return PromptType.SETUPEMAIL;
         }
 
         

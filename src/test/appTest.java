@@ -282,9 +282,14 @@ public class appTest {
         PromptType promptTypeDelete = mockAPIHandler.promptParser("delete prompt");
         assertEquals(PromptType.DELETEPROMPT, promptTypeDelete);
 
+        //Test case for setup email
+        PromptType promptTypeSetupEmail = mockAPIHandler.promptParser("sEt Up EmAiL.");
+        assertEquals(PromptType.SETUPEMAIL, promptTypeSetupEmail);
+
         // Test case for no command prompt
         PromptType promptTypeOther = mockAPIHandler.promptParser("this should return no command");
         assertEquals(PromptType.NOCOMMAND, promptTypeOther);
+
     }
 
 

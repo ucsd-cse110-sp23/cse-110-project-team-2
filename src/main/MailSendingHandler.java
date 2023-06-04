@@ -21,6 +21,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.print.attribute.PrintServiceAttribute;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
@@ -30,8 +31,31 @@ public class MailSendingHandler {
 
 	private Mail mail;
 
-    public MailSendingHandler(Mail mail){
-		this.mail = mail;
+    public MailSendingHandler(QNA emailPrompt, QNA sendEmailPrompt, EmailSetupPanel esp){
+		this.mail = parseSendEmailPrompt(emailPrompt, sendEmailPrompt, esp);
+	}
+
+	private Mail parseSendEmailPrompt(QNA emailPrompt, QNA sendEmailPrompt, EmailSetupPanel esp){
+		MailBuilder mb = new MailBuilder();
+
+		String[] splitPromptString = sendEmailPrompt.getQuestion().split(" ");
+		String emailBody = emailPrompt.getAnswer();
+		String recipientEmail = splitPromptString[3] + "@" + splitPromptString[5];
+		
+		//sometimes it adds a thing at the end
+		if(recipientEmail.charAt(recipientEmail.length() - 1) == '.'){
+			recipientEmail = recipientEmail.substring(0,recipientEmail.length()-1);
+		}
+
+		mb.setSenderEmail(esp.getEmailFieldContent())
+		.setRecipientEmail(recipientEmail)
+		.setEmailPassword(esp.getPasswordFieldContent())
+		.setSmtpHost(esp.getSmtpHostFieldContent())
+		.setSmtpPort(esp.getSmtpPortFieldContent())
+		.setSubjectLine("New email from SayIt")
+		.setMailbody(emailBody);
+		
+		return mb.create();
 	}
 
     private Session buildEmailSession(){

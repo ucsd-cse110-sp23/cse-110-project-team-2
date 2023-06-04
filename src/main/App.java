@@ -179,6 +179,11 @@ class QnaPanel extends JPanel {
             //User says "send email" with an email selected
             if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() == PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
                 System.out.println("Detected Send email command!");
+                MailSendingHandler msh = new MailSendingHandler(historyManager.getSelected().getQNA(), gptPrompt, emailSetupPanel);
+                msh.sendEmail();
+
+                
+
                 return;
             }
 

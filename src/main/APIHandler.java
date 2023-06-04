@@ -111,6 +111,10 @@ public class APIHandler {
         return questionSubQNA;
     }
 
+    public QNA handleSendEmailPromptType(String promptString){
+        return new QNA(promptString,null,PromptType.SENDEMAIL);
+    }
+
     public QNA audioToReply(){
         String promptString = audioToQuestion(); //turn the current audio file into str
 
@@ -128,6 +132,8 @@ public class APIHandler {
                 return setupEmailPromptType(promptString); 
             case CREATEEMAIL:
                 return createEmailPromptType(promptString);
+            case SENDEMAIL:
+                return handleSendEmailPromptType(promptString);
             default:
                 break;
         }
@@ -136,6 +142,9 @@ public class APIHandler {
         return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
     }
 
+    public String parseSendEmailString(String s){
+        return "horse";
+    }
 
 
     //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
@@ -156,6 +165,11 @@ public class APIHandler {
         String wordTuple = strArr[0] + " " + strArr[1];
         if(wordTuple.toLowerCase().equals("create email")){
             return PromptType.CREATEEMAIL;
+        }
+
+        //"SEND EMAIL TO {RECIPIENT}"
+        if(wordTuple.toLowerCase().equals("send email")){
+            return PromptType.SENDEMAIL;
         }
 
 

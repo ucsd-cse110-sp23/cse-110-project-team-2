@@ -10,6 +10,8 @@ public class GUIMediator {
     public GUIMediator(){
 
     }
+
+
     public void setHistoryList(HistoryList hl){
         historyList = hl;
     }

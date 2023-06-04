@@ -171,6 +171,16 @@ class QnaPanel extends JPanel {
                 return;
             }
 
+            
+            if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() != PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                System.out.println("Tried to send email without create email selected");
+            }
+
+            if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() == PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                System.out.println("Detected Send email command!");
+                return;
+            }
+
             //update the display to show the qna
             guiMediator.changeQnaDisplayText(gptPrompt);
 
@@ -430,6 +440,10 @@ class HistoryList extends JPanel {
         this.layout.setRows(numRows);
     }
 
+    public Prompt getSelectedPrompt(){
+        return historyManager.getSelected();
+    }
+
     /*
      * Add a prompt to the history list
      */
@@ -662,6 +676,10 @@ class Prompt extends JPanel {
 
     public QNA getQNA(){
       return qna;
+    }
+
+    public PromptType getPromptType(){
+        return qna.getCommand();
     }
   
     public JButton getSelectButton() {

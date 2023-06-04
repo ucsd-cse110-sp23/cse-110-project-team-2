@@ -171,11 +171,12 @@ class QnaPanel extends JPanel {
                 return;
             }
 
-            
+            //User says "send email" when they don't have an email selected
             if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() != PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
                 System.out.println("Tried to send email without create email selected");
             }
 
+            //User says "send email" with an email selected
             if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() == PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
                 System.out.println("Detected Send email command!");
                 return;

@@ -16,8 +16,13 @@ import org.junit.jupiter.api.BeforeEach;
 // import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class appTest {
 
@@ -26,8 +31,7 @@ public class appTest {
      * retrieve answer and try saving to prompt history
      */
 
-     GPTHandler gpt;
-     WhisperHandler wh;
+     MockMail mockMail = new MockMail(new Mail());
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
      MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
@@ -299,6 +303,25 @@ public class appTest {
         assertEquals("What is the meaning of life?", qna.getQuestion());
         assertTrue(Arrays.asList("42", "The meaning of life is 42", "42 is the meaning of life").contains(qna.getAnswer()));
     }
+    @Test
+    public void testSendEmail() {
+
+        // Capture the console output
+        
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
+        mockMail.sendEmail();
+        assertEquals("Email Sent Successfully!!\n", outContent.toString());
+        assertEquals("", errContent.toString());
+        System.out.flush();
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        
+     }
 
 }
     

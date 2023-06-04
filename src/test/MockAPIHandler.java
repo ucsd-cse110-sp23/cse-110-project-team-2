@@ -12,7 +12,7 @@ public class MockAPIHandler {
     MockAPIHandler() {
         audioHandler = new MockAudioHandler();
         gptHandler = new MockGPT(answerSet);
-        whisperHandler = new MockWhisper("question What is the meaning of life?");
+        whisperHandler = new MockWhisper("What is the meaning of life?");
     }
 
     public void startRecording() {

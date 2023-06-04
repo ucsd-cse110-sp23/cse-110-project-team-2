@@ -34,6 +34,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     implementation "org.json:json:20210307"
+    implementation "javax.mail:mail:1.4.7"
 }
 
 test {

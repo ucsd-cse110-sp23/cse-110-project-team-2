@@ -34,7 +34,7 @@ public class appTest {
      MockMail mockMail = new MockMail(new Mail());
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
-     MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
+     MockWhisper mockWhisper = new MockWhisper("question What is the meaning of life?");
      MockAPIHandler mockAPIHandler = new MockAPIHandler();
      private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
      String MOCK_API_KEY = "f90q324j0j4359f90w";
@@ -315,7 +315,7 @@ public class appTest {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
         mockMail.sendEmail();
-        assertEquals("Email Sent Successfully!!\n", outContent.toString());
+        assertEquals("Email Sent Successfully!!", outContent.toString());
         assertEquals("", errContent.toString());
         System.out.flush();
         System.setOut(originalOut);

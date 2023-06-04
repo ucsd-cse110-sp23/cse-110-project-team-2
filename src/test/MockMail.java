@@ -75,7 +75,7 @@ public class MockMail {
 	      msg.setSentDate(new Date());
 
 	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("mail.getRecipientEmail()", false));
-	      System.out.println("Email Sent Successfully!!");
+	      System.out.print("Email Sent Successfully!!");
 		  
 		  //throw new MessagingException("Email Sent Successfully!!");
 	    }

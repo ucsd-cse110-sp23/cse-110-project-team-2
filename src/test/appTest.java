@@ -293,6 +293,9 @@ public class appTest {
         PromptType promptTypeCreateEmail = mockAPIHandler.promptParser("create email to Felix");
         assertEquals(PromptType.CREATEEMAIL, promptTypeCreateEmail);
 
+        PromptType promptTypeSendEmail = mockAPIHandler.promptParser("send email to fpeng@ucsd.edu");
+        assertEquals(PromptType.SENDEMAIL, promptTypeSendEmail);
+
     }
 
     @Test

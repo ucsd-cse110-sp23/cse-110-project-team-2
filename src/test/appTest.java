@@ -323,6 +323,38 @@ public class appTest {
         
      }
 
+     @Test
+     public void testPromptToEmail(){
+        EmailSetupPanel esp = new EmailSetupPanel();
+        MailSendingHandler msh; 
+        MailBuilder mb = new MailBuilder();
+        QNA sendEmailQNA = new QNA("send email to fpeng at ucsd.edu", null, PromptType.SENDEMAIL);
+        QNA createEmailQNA = new QNA(null, "hello felix, this is a test email. Sincerely, Quandale.", PromptType.CREATEEMAIL);
+
+        esp.setSmtpHostFieldContent("host");
+        esp.setSmtpPortFieldContent("port");
+        esp.setEmailFieldContent("userEmail");
+        esp.setPasswordFieldContent("hunter2");
+        
+        Mail mail = mb.setSmtpHost("host")
+        .setSmtpPort("port")
+        .setSenderEmail("userEmail")
+        .setEmailPassword("hunter2")
+        .setMailbody("hello felix, this is a test email. Sincerely, Quandale.")
+        .setSubjectLine("New email from SayIt")
+        .setRecipientEmail("fpeng@ucsd.edu")
+        .create();
+
+        msh = new MailSendingHandler(createEmailQNA, sendEmailQNA, esp);
+        
+        assertEquals(mail.toString(), msh.getMail().toString());
+        
+
+    
+
+        
+     }
+
 }
     
 

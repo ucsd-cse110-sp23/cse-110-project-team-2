@@ -66,4 +66,12 @@ public class Mail {
     public String getRecipientEmail(){
         return recipientEmail;
     }
+
+    public boolean equals(Mail otherMail){
+        return otherMail.toString().equals(this.toString());
+    }
+
+    public String toString(){
+        return "host: " + this.getSmtpHost() + "\n port: " + this.getSmtpPort() + "\n sender email: " + this.getSenderEmail() + "\n email pw: " + this.getEmailPassword() + "\n recipientEmail: " + this.getRecipientEmail() + "\n mail body: " + this.getMailBody() + "\n subject line: " + this.getMailSubjectLine();
+    }
 }

@@ -106,4 +106,8 @@ public class MailSendingHandler {
 	      e.printStackTrace();
 	    }
 	}
+
+	public Mail getMail(){
+		return mail;
+	}
 }

@@ -77,9 +77,7 @@ public class MailSendingHandler {
         
     }
 
-    public void sendEmail(){
-		try
-	    {
+    public void sendEmail() throws Exception{
 	      MimeMessage msg = new MimeMessage(buildEmailSession());
 	      //set message headers
 	      msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -101,10 +99,6 @@ public class MailSendingHandler {
     	  Transport.send(msg);  
 
 	      System.out.println("EMail Sent Successfully!!");
-	    }
-	    catch (Exception e) {
-	      e.printStackTrace();
-	    }
 	}
 
 	public Mail getMail(){

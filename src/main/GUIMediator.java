@@ -4,6 +4,7 @@
  */
 public class GUIMediator {
     private HistoryList historyList;
+    private HistoryPanel historyPanel;
     private QnaDisplay qnaDisplay;
 
 
@@ -15,6 +16,10 @@ public class GUIMediator {
     public void setHistoryList(HistoryList hl){
         historyList = hl;
     }
+
+    // public void setHistoryPanel(HistoryPanel hp){
+    //     historyPanel = hp;
+    // }
 
     public void setQnaDisplay(QnaDisplay qd){
         qnaDisplay = qd;
@@ -31,6 +36,10 @@ public class GUIMediator {
     public void clearQNADisplayText(){
         QNA qna = new QNA("","", PromptType.NOCOMMAND);
         qnaDisplay.setQNASection(qna);
+    }
+
+    public void deletePrompt(){
+        historyList.deletePrompt();
     }
 
 }

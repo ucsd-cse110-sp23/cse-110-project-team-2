@@ -24,6 +24,10 @@ public class QNA {
         this.answer = answer;
     }
 
+    public void setQuestion(String question){
+        this.question = question;
+    }
+
     public PromptType getCommand() {
         return promptType;
     }

@@ -120,7 +120,13 @@ public class MockAPIHandler {
             //TODO OPEN THE EMAIL SETUP WINDOW
             return PromptType.SETUPEMAIL;
         }
-
+      
+        //Email Setup prompt case-
+        String wordTuple = strArr[0] + " " + strArr[1];
+        if(wordTuple.toLowerCase().equals("create email")){
+            return PromptType.CREATEEMAIL;
+        }
+      
         if(strArr.length > 1 ){
             strArr[1] = strArr[1].toLowerCase();
         }

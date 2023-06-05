@@ -94,6 +94,29 @@ public class APIHandler {
         return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
     }
 
+    public QNA createEmailPromptType(String promptString){
+
+        boolean tempIsDisplayNameSetup = true;
+
+        //TODO: ACTUALLY IMPLEMENT THIS WHEN DB STUFF IS DONE.
+        if(!tempIsDisplayNameSetup){
+            return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.SETUPEMAIL);
+        }
+
+        //this is just a fancy question type, asks gpt to generate
+        //we also ask it to sign it using our name
+        String displayName = "QUANDALE";
+        String signatureRequest = ", sign my name with Best Regards, and my first name" + displayName + ". DO NOT CREATE A SUBJECT LINE.";
+        String signedPromptString = promptString + signatureRequest;
+
+        QNA questionSubQNA = questionPromptType(signedPromptString);
+
+        //make sure the QNA does not have the fields that the creation method gives it
+        questionSubQNA.setCommand(PromptType.CREATEEMAIL);
+        questionSubQNA.setQuestion(promptString);
+
+        return questionSubQNA;
+    }
 
     public QNA audioToReply(){
         String promptString = audioToQuestion(); //turn the current audio file into str
@@ -112,6 +135,8 @@ public class APIHandler {
                 return deletePromptType();
             case SETUPEMAIL:
                 return setupEmailPromptType(promptString); 
+            case CREATEEMAIL:
+                return createEmailPromptType(promptString);
             default:
                 break;
         }
@@ -136,7 +161,12 @@ public class APIHandler {
         if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
-        //Email Setup prompt case
+        //Email Setup prompt case-
+        String wordTuple = strArr[0] + " " + strArr[1];
+        if(wordTuple.toLowerCase().equals("create email")){
+            return PromptType.CREATEEMAIL;
+        }
+
 
         if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
             transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||

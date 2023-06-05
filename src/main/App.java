@@ -160,17 +160,12 @@ class QnaPanel extends JPanel {
             System.out.println(gptPrompt.getQuestion());
 
             if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){
-                int result = JOptionPane.showConfirmDialog(null, emailSetupPanel, "setup email", JOptionPane.OK_CANCEL_OPTION);
-                
-                if(result == JOptionPane.OK_OPTION){
-                    System.out.println(emailSetupPanel.getSmtpHostFieldContent());
-                    System.out.println(emailSetupPanel.getSmtpPortFieldContent());
-                    System.out.println(emailSetupPanel.getEmailFieldContent());
-                    System.out.println(emailSetupPanel.getPasswordFieldContent());
-                } else{
-                    System.out.println("The user canceled email setup");
-                }
+                emailSetupPanel.setupEmail();
+                return;
+            }
 
+            if(gptPrompt.getCommand() == PromptType.CREATEEMAIL && !emailSetupPanel.isEmailSetup()){
+                emailSetupPanel.setupEmail();
                 return;
             }
             else if(gptPrompt.getCommand() == PromptType.QUESTION) {
@@ -284,6 +279,50 @@ class EmailSetupPanel extends JPanel{
 
     public String getPasswordFieldContent(){
         return passwordField.getText();
+    }
+
+    public void setSmtpHostFieldContent(String s){
+        smtpHostField.setText(s);
+    }
+
+    public void setSmtpPortFieldContent(String s){
+        smtpPortField.setText(s);
+    }
+
+    public void setEmailFieldContent(String s){
+        emailField.setText(s);
+    }
+
+    public void setPasswordFieldContent(String s){
+        passwordField.setText(s);
+    }
+
+    public boolean isEmailSetup(){
+        String EMPTY_STRING = "";
+        return !getSmtpHostFieldContent().equals(EMPTY_STRING) && !getSmtpPortFieldContent().equals(EMPTY_STRING) && !getEmailFieldContent().equals(EMPTY_STRING) && !getPasswordFieldContent().equals(EMPTY_STRING);
+    }
+
+    
+
+    public void setupEmail(){
+        String oldSmtpHost = getSmtpHostFieldContent();
+        String oldSmtpPort = getSmtpPortFieldContent();
+        String oldEmail = getEmailFieldContent();
+        String oldPassword = getEmailFieldContent();
+
+        int result = JOptionPane.showConfirmDialog(null, this, "setup email", JOptionPane.OK_CANCEL_OPTION);
+                
+        if(result == JOptionPane.OK_OPTION){
+            //idk
+        } else{
+            //user canceled setup, reverting to old info
+            setSmtpHostFieldContent(oldSmtpHost);
+            setSmtpPortFieldContent(oldSmtpPort);
+            setEmailFieldContent(oldEmail);
+            setPasswordFieldContent(oldPassword);
+        }
+
+        return;
     }
 }
 

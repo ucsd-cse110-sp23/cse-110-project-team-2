@@ -287,8 +287,16 @@ public class appTest {
         assertEquals(PromptType.SETUPEMAIL, promptTypeSetupEmail);
 
         // Test case for no command prompt
+        /*
+        PromptType promptTypeOther = mockAPIHandler.promptParser("blah blah blah");
+        */
         PromptType promptTypeOther = mockAPIHandler.promptParser("this should return no command");
+      
         assertEquals(PromptType.NOCOMMAND, promptTypeOther);
+
+        // Test case for setup email
+        PromptType promptTypeCreateEmail = mockAPIHandler.promptParser("create email to Felix");
+        assertEquals(PromptType.CREATEEMAIL, promptTypeCreateEmail);
 
     }
 

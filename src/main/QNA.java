@@ -36,6 +36,10 @@ public class QNA {
         return answer;
     }
 
+    public PromptType getPromptType() {
+        return promptType;
+    }
+
     public String toString() { 
         return this.promptType + DELIM + this.question + DELIM + this.answer;
     }

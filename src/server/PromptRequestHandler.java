@@ -6,9 +6,10 @@ import java.util.*;
 
 public class PromptRequestHandler implements HttpHandler {
 
-    
+    private MongoHandler dbHandler;
 
     public PromptRequestHandler() {
+        this.dbHandler = dbHandler;
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {

@@ -6,7 +6,10 @@ import java.util.*;
 
 public class LoginRequestHandler implements HttpHandler {
 
+    private MongoHandler dbHandler;
+
     public LoginRequestHandler() {
+        this.dbHandler = dbHandler;
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -32,6 +35,7 @@ public class LoginRequestHandler implements HttpHandler {
 
     private String handleGet(HttpExchange httpExchange) throws IOException {
         //check if the provided username and password match with a user
+        return "foo";
     }   
 }
 

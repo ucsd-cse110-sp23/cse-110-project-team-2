@@ -90,9 +90,7 @@ class QnaPanel extends JPanel {
 
     QnaDisplay qnaDisplay;
     
-    public HistoryList historyList;
     RecordPanel recordPanel;
-    
 
     APIHandler apiHandler;
     EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
@@ -170,7 +168,21 @@ class QnaPanel extends JPanel {
                 emailSetupPanel.setupEmail();
                 return;
             }
-
+            else if(gptPrompt.getCommand() == PromptType.QUESTION) {
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                 //add the prompt to the history manager/get prompt to display in history
+                Prompt newPrompt = historyManager.addToHistory(gptPrompt);
+                guiMediator.addHistoryListPrompt(newPrompt);            
+                revalidate();  
+                return;
+            }
+            else if(gptPrompt.getCommand() == PromptType.DELETEPROMPT) {
+                guiMediator.clearQNADisplayText();
+                guiMediator.deletePrompt();
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                return;
+            }
+                            
             //update the display to show the qna
             guiMediator.changeQnaDisplayText(gptPrompt);
 
@@ -420,6 +432,7 @@ class HistoryList extends JPanel {
         this.setBackground(green);
 
         guiM.setHistoryList(this);
+        System.out.println("this is the history list");
         this.historyManager = histManager;
         this.guiMediator = guiM;
         loadHistory();
@@ -459,6 +472,16 @@ class HistoryList extends JPanel {
         this.remove(prompt);
         revalidate();
         //repaint();
+    }
+
+    public void deletePrompt(){
+        Prompt toDelete = historyManager.getSelectedToDelete();
+        if (toDelete != null) {
+            System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+            this.removePrompt(toDelete);
+            repaint();
+            revalidate();
+        }
     }
 
     /*
@@ -508,52 +531,53 @@ class HistoryPanel extends JPanel {
         this.setAutoscrolls(true);
         this.add(sp, BorderLayout.CENTER);
 
-        historyButtonPanel = new HistoryButtonPanel();
-        this.add(historyButtonPanel, BorderLayout.SOUTH);
+        // historyButtonPanel = new HistoryButtonPanel();
+        // this.add(historyButtonPanel, BorderLayout.SOUTH);
 
-        this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
-        this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
+        // this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
+        // this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
 
         this.guiM = guiM;
 
         this.historyManager = histManager;
-        addListeners();
+        // addListeners();
 
     }
 
     /*
+     * OLD CODE FOR HISTORY PANEL; WE DONT NEED BUTTONS ANYMORE
      * add listeners to the delete selected, and the delete all buttons
      */
-    public void addListeners(){
-        deleteSingleButton.addActionListener(
-            (ActionEvent e) -> {
-                Prompt toDelete = historyManager.getSelectedToDelete();
-                if (toDelete != null) {
-                    System.out.println("Deleting prompt" + toDelete.getQNA().toString());
-                    historyList.removePrompt(toDelete);
-                    guiM.clearQNADisplayText();
-                    repaint();
-                    revalidate();
-                }
-            }
-        );
+    // public void addListeners(){
+    //     deleteSingleButton.addActionListener(
+    //         (ActionEvent e) -> {
+    //             Prompt toDelete = historyManager.getSelectedToDelete();
+    //             if (toDelete != null) {
+    //                 System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+    //                 historyList.removePrompt(toDelete);
+    //                 guiM.clearQNADisplayText();
+    //                 repaint();
+    //                 revalidate();
+    //             }
+    //         }
+    //     );
     
-        deleteAllButton.addActionListener(
-            (ActionEvent e) -> {
-                for (Component prompt : historyList.getComponents()){
-                    if (prompt instanceof Prompt) {
-                        historyList.removePrompt((Prompt) prompt);
-                        repaint();
-                        revalidate();
-                    }
-                }
-                historyManager.clearHistory();
-                guiM.clearQNADisplayText();
-                repaint();
-                revalidate();
-            }
-        );
-    }
+    //     deleteAllButton.addActionListener(
+    //         (ActionEvent e) -> {
+    //             for (Component prompt : historyList.getComponents()){
+    //                 if (prompt instanceof Prompt) {
+    //                     historyList.removePrompt((Prompt) prompt);
+    //                     repaint();
+    //                     revalidate();
+    //                 }
+    //             }
+    //             historyManager.clearHistory();
+    //             guiM.clearQNADisplayText();
+    //             repaint();
+    //             revalidate();
+    //         }
+    //     );
+    // }
 }
 
 

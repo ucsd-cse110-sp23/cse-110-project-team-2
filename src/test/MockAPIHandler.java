@@ -66,6 +66,13 @@ public class MockAPIHandler {
 
     }
 
+    public QNA deletePromptType() {
+        String promptT = "";
+        String answer = "Your prompt was deleted.";
+        return new QNA(promptT,answer,PromptType.DELETEPROMPT);
+    }
+
+
 
     public QNA audioToReply(){
         String promptString = audioToQuestion();
@@ -77,6 +84,8 @@ public class MockAPIHandler {
         switch (pType){
             case QUESTION:
                 return questionPromptType(promptString);
+            case DELETEPROMPT:
+                return deletePromptType();
             default:
                 break;
         }
@@ -98,9 +107,10 @@ public class MockAPIHandler {
         strArr[0] = strArr[0].toLowerCase();
         
         //Question prompt case
-        if (strArr[0].equals("question") || strArr[0].equals("question,") || strArr[0].equals("question.")){
+        if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
+
 
         if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
         transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||
@@ -110,20 +120,36 @@ public class MockAPIHandler {
             //TODO OPEN THE EMAIL SETUP WINDOW
             return PromptType.SETUPEMAIL;
         }
-
+      
         //Email Setup prompt case-
         String wordTuple = strArr[0] + " " + strArr[1];
         if(wordTuple.toLowerCase().equals("create email")){
             return PromptType.CREATEEMAIL;
         }
-        
+      
         if(strArr.length > 1 ){
             strArr[1] = strArr[1].toLowerCase();
         }
         //two/three word length prompt cases
         
+        // Delete prompt case
+        if (checkPunctuationEquals(strArr[0], "delete") && checkPunctuationEquals(strArr[1], "prompt")){
+            return PromptType.DELETEPROMPT;
+        }
+
 
         return PromptType.NOCOMMAND;
         
+    }
+
+    public Boolean checkPunctuationEquals(String str1, String str2) {
+        if (str1.equals(str2)) {
+            return true;
+        }
+        if (str1.equals(str2 + ".") || str1.equals(str2 + ",") || str1.equals(str2 + "?") || str1.equals(str2 + "!")) {
+            return true;
+        }
+        return false;
+
     }
 }

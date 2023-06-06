@@ -90,8 +90,6 @@ public class MongoHandler {
         Bson filter = eq("username",username);
         ArrayList<Document> query = (ArrayList<Document>) userInfoCollection.find(filter).first().get("prompts");
         
-        
-
         System.out.println(query.size());
         
         return query;
@@ -113,8 +111,8 @@ public class MongoHandler {
         Document newPrompt = new Document();
         newPrompt.append("_id", oid)
         .append("promptType", promptType)
-        .append("question", prompt)
-        .append("answer", promptBody);
+        .append("question", question)
+        .append("answer", answer);
         
         //filter db query to only select the user we want
         Bson filter = eq("username", username);

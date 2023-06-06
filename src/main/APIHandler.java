@@ -122,6 +122,11 @@ public class APIHandler {
         return new QNA(promptString,null,PromptType.SENDEMAIL);
     }
 
+    public QNA handNoCommandPromptType(String promptString){
+        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
+    }
+
+
     public QNA audioToReply(){
         String promptString = audioToQuestion(); //turn the current audio file into str
 
@@ -143,12 +148,14 @@ public class APIHandler {
                 return createEmailPromptType(promptString);
             case SENDEMAIL:
                 return handleSendEmailPromptType(promptString);
+            case NOCOMMAND:
+                return handNoCommandPromptType(promptString);
             default:
                 break;
         }
         
 
-        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
+        return handNoCommandPromptType(promptString);
     }
 
     public String parseSendEmailString(String s){
@@ -170,9 +177,14 @@ public class APIHandler {
         if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
+
+        if (strArr.length == 1){
+            return PromptType.NOCOMMAND;
+        }
+
         //Email Setup prompt case-
         String wordTuple = strArr[0] + " " + strArr[1];
-        if(wordTuple.toLowerCase().equals("create email")){
+        if(checkPunctuationEquals(wordTuple.toLowerCase(), "create email")){
             return PromptType.CREATEEMAIL;
         }
 

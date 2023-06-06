@@ -2,7 +2,7 @@ import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
+import org.bson.Document;
 
 public class PromptRequestHandler implements HttpHandler {
 
@@ -45,9 +45,17 @@ public class PromptRequestHandler implements HttpHandler {
     }   
     private String handlePost(HttpExchange httpExchange) throws IOException {
         //TODO add a new prompt to a user
-        return "prompt";
+        InputStream inStream = httpExchange.getRequestBody();
+        Scanner scanner = new Scanner(inStream);
+        String postData = scanner.nextLine();
+        Document d = Document.parse(postData);
+        System.out.println(d.toString());
+        scanner.close();
+       
+        return postData;
     }
     private String handleDelete(HttpExchange httpExchange) throws IOException {
+
         //TODO delete a user's prompts
         return "prompt";
     }

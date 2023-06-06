@@ -63,7 +63,11 @@ public class MongoHandler {
         emailInfo.append("smtpPort","")
                     .append("smtpHost","")
                     .append("email","")
-                    .append("emailPassword","");
+                    .append("emailPassword","")
+                    .append("firstName", "")
+                    .append("lastName", "")
+                    .append("displayName", "");
+
 
         user.append("username", username)
             .append("password", password)
@@ -98,18 +102,19 @@ public class MongoHandler {
      * 
      * @param username - the user's username
      * @param promptType - the type of the prompt
-     * @param prompt - the command "Create email to X"
-     * @param promptBody - "the response of the prompt"
-     * @return true if the prompt was successfully added and false if something went wrong
+     * @param question - the command "Create email to X"
+     * @param answer - "the response of the prompt"
+     * @return The id of the newly created prompt, or null if there was no user with the given username.
      */
-    public boolean addPrompt(String username, String promptType, String prompt, String promptBody){
+    public String addPrompt(String username, String promptType, String question, String answer){
         
         //make the new prompt object/document
+        ObjectId oid = new ObjectId(); 
         Document newPrompt = new Document();
-        newPrompt.append("_id", new ObjectId())
+        newPrompt.append("_id", oid)
         .append("promptType", promptType)
-        .append("prompt", prompt)
-        .append("promptBody", promptBody);
+        .append("question", prompt)
+        .append("answer", promptBody);
         
         //filter db query to only select the user we want
         Bson filter = eq("username", username);
@@ -119,8 +124,13 @@ public class MongoHandler {
         
         //apply the update to the db
         UpdateResult updateResult = userInfoCollection.updateOne(filter,updateOperation);
+
+        //no user was found to append the prompt to
+        if(updateResult.getMatchedCount() == 0){
+            return null;
+        }
         
-        return updateResult.getModifiedCount() == 1;
+        return oid.toString();
     }
     
 
@@ -132,17 +142,24 @@ public class MongoHandler {
      * @param smtpPort
      * @param email
      * @param emailPassword
+     * @param firstName
+     * @param lastName
+     * @param displayName
      * @return true if the info was successfully updated, and false if something went wrong
      */
-    public boolean updateUserEmailInfo(String username, String smtpHost, String smtpPort, String email, String emailPassword){
+    public boolean updateUserEmailInfo(String username, String smtpHost, String smtpPort, String email, String emailPassword, String firstName, String lastName, String displayName){
         
         //Instead of changing one field I'm just gonna replace the
         //email document in the user entirely
         Document emailInfo = new Document();
+
         emailInfo.append("smtpPort", smtpPort)
         .append("smtpHost",smtpHost)
         .append("email",email)
-        .append("emailPassword",emailPassword);
+        .append("emailPassword",emailPassword)
+        .append("firstName", firstName)
+        .append("lastName", lastName)
+        .append("displayName", displayName);
         
         Bson filter = eq("username", username);
         Bson updateOperation = set("emailInfo", emailInfo);
@@ -200,15 +217,15 @@ public class MongoHandler {
      * Modifies the bnody of a prompt
      * @param username
      * @param promptID
-     * @param newBody - the new body to replace the old body
+     * @param newAnswer - the new body to replace the old body
      * @return true if the modification was successful and false if otherwise
      */
-    public boolean modifyPromptBody(String username, String promptID, String newBody){
+    public boolean modifyPromptAnswer(String username, String promptID, String newAnswer){
         Bson a = eq("username",username);
         Bson b = eq("prompts._id", new ObjectId(promptID));
         Bson q = combine(a,b);
         
-        Bson setOperation = set("prompts.$.promptBody", newBody);
+        Bson setOperation = set("prompts.$.answer", newAnswer);
 
         UpdateResult ur = userInfoCollection.updateOne(q, setOperation);
         

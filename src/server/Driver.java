@@ -11,5 +11,8 @@ public class Driver {
         mongo.getAllUserPrompts("baz");
         mongo.deletePrompt("foo", "647dd1d0409aa55cfb3df284");  
         mongo.addUser("aaa","aaa");      
+
+        mongo.addPrompt("foo", "aa", "abc", "jifij");
+        mongo.addPrompt("jacob", "aa", "abc", "jifij");
     }
 }

@@ -4,11 +4,20 @@ public class QNA {
     private String question;
     private String answer;
     private PromptType promptType = PromptType.NOCOMMAND;
+    private String id;
 
     public QNA(String question, String answer, PromptType command){
         this.question = question;
         this.answer = answer;
         this.promptType = command;
+        this.id = "CHANGE THE CONSTRUCTOR TO USE THE ID VERSION";
+    }
+
+    public QNA(String id, String question, String answer, PromptType command){
+        this.question = question;
+        this.answer = answer;
+        this.promptType = command;
+        this.id = id;
     }
 
     public boolean equals(QNA otherQuestion){

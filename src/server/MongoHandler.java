@@ -102,11 +102,11 @@ public class MongoHandler {
      * 
      * @param username - the user's username
      * @param promptType - the type of the prompt
-     * @param prompt - the command "Create email to X"
-     * @param promptBody - "the response of the prompt"
+     * @param question - the command "Create email to X"
+     * @param answer - "the response of the prompt"
      * @return The id of the newly created prompt, or null if there was no user with the given username.
      */
-    public String addPrompt(String username, String promptType, String prompt, String promptBody){
+    public String addPrompt(String username, String promptType, String question, String answer){
         
         //make the new prompt object/document
         ObjectId oid = new ObjectId(); 
@@ -217,10 +217,10 @@ public class MongoHandler {
      * Modifies the bnody of a prompt
      * @param username
      * @param promptID
-     * @param newBody - the new body to replace the old body
+     * @param newAnswer - the new body to replace the old body
      * @return true if the modification was successful and false if otherwise
      */
-    public boolean modifyPromptBody(String username, String promptID, String newAnswer){
+    public boolean modifyPromptAnswer(String username, String promptID, String newAnswer){
         Bson a = eq("username",username);
         Bson b = eq("prompts._id", new ObjectId(promptID));
         Bson q = combine(a,b);

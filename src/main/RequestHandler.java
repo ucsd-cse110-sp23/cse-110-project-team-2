@@ -7,21 +7,16 @@ import org.bson.Document;
 
 public class RequestHandler {
 
-    public String postMethod() throws Exception{
-        String URL = "http://localhost:8100/prompts/";
+    public String sendHttpRequest(String bodyString, String httpMethod, String path) throws Exception{
+        String URL = "http://localhost:8100/" + path;
         URL url = new URL(URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod(httpMethod);
         conn.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(
               conn.getOutputStream()
         );
-
-
-        Document d = new Document("yo mama", "so fat");
-        d.append("she really", "fat");
-        String s =  d.toJson();
-        out.write(s);
+        out.write(bodyString);
         out.flush();
         out.close();
         BufferedReader in = new BufferedReader(
@@ -31,6 +26,7 @@ public class RequestHandler {
         in.close();
         return response;
     }
+
     
     public String QNAToJSON(QNA qna){
         Document d = new Document("promptType", qna.getPromptType().toString())

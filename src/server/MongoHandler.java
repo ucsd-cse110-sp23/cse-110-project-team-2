@@ -36,7 +36,7 @@ public class MongoHandler {
     private MongoClient mongoClient;
     private MongoDatabase db; 
     private MongoCollection<Document> userInfoCollection;
-    private MongoCollection<Document> promptCollection;
+    private MongoCollection<Document> promptCollection; // ?
 
     public MongoHandler(){
         mongoClient = MongoClients.create(connectionUri);

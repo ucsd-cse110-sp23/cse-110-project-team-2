@@ -33,6 +33,8 @@ public class LoginRequestHandler implements HttpHandler {
         outStream.close();
     } 
 
+    // Add method for adding new user info? 
+
     private String handleGet(HttpExchange httpExchange) throws IOException {
         //check if the provided username and password match with a user
         return "foo";

@@ -168,6 +168,28 @@ class QnaPanel extends JPanel {
                 emailSetupPanel.setupEmail();
                 return;
             }
+          
+            //user tries to send an email without having an email set up.
+            if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() != PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                //User says "send email" when they don't have an email selected
+                gptPrompt = new QNA(gptPrompt.getQuestion(), "When trying to send an email, please select a prompt labeled \"Create email\"", PromptType.SENDEMAIL);
+            }
+            else if(gptPrompt.getCommand() == PromptType.SENDEMAIL && !emailSetupPanel.isEmailSetup()){
+                gptPrompt.setAnswer("Please set up an email by saying \"set up email\" before trying to send an email.");
+            }
+            else if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() == PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                //User says "send email" with an email selected
+                MailSendingHandler msh = new MailSendingHandler(historyManager.getSelected().getQNA(), gptPrompt, emailSetupPanel);
+                try{
+                    msh.sendEmail();
+                    gptPrompt.setAnswer("Email Successfully sent.");
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                    gptPrompt.setAnswer("There was an error sending the email.");
+                }
+
+            }
+
             else if(gptPrompt.getCommand() == PromptType.QUESTION) {
                 guiMediator.changeQnaDisplayText(gptPrompt);
                  //add the prompt to the history manager/get prompt to display in history
@@ -182,7 +204,7 @@ class QnaPanel extends JPanel {
                 guiMediator.changeQnaDisplayText(gptPrompt);
                 return;
             }
-                            
+
             //update the display to show the qna
             guiMediator.changeQnaDisplayText(gptPrompt);
 
@@ -443,6 +465,10 @@ class HistoryList extends JPanel {
         this.layout.setRows(numRows);
     }
 
+    public Prompt getSelectedPrompt(){
+        return historyManager.getSelected();
+    }
+
     /*
      * Add a prompt to the history list
      */
@@ -686,6 +712,10 @@ class Prompt extends JPanel {
 
     public QNA getQNA(){
       return qna;
+    }
+
+    public PromptType getPromptType(){
+        return qna.getCommand();
     }
   
     public JButton getSelectButton() {

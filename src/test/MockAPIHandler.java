@@ -126,7 +126,12 @@ public class MockAPIHandler {
         if(wordTuple.toLowerCase().equals("create email")){
             return PromptType.CREATEEMAIL;
         }
-      
+
+        //"SEND EMAIL TO {RECIPIENT}"
+        if(wordTuple.toLowerCase().equals("send email")){
+            return PromptType.SENDEMAIL;
+        }
+        
         if(strArr.length > 1 ){
             strArr[1] = strArr[1].toLowerCase();
         }

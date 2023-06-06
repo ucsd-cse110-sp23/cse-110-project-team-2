@@ -16,8 +16,13 @@ import org.junit.jupiter.api.BeforeEach;
 // import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class appTest {
 
@@ -26,11 +31,10 @@ public class appTest {
      * retrieve answer and try saving to prompt history
      */
 
-     GPTHandler gpt;
-     WhisperHandler wh;
+     MockMail mockMail = new MockMail(new Mail());
      String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
      MockGPT mockGPT = new MockGPT(answerSet);
-     MockWhisper mockWhisper = new MockWhisper("What is the meaning of life?");
+     MockWhisper mockWhisper = new MockWhisper("question What is the meaning of life?");
      MockAPIHandler mockAPIHandler = new MockAPIHandler();
      private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
      String MOCK_API_KEY = "f90q324j0j4359f90w";
@@ -298,6 +302,9 @@ public class appTest {
         PromptType promptTypeCreateEmail = mockAPIHandler.promptParser("create email to Felix");
         assertEquals(PromptType.CREATEEMAIL, promptTypeCreateEmail);
 
+        PromptType promptTypeSendEmail = mockAPIHandler.promptParser("send email to fpeng@ucsd.edu");
+        assertEquals(PromptType.SENDEMAIL, promptTypeSendEmail);
+
     }
 
 
@@ -309,6 +316,57 @@ public class appTest {
         assertEquals("What is the meaning of life?", qna.getQuestion());
         assertTrue(Arrays.asList("42", "The meaning of life is 42", "42 is the meaning of life").contains(qna.getAnswer()));
     }
+    @Test
+    public void testSendEmail() {
+
+        // Capture the console output
+        
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
+        mockMail.sendEmail();
+        assertEquals("Email Sent Successfully!!", outContent.toString());
+        assertEquals("", errContent.toString());
+        System.out.flush();
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        
+     }
+
+     @Test
+     public void testPromptToEmail(){
+        EmailSetupPanel esp = new EmailSetupPanel();
+        MailSendingHandler msh; 
+        MailBuilder mb = new MailBuilder();
+        QNA sendEmailQNA = new QNA("send email to fpeng at ucsd.edu", null, PromptType.SENDEMAIL);
+        QNA createEmailQNA = new QNA(null, "hello felix, this is a test email. Sincerely, Quandale.", PromptType.CREATEEMAIL);
+
+        esp.setSmtpHostFieldContent("host");
+        esp.setSmtpPortFieldContent("port");
+        esp.setEmailFieldContent("userEmail");
+        esp.setPasswordFieldContent("hunter2");
+        
+        Mail mail = mb.setSmtpHost("host")
+        .setSmtpPort("port")
+        .setSenderEmail("userEmail")
+        .setEmailPassword("hunter2")
+        .setMailbody("hello felix, this is a test email. Sincerely, Quandale.")
+        .setSubjectLine("New email from SayIt")
+        .setRecipientEmail("fpeng@ucsd.edu")
+        .create();
+
+        msh = new MailSendingHandler(createEmailQNA, sendEmailQNA, esp);
+        
+        assertEquals(mail.toString(), msh.getMail().toString());
+        
+
+    
+
+        
+     }
 
 }
     

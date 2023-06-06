@@ -28,6 +28,10 @@ public class HistoryManager {
         
     }
 
+    public Prompt getSelected(){
+        return selected;
+    }
+
     public void setSelected(Prompt select){
         if(selected != null){
             selected.changeState();

@@ -45,9 +45,15 @@ public class RequestHandler {
         return d.toJson();
     }
 
-    public String SetupEmailToJSON(String prefferedName, String SMTPHost, String SMTPPort, String emailPassword){
-        //Document d = new Document( "", );
+    public String SetupEmailToJSON(String firstName, String lastName, String displayName, String smtpHost, String smtpPort, String email, String emailPassword){
+        Document d = new Document( "firstName", firstName)
+            .append("lastName", lastName)
+            .append("displayName", displayName)
+            .append("smtpHost", smtpHost)
+            .append("smtpPort", smtpPort)
+            .append("email", email)
+            .append("emailPassword", emailPassword);
         //TODO: check what we need for setup email MORE FIELDS
-        return "";
+        return d.toJson();
     }
 }

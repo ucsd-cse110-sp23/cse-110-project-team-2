@@ -7,7 +7,7 @@ import org.bson.Document;
 
 public class RequestHandler {
 
-    public String postMethod(){
+    public String postMethod() throws Exception{
         String URL = "http://localhost:8100/prompts/";
         URL url = new URL(URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -32,11 +32,22 @@ public class RequestHandler {
         return response;
     }
     
-    public String QNAtoJSON(QNA qna){
+    public String QNAToJSON(QNA qna){
         Document d = new Document("promptType", qna.getPromptType().toString())
             .append("question", qna.getQuestion())
             .append("answer", qna.getAnswer());
         return d.toJson();
     }
     
+    public String CredentionalsToJSON(String username, String password){
+        Document d = new Document( "username", username)
+            .append("password", password);
+        return d.toJson();
+    }
+
+    public String SetupEmailToJSON(String prefferedName, String SMTPHost, String SMTPPort, String emailPassword){
+        //Document d = new Document( "", );
+        //TODO: check what we need for setup email MORE FIELDS
+        return "";
+    }
 }

@@ -35,6 +35,7 @@ dependencies {
 
     implementation "org.json:json:20210307"
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
+    implementation "javax.mail:mail:1.4.7"
 
 }
 

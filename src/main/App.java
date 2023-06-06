@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 // gui libraries
 import java.awt.BorderLayout;
@@ -8,13 +7,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,40 +15,54 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.JList;
-
+import javax.swing.JOptionPane;
 import java.util.ArrayList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.text.StyleContext;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
+/*
+ * Recording panel with buttons start and stop,with recording label
+ */
 class RecordPanel extends JPanel {
     private JButton startButton;
     private JButton stopButton;
     private JLabel recordingLabel;
+
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
     
-    private Border emptyBorder = BorderFactory.createEmptyBorder();
+    //private Border emptyBorder = BorderFactory.createEmptyBorder();
 
     RecordPanel(){
-        this.setPreferredSize(new Dimension(600, 200));
-        this.setBackground(Color.YELLOW);
+        this.setPreferredSize(new Dimension(600, 100));
+        this.setBackground(blue);
 
         startButton = new JButton("Start");
         startButton.setPreferredSize(new Dimension(80, 20));
+        startButton.setFont(new Font("Verdana", 0, 15));
+        //startButton.setBackground(blue);
         this.add(startButton);
         stopButton = new JButton("Stop");
         stopButton.setPreferredSize(new Dimension(80, 20));
+        stopButton.setFont(new Font("Verdana", 0, 15));
+        //stopButton.setBackground(blue);
         this.add(stopButton); 
 
         recordingLabel = new JLabel("Recording");
         recordingLabel.setVerticalAlignment(JLabel.CENTER);
         recordingLabel.setForeground(Color.RED);
         recordingLabel.setPreferredSize(new Dimension(100, 20));
+        recordingLabel.setFont(new Font("Verdana", 0, 15));
         recordingLabel.setVisible(false);
         this.add(recordingLabel);
 
     }
-
-
-    //TODO: Move listeners to QNA panel class possibly.
-    
-    
 
     public JButton getStartButton(){
         return startButton;
@@ -74,17 +80,20 @@ class RecordPanel extends JPanel {
     }
 }
 
+/*
+ * Total panel with the prompts/answers and the buttons?
+ */
 class QnaPanel extends JPanel {
 
     JButton startButton;
     JButton stopButton;
 
-    //TODO: REFACTOR TO USE THIS STYLE (IMPORTANT)
     QnaDisplay qnaDisplay;
-    public HistoryList historyList;
+    
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
+    EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
@@ -95,39 +104,50 @@ class QnaPanel extends JPanel {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
+    }
+    
+    HistoryManager historyManager;
+    GUIMediator guiMediator; 
 
-        qnaDisplay = new QnaDisplay();
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
+
+    QnaPanel(GUIMediator guiM, HistoryManager histManager) {
+        this.setPreferredSize(new Dimension(600, 300));
+
+        this.setLayout(new BorderLayout());
+        this.setBackground(yellow);
+
+
+        qnaDisplay = new QnaDisplay(guiM);
         recordPanel = new RecordPanel();
         this.add(qnaDisplay, BorderLayout.CENTER);
         this.add(recordPanel, BorderLayout.SOUTH);
+
 
         startButton = recordPanel.getStartButton();
         stopButton = recordPanel.getStopButton();
 
         apiHandler = new APIHandler();
-/*     
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
-*/
+        historyManager = histManager;
+        guiMediator = guiM;
+
         addListeners();
     }
 
-    public QnaDisplay getQnaDisplay(){
-        return qnaDisplay;
-    }
-
-    public void setHistoryList(HistoryList hl){
-        historyList = hl;
-    }
-
+    /*
+     * Adds listeners for the start and stop recordings button
+     */
     public void addListeners() {
         startButton.addActionListener(
-          (ActionEvent e) -> {
-              System.out.println("START PRESSED");
-              //audioHandler.startRecording();
-              recordPanel.showRecording();
-              apiHandler.startRecording();
+            (ActionEvent e) -> {
+                System.out.println("START PRESSED");
+                
+                //show the recording text then start recording
+                recordPanel.showRecording();
+                apiHandler.startRecording();
           }
         );
         stopButton.addActionListener(
@@ -137,75 +157,96 @@ class QnaPanel extends JPanel {
             apiHandler.stopRecording();
             //audioHandler.stopRecording();
             QNA gptPrompt = apiHandler.audioToAnswer();
-            //Note: change spot recording is saved
-            qnaDisplay.setQNASection(gptPrompt);
-            //File newFile = new File("recording.wav");
-            revalidate();
+            System.out.println(gptPrompt.getQuestion());
 
-// TODO: Separate class for managing history (keep business logic out of gui)
-
-            try {
-                
-                //System.out.println("getting API responses...");
-                //TODO: maybe multithread?
-                /*
-                whisperResponse = whisperHandler.transcribeAudio(newFile);
-                gptResponse = gptHandler.askQuestion(whisperResponse);
-                System.out.println(gptResponse);
-
-                QNA gptPrompt = new QNA(whisperResponse, gptResponse);
-                System.out.println("response...");
-                */
-
-                //TODO: save the prompt
-                FileWriter history = new FileWriter("history.txt", true);
-                history.write(gptPrompt.getQuestion() + ",,," + gptPrompt.getAnswer() + ",,,");
-                history.close();
-            } catch (Exception exception) {
-                System.out.println(exception.getStackTrace());
+            if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){
+                emailSetupPanel.setupEmail();
+                return;
             }
-            QNA qna = new QNA(gptPrompt.getQuestion(),gptPrompt.getAnswer());
-            Prompt prompt = new Prompt(qna);
-            historyList.add(prompt);
-            JButton selectButton = prompt.getSelectButton();
-            selectButton.addActionListener(
-            (ActionEvent e2) -> {
-                //TODO: update qnadisplay to show the selected prompt and answer
-                prompt.changeState(); // Change color of task
-                qnaDisplay.setQNASection(qna);
-                revalidate(); // Updates the frame
+
+            if(gptPrompt.getCommand() == PromptType.CREATEEMAIL && !emailSetupPanel.isEmailSetup()){
+                emailSetupPanel.setupEmail();
+                return;
             }
-            );
-          }
+          
+            //user tries to send an email without having an email set up.
+            if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() != PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                //User says "send email" when they don't have an email selected
+                gptPrompt = new QNA(gptPrompt.getQuestion(), "When trying to send an email, please select a prompt labeled \"Create email\"", PromptType.SENDEMAIL);
+            }
+            else if(gptPrompt.getCommand() == PromptType.SENDEMAIL && !emailSetupPanel.isEmailSetup()){
+                gptPrompt.setAnswer("Please set up an email by saying \"set up email\" before trying to send an email.");
+            }
+            else if(historyManager.getSelected() != null && historyManager.getSelected().getPromptType() == PromptType.CREATEEMAIL && gptPrompt.getCommand() == PromptType.SENDEMAIL){
+                //User says "send email" with an email selected
+                MailSendingHandler msh = new MailSendingHandler(historyManager.getSelected().getQNA(), gptPrompt, emailSetupPanel);
+                try{
+                    msh.sendEmail();
+                    gptPrompt.setAnswer("Email Successfully sent.");
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                    gptPrompt.setAnswer("There was an error sending the email.");
+                }
+
+            }
+
+            else if(gptPrompt.getCommand() == PromptType.QUESTION) {
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                 //add the prompt to the history manager/get prompt to display in history
+                Prompt newPrompt = historyManager.addToHistory(gptPrompt);
+                guiMediator.addHistoryListPrompt(newPrompt);            
+                revalidate();  
+                return;
+            }
+            else if(gptPrompt.getCommand() == PromptType.DELETEPROMPT) {
+                guiMediator.clearQNADisplayText();
+                guiMediator.deletePrompt();
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                return;
+            }
+
+            //update the display to show the qna
+            guiMediator.changeQnaDisplayText(gptPrompt);
+
+            //add the prompt to the history manager/get prompt to display in history
+            Prompt newPrompt = historyManager.addToHistory(gptPrompt);
+            guiMediator.addHistoryListPrompt(newPrompt);            
+            revalidate();                
+            }
         );
     }
 }
 
+/*
+ * Panel type to generically display content
+ */
 class ContentPanel extends JPanel {
+    private static final int MIN_HEIGHT = 35;
+    private String title, content;
+    private TextPane titlePane, contentPane;
 
-    private String title;
-    private String content;
-    private TextPanel titlePanel;
-    private TextPanel contentPanel;
-
-
-    ContentPanel(String title, String content, Color titleColor, Color contentColor) {
-        this.setPreferredSize(new Dimension(600, 300));
+    ContentPanel(String title, String content, 
+                 Color titleColor, Color titlePaneColor, 
+                 Color contentColor,  Color contentPaneColor, 
+                 int height, int width) {
+        this.setPreferredSize(new Dimension(width, height));
         this.setLayout(new BorderLayout());
 
         this.title = title;
         this.content = content;
 
-        titlePanel = new TextPanel(title, titleColor, new Dimension(600,50));
-        contentPanel = new TextPanel(content, contentColor, new Dimension(600,250));
+        titlePane = new TextPane(title, new Dimension(width, MIN_HEIGHT), 20, titleColor, titlePaneColor);
+        contentPane = new TextPane(content, new Dimension(width, height-MIN_HEIGHT), 20, contentColor, contentPaneColor);
+        this.setTitle(title);
+        this.setContent(content);
 
-        this.add(titlePanel, BorderLayout.NORTH);
-        this.add(contentPanel, BorderLayout.CENTER);
+        this.add(titlePane, BorderLayout.NORTH);
+        this.add(contentPane, BorderLayout.CENTER);
     }
 
     public void setContent(String content){
         this.content = content;
-        contentPanel.setText(content);
+        contentPane.replace(content);
     }
 
     public String getContent(){
@@ -214,7 +255,7 @@ class ContentPanel extends JPanel {
 
     public void setTitle(String title){
         this.title = title;
-        titlePanel.setText(title);
+        titlePane.replace(title);
     }
 
 
@@ -223,145 +264,365 @@ class ContentPanel extends JPanel {
     }
 }
 
-class TextPanel extends JPanel {
+class EmailSetupPanel extends JPanel{
+    private JTextField smtpHostField;
+    private JTextField smtpPortField;
+    private JTextField emailField;
+    private JTextField passwordField;
 
-    private JLabel textLabel;
+    public EmailSetupPanel(){
+        this.setLayout(new GridLayout(4,1));
+        smtpHostField = new JTextField(20);
+        smtpPortField = new JTextField(20);
+        emailField = new JTextField(20);
+        passwordField = new JTextField(20);
 
-    TextPanel(String text, Color color, Dimension size) {
-        this.setBackground(color);
-        this.setPreferredSize(size);
-        textLabel = new JLabel(text);
-        textLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        this.add(textLabel);
+        this.add(new JLabel("SMTP HOST"));
+        this.add(smtpHostField);
+        this.add(new JLabel("SMTP PORT"));
+        this.add(smtpPortField);
+        this.add(new JLabel("YOUR EMAIL"));
+        this.add(emailField);
+        this.add(new JLabel("YOUR EMAIL PASSWORD"));
+        this.add(passwordField);
     }
 
-    //FIX XD
-    public void setText(String text){
-        textLabel.setText(text);
+    public String getSmtpHostFieldContent(){
+        return smtpHostField.getText();
+    }
+
+    public String getSmtpPortFieldContent(){
+        return smtpPortField.getText();
+    }
+
+    public String getEmailFieldContent(){
+        return emailField.getText();
+    }
+
+    public String getPasswordFieldContent(){
+        return passwordField.getText();
+    }
+
+    public void setSmtpHostFieldContent(String s){
+        smtpHostField.setText(s);
+    }
+
+    public void setSmtpPortFieldContent(String s){
+        smtpPortField.setText(s);
+    }
+
+    public void setEmailFieldContent(String s){
+        emailField.setText(s);
+    }
+
+    public void setPasswordFieldContent(String s){
+        passwordField.setText(s);
+    }
+
+    public boolean isEmailSetup(){
+        String EMPTY_STRING = "";
+        return !getSmtpHostFieldContent().equals(EMPTY_STRING) && !getSmtpPortFieldContent().equals(EMPTY_STRING) && !getEmailFieldContent().equals(EMPTY_STRING) && !getPasswordFieldContent().equals(EMPTY_STRING);
+    }
+
+    
+
+    public void setupEmail(){
+        String oldSmtpHost = getSmtpHostFieldContent();
+        String oldSmtpPort = getSmtpPortFieldContent();
+        String oldEmail = getEmailFieldContent();
+        String oldPassword = getEmailFieldContent();
+
+        int result = JOptionPane.showConfirmDialog(null, this, "setup email", JOptionPane.OK_CANCEL_OPTION);
+                
+        if(result == JOptionPane.OK_OPTION){
+            //idk
+        } else{
+            //user canceled setup, reverting to old info
+            setSmtpHostFieldContent(oldSmtpHost);
+            setSmtpPortFieldContent(oldSmtpPort);
+            setEmailFieldContent(oldEmail);
+            setPasswordFieldContent(oldPassword);
+        }
+
+        return;
     }
 }
 
-class QnaDisplay extends JPanel {
+/*
+ * class to be used as a text pane
+ */
+class TextPane extends JTextPane {   
 
-    //Refactor maybe?
+    TextPane(String text, Dimension size, int fontSize, Color textColor, Color paneColor) {
+        this.setEditable(false);
+        this.setBackground(paneColor);
+        this.setPreferredSize(size);
+        //this.setFont(new Font("Open Sans", 0, size));
+
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, textColor);
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Verdana");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_CENTER);
+        aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
+        this.setCharacterAttributes(aset, false);
+
+        this.replace(text);
+    }
+
+    public void replace(String msg) {
+        this.setEditable(true);
+        this.setText(msg);
+        this.setEditable(false);
+    }
+
+    public void setBG(Color paneColor) {
+        this.setBackground(paneColor);
+    }
+}
+
+
+/*
+ * Display for the question and answer
+ */ 
+class QnaDisplay extends JPanel {
+    private static final int WIDTH = 600, HEIGHT = 600;
+
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
+
+    ContentPanel commandContentPanel;
     ContentPanel questionContentPanel;
     ContentPanel answerContentPanel;
-    QnaDisplay() {
-        this.setPreferredSize(new Dimension(600, 600));
-        this.setLayout(new GridLayout(2, 1));
+    QnaDisplay(GUIMediator guiM) {
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        this.setLayout(new BorderLayout());
         this.setBackground(Color.GREEN);
+        
+        commandContentPanel = new ContentPanel("Command", "DEFAULT_COMMAND",
+                                                Color.BLACK, turquoise, Color.BLACK, yellow,
+                                                HEIGHT/4, WIDTH);
+        questionContentPanel = new ContentPanel("Question", "DEFAULT_QUESTION", 
+                                                Color.BLACK, turquoise, Color.DARK_GRAY, yellow,
+                                                HEIGHT/4, WIDTH);
+        answerContentPanel =  new ContentPanel("Answer", "DEFAULT_ANSWER",
+                                               Color.BLACK, turquoise, Color.BLUE, yellow,
+                                               HEIGHT/2, WIDTH);
 
-        questionContentPanel = new ContentPanel("Question", "", Color.RED, Color.BLUE);
-        answerContentPanel =  new ContentPanel("Answer", "", Color.CYAN, Color.PINK);
-        this.add(questionContentPanel);
-        this.add(answerContentPanel);
+        JPanel qc = new JPanel(new GridLayout(2,1));
+        qc.add(commandContentPanel);
+        qc.add(questionContentPanel);
+
+        this.add(qc, BorderLayout.NORTH);
+        this.add(answerContentPanel, BorderLayout.CENTER);
+
+        guiM.setQnaDisplay(this);
         
     }
 
     public void setQNASection(QNA qna){
+        commandContentPanel.setContent(qna.getCommand().toString());
         questionContentPanel.setContent(qna.getQuestion());
         answerContentPanel.setContent(qna.getAnswer());
-        
     }
 }
 
-//SHOULD ONLY DISPLAY QUESTIONS
-// TODO: Separate class for managing history (keep business logic out of gui)
+/*
+ * panel that holds all the prompts in the prompt history
+ */
 class HistoryList extends JPanel {
-    public QnaDisplay qnaDisplay;
-    Color backgroundColor = new Color(240, 248, 255);
+    private GridLayout layout;
+    private final int MIN_ROWS = 6;
 
-    HistoryList(){
-        GridLayout layout = new GridLayout(10, 1);
+    Color backgroundColor = new Color(240, 248, 255);
+    HistoryManager historyManager;
+    GUIMediator guiMediator;
+    int count;
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
+
+    HistoryList(GUIMediator guiM, HistoryManager histManager){
+        layout = new GridLayout(0, 1);
         layout.setVgap(5); // Vertical gap
+        layout.setColumns(1);
 
         this.setLayout(layout); // 10 tasks
-        this.setPreferredSize(new Dimension(100, 500));
-        this.setBackground(backgroundColor);
+        //this.setPreferredSize(new Dimension(100, 500));
+        this.setBackground(green);
+
+        guiM.setHistoryList(this);
+        System.out.println("this is the history list");
+        this.historyManager = histManager;
+        this.guiMediator = guiM;
         loadHistory();
     }
 
-    public void setQnaDisplay(QnaDisplay qd){
-        qnaDisplay = qd;
+    public void updateLayout() {
+        int numRows = (count < MIN_ROWS) ? MIN_ROWS : count;
+        this.layout.setRows(numRows);
     }
 
-    private void loadHistory(){
-        String tempQuestion;
-        String tempAnswer;
-        ArrayList<QNA> qnalist = new ArrayList<QNA>();
-        try {
-            FileReader file = new FileReader("history.txt");
-            BufferedReader br = new BufferedReader(file);
-            Scanner sr = new Scanner(br);
-            sr.useDelimiter(",,,");
-            while (sr.hasNext()) {
-                tempQuestion = sr.next();
-                tempAnswer = sr.next();
-                qnalist.add(new QNA(tempQuestion,tempAnswer));
-            }
-            sr.close();
-            br.close();
-            file.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        for(QNA qna : qnalist){
-            Prompt prompt = new Prompt(qna);
-            this.add(prompt);
-            JButton selectButton = prompt.getSelectButton();
-            selectButton.addActionListener(
+    public Prompt getSelectedPrompt(){
+        return historyManager.getSelected();
+    }
+
+    /*
+     * Add a prompt to the history list
+     */
+    public void addPrompt(Prompt prompt){
+        count++;
+        updateLayout();
+        this.add(prompt);
+        JButton selectButton = prompt.getSelectButton();
+
+        //Add a listener to the button on the prompt to select the prompt for viewing
+        selectButton.addActionListener(
             (ActionEvent e2) -> {
                 //TODO: update qnadisplay to show the selected prompt and answer
-                prompt.changeState(); // Change color of task
-                qnaDisplay.setQNASection(qna);
+                historyManager.setSelected(prompt);
+                guiMediator.changeQnaDisplayText(prompt.getQNA());
                 revalidate(); // Updates the frame
             }
-          );
+        );
+    }
+
+    /*
+     * remove a prompt from the history list
+     */
+    public void removePrompt(Prompt prompt){
+        count--;
+        updateLayout();
+        this.remove(prompt);
+        revalidate();
+        //repaint();
+    }
+
+    public void deletePrompt(){
+        Prompt toDelete = historyManager.getSelectedToDelete();
+        if (toDelete != null) {
+            System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+            this.removePrompt(toDelete);
+            repaint();
+            revalidate();
         }
     }
+
+    /*
+     * Load all the prompts from the history.txt file. delegates to history manager
+     */
+    private void loadHistory(){
+        ArrayList<Prompt> promptList = historyManager.getHistoryList();
+        for(Prompt prompt : promptList){
+            addPrompt(prompt);
+        }
+        count = promptList.size();
+    }
 }
 
-class HistoryPanel extends JPanel {
-    private JPanel historyFooter;
-    private JPanel historyButtonPanel;
-    private HistoryList historyList;
 
-    HistoryPanel() {
+/*
+ * Wrapper panel for history
+ */
+class HistoryPanel extends JPanel {
+    //private JPanel historyFooter;
+    private HistoryButtonPanel historyButtonPanel;
+    private HistoryList historyList;
+    private HistoryManager historyManager;
+    private JButton deleteSingleButton;
+    private JButton deleteAllButton;
+
+    private GUIMediator guiM;
+    Color yellow = new Color(229, 239, 193);
+    Color green = new Color(162, 213, 171);
+    Color turquoise = new Color(57, 174, 169);
+    Color blue = new Color(85, 123, 131);
+
+
+    HistoryPanel(GUIMediator guiM, HistoryManager histManager) {
         this.setPreferredSize(new Dimension(200, 800));
-        this.setBackground(Color.BLUE);
+        this.setBackground(green);
         this.setLayout(new BorderLayout());
 
-        TextPanel headerPanel = new TextPanel("History", Color.LIGHT_GRAY, new Dimension(200, 50));
-
+        TextPane headerPanel = new TextPane("History", new Dimension(200, 50), 20, Color.LIGHT_GRAY, blue);
         this.add(headerPanel, BorderLayout.NORTH);
 
-        historyList = new HistoryList();
-        this.add(historyList, BorderLayout.CENTER);
+        historyList = new HistoryList(guiM, histManager);
+        //this.add(historyList, BorderLayout.CENTER);
 
-        historyButtonPanel = new HistoryButtonPanel();
-        this.add(historyButtonPanel, BorderLayout.SOUTH);
+        JScrollPane sp = new JScrollPane(historyList);
+        sp.setPreferredSize(new Dimension(200, 670));
+        this.setAutoscrolls(true);
+        this.add(sp, BorderLayout.CENTER);
+
+        // historyButtonPanel = new HistoryButtonPanel();
+        // this.add(historyButtonPanel, BorderLayout.SOUTH);
+
+        // this.deleteSingleButton = historyButtonPanel.getDeleteSingleButton();
+        // this.deleteAllButton = historyButtonPanel.getDeleteAllButton();
+
+        this.guiM = guiM;
+
+        this.historyManager = histManager;
+        // addListeners();
+
     }
 
-    public void setQnaDisplay(QnaDisplay qd){
-        historyList.setQnaDisplay(qd);
-    }
-
-    public HistoryList getHistoryList(){
-        return historyList;
-    }
+    /*
+     * OLD CODE FOR HISTORY PANEL; WE DONT NEED BUTTONS ANYMORE
+     * add listeners to the delete selected, and the delete all buttons
+     */
+    // public void addListeners(){
+    //     deleteSingleButton.addActionListener(
+    //         (ActionEvent e) -> {
+    //             Prompt toDelete = historyManager.getSelectedToDelete();
+    //             if (toDelete != null) {
+    //                 System.out.println("Deleting prompt" + toDelete.getQNA().toString());
+    //                 historyList.removePrompt(toDelete);
+    //                 guiM.clearQNADisplayText();
+    //                 repaint();
+    //                 revalidate();
+    //             }
+    //         }
+    //     );
+    
+    //     deleteAllButton.addActionListener(
+    //         (ActionEvent e) -> {
+    //             for (Component prompt : historyList.getComponents()){
+    //                 if (prompt instanceof Prompt) {
+    //                     historyList.removePrompt((Prompt) prompt);
+    //                     repaint();
+    //                     revalidate();
+    //                 }
+    //             }
+    //             historyManager.clearHistory();
+    //             guiM.clearQNADisplayText();
+    //             repaint();
+    //             revalidate();
+    //         }
+    //     );
+    // }
 }
 
+
+/*
+ * Panel for delete buttons
+ */ 
 class HistoryButtonPanel extends JPanel {
     private JButton deleteAll;
     private JButton deleteSingle;
 
-    private JLabel deleteSelected; // Maybe implement when any delete is selected, label shows up
     HistoryButtonPanel() {
+        this.setLayout(new GridLayout(2, 1));
         deleteAll = new JButton("Delete All");
+        deleteAll.setFont(new Font("Verdana", 0, 15));
         deleteAll.setPreferredSize(new Dimension(80, 20));
 
-        deleteSingle = new JButton("Delete One");
+
+        deleteSingle = new JButton("Delete Selected");
+        deleteSingle.setFont(new Font("Verdana", 0, 15));
         deleteSingle.setPreferredSize(new Dimension(80, 20));
 
         this.setPreferredSize(new Dimension(200, 100));
@@ -369,8 +630,21 @@ class HistoryButtonPanel extends JPanel {
         this.add(deleteSingle, BorderLayout.CENTER);
     }
 
+    public JButton getDeleteAllButton(){
+        return deleteAll;
+    }
+
+    public JButton getDeleteSingleButton(){
+        return deleteSingle;
+    }
+
+
+
 }
 
+/*
+ * Appframe that holds all the panels
+ */
 class AppFrame extends JFrame {
 
     AppFrame() {
@@ -379,47 +653,56 @@ class AppFrame extends JFrame {
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
-        HistoryPanel hp = new HistoryPanel();
-        QnaPanel qp = new QnaPanel();
-        hp.getHistoryList().qnaDisplay = qp.getQnaDisplay();
+
+
+        GUIMediator guiMediator =  new GUIMediator();
+        HistoryManager historyManager = new HistoryManager("history.txt");
+
+        HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
+        QnaPanel qp = new QnaPanel(guiMediator, historyManager);
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
-        qp.setHistoryList(hp.getHistoryList());
         this.setVisible(true); // Make visible
     }
 }
 
+/*
+ * prompts that are added to the history list. Each one encodes a qna
+ */
 class Prompt extends JPanel {
 
-    JLabel qtext;
+    TextPane qtext;
     JButton selectButton;
   
     Color gray = new Color(218, 229, 234);
     Color green = new Color(188, 226, 158);
+    Color yellow = new Color(229, 239, 193);
   
     private boolean selected;
     private QNA qna;
   
     Prompt(QNA qna) {
       this.qna = qna;
-      this.setPreferredSize(new Dimension(400, 20)); // set size of task
+      this.setPreferredSize(new Dimension(200, 75)); // set size of task
       this.setBackground(gray); // set background color of task
   
       this.setLayout(new BorderLayout()); // set layout of task
-  
-      //markedDone = false;
-  
-      qtext = new JLabel(qna.getQuestion()); // create index label
-      qtext.setPreferredSize(new Dimension(150, 20)); // set size of index label
-      qtext.setHorizontalAlignment(JLabel.CENTER); // set alignment of index label
-      this.add(qtext, BorderLayout.WEST); // add index label to task
+
+      String promptText = qna.getCommand().toString() + "\n" + qna.getQuestion();
+      qtext = new TextPane(promptText, new Dimension(150, 20), 16, Color.BLACK, yellow);
+      this.add(qtext, BorderLayout.WEST);
   
       selectButton = new JButton("Select");
-      selectButton.setPreferredSize(new Dimension(80, 20));
+      selectButton.setPreferredSize(new Dimension(50, 20));
+      selectButton.setFont(new Font("Verdana", 0, 15));
       selectButton.setBorder(BorderFactory.createEmptyBorder());
       selectButton.setFocusPainted(false);
   
       this.add(selectButton, BorderLayout.EAST);
+    }
+
+    public boolean equals(Prompt otherPrompt){
+        return this.qna.equals(otherPrompt.getQNA());
     }
   
     public void changeIndex(int num) {
@@ -430,6 +713,10 @@ class Prompt extends JPanel {
     public QNA getQNA(){
       return qna;
     }
+
+    public PromptType getPromptType(){
+        return qna.getCommand();
+    }
   
     public JButton getSelectButton() {
       return selectButton;
@@ -438,15 +725,17 @@ class Prompt extends JPanel {
     public boolean getState() {
       return selected;
     }
-  
-    // TODO: deselect every time we select a new one
+    
+    /*
+     * Change the color depending on if the prompt is selected
+     */
     public void changeState() {
       if(!this.getState()){
-        this.setBackground(green);
+        this.qtext.setBackground(green);
         selected = true;
       }
       else{
-        this.setBackground(gray);
+        this.qtext.setBackground(yellow);
         selected = false;
       }
       revalidate();
@@ -454,7 +743,9 @@ class Prompt extends JPanel {
 }
 
 
-
+/*
+ * Run the app!
+ */
 public class App {
     public static void main(String[] args) throws Exception {
         new AppFrame();

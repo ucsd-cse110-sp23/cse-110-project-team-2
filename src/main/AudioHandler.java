@@ -2,6 +2,9 @@
 import java.io.*;
 import javax.sound.sampled.*;
 
+/*
+ * Audio handler class to manage recording user audio
+ */
 public class AudioHandler {
 
     private AudioFormat audioFormat;

@@ -1,5 +1,3 @@
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import org.bson.Document;
@@ -7,8 +5,16 @@ import org.bson.Document;
 
 public class RequestHandler {
 
+    /**
+     * Generic method to send httpRequests to the local 
+     * @param bodyString the body of the request. The body should be generated using the methods below
+     * @param httpMethod the method (GET, POST, PUT, DELETE) as a string
+     * @param path the path, either "login" for login and account creation related queries, or "prompt"
+     * @return the string request body (format is undecided as of now, we will figure it out im sure)
+     * @throws Exception
+     */
     public String sendHttpRequest(String bodyString, String httpMethod, String path) throws Exception{
-        String URL = "http://localhost:8100/" + path;
+        String URL = "http://localhost:8100/" + path + "/";
         URL url = new URL(URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(httpMethod);

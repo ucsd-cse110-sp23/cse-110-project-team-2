@@ -1,34 +1,27 @@
+
 import java.io.File;
 
+public class MockAPIHandler {
 
-//API Handler class that serves as an interface for the 3 different API's we use
-public class APIHandler {
+    public MockAudioHandler audioHandler;
+    public MockGPT gptHandler;
+    public MockWhisper whisperHandler;
+    //private String MOCK_API_KEY = "f90q324j0j4359f90w";
+    String[] answerSet = {"42", "The meaning of life is 42", "42 is the meaning of life"};
 
-    private AudioHandler audioHandler;
-    private GPTHandler gptHandler;
-    private WhisperHandler whisperHandler;
-    private static String APIKey = "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";
-
-    APIHandler() {
-        audioHandler = new AudioHandler();
-        gptHandler = new GPTHandler(APIKey);
-        whisperHandler = new WhisperHandler(APIKey);
+    MockAPIHandler() {
+        audioHandler = new MockAudioHandler();
+        gptHandler = new MockGPT(answerSet);
+        whisperHandler = new MockWhisper("question What is the meaning of life?");
     }
 
     public void startRecording() {
-        audioHandler.startRecording();
+        //audioHandler.startRecording();
     }
 
     public void stopRecording() {
-        audioHandler.stopRecording();
+        //audioHandler.stopRecording();
     }
-
-    /*
-     *  Sends the audio to whisper API, then recieves the transcription. Delegates to whisper API handler
-     * in:
-     * out: the return string from whisperAPI
-     */
-    
 
     private String audioToQuestion() {
         File newFile = new File("recording.wav");
@@ -43,11 +36,6 @@ public class APIHandler {
         return whisperResponse;
     }
 
-    /*
-     * Sends the question transcription to GPT API and recieves the response
-     * in: transcription String
-     * out: answer String
-     */
     private String questionToAnswer(String transcription) {
         String gptResponse = "";
         try {
@@ -60,26 +48,21 @@ public class APIHandler {
         return gptResponse;
     }
 
-    /*
-     * Goes from recording file to transcription to GPT answer. 
-     * in: transcription String
-     * out: answer String
-     */
     public QNA audioToAnswer() {
-        return audioToReply();
+        String question = audioToQuestion();
+        String answer = questionToAnswer(question);
+        return new QNA(question, answer, PromptType.QUESTION);
     }
 
     public QNA questionPromptType(String promptString){
         String[] strArr = promptString.split(" ", 2);
 
         if (strArr.length == 1 || strArr[1].equals("")){
-            return new QNA("", 
-                "Your question was empty, please try asking the question again.", 
-                PromptType.QUESTION);
+            return new QNA("", "Your question was empty, please try asking the quesiton again.", PromptType.QUESTION);
         }
         String questionT = strArr[1];
         String answer = questionToAnswer(questionT);
-        return new QNA(questionT,answer,PromptType.QUESTION);
+        return new QNA(questionT,answer, PromptType.QUESTION);
 
     }
 
@@ -90,46 +73,12 @@ public class APIHandler {
     }
 
 
-    public QNA setupEmailPromptType(String promptString){
-        return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
-    }
-
-    public QNA createEmailPromptType(String promptString){
-
-        boolean tempIsDisplayNameSetup = true;
-
-        //TODO: ACTUALLY IMPLEMENT THIS WHEN DB STUFF IS DONE.
-        if(!tempIsDisplayNameSetup){
-            return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.SETUPEMAIL);
-        }
-
-        //this is just a fancy question type, asks gpt to generate
-        //we also ask it to sign it using our name
-        String displayName = "QUANDALE";
-        String signatureRequest = ", sign my name with Best Regards, and my first name" + displayName + ". DO NOT CREATE A SUBJECT LINE.";
-        String signedPromptString = promptString + signatureRequest;
-
-        QNA questionSubQNA = questionPromptType(signedPromptString);
-
-        //make sure the QNA does not have the fields that the creation method gives it
-        questionSubQNA.setCommand(PromptType.CREATEEMAIL);
-        questionSubQNA.setQuestion(promptString);
-
-        return questionSubQNA;
-    }
-
-    public QNA handleSendEmailPromptType(String promptString){
-        return new QNA(promptString,null,PromptType.SENDEMAIL);
-    }
 
     public QNA audioToReply(){
-        String promptString = audioToQuestion(); //turn the current audio file into str
-
+        String promptString = audioToQuestion();
         if (promptString.equals("")){
             return new QNA("", "Your prompt was blank, please check your microphone and try again.", PromptType.NOCOMMAND);
         }
-
-        System.out.println("parsing the line:" + promptString);
         PromptType pType = promptParser(promptString);
 
         switch (pType){
@@ -137,12 +86,6 @@ public class APIHandler {
                 return questionPromptType(promptString);
             case DELETEPROMPT:
                 return deletePromptType();
-            case SETUPEMAIL:
-                return setupEmailPromptType(promptString); 
-            case CREATEEMAIL:
-                return createEmailPromptType(promptString);
-            case SENDEMAIL:
-                return handleSendEmailPromptType(promptString);
             default:
                 break;
         }
@@ -151,9 +94,6 @@ public class APIHandler {
         return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
     }
 
-    public String parseSendEmailString(String s){
-        return "horse";
-    }
 
 
     //Setup email (2 or 3 words?) , delete all, delete prompt, question, create email, send email
@@ -170,6 +110,17 @@ public class APIHandler {
         if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
+
+
+        if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
+        transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||
+        transcriptionString.toUpperCase().equals("SET UP EMAIL") ||
+        transcriptionString.toUpperCase().equals("SETUP EMAIL"))
+        {
+            //TODO OPEN THE EMAIL SETUP WINDOW
+            return PromptType.SETUPEMAIL;
+        }
+      
         //Email Setup prompt case-
         String wordTuple = strArr[0] + " " + strArr[1];
         if(wordTuple.toLowerCase().equals("create email")){
@@ -180,17 +131,6 @@ public class APIHandler {
         if(wordTuple.toLowerCase().equals("send email")){
             return PromptType.SENDEMAIL;
         }
-
-
-        if(transcriptionString.toUpperCase().equals("SETUP EMAIL.") ||
-            transcriptionString.toUpperCase().equals("SET UP EMAIL.") ||
-            transcriptionString.toUpperCase().equals("SET UP EMAIL") ||
-            transcriptionString.toUpperCase().equals("SETUP EMAIL"))
-        {
-            //TODO OPEN THE EMAIL SETUP WINDOW
-             return PromptType.SETUPEMAIL;
-        }
-
         
         if(strArr.length > 1 ){
             strArr[1] = strArr[1].toLowerCase();

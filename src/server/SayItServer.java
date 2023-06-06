@@ -26,6 +26,7 @@ public class SayItServer {
    server.createContext("/prompts/", new PromptRequestHandler());
    server.setExecutor(threadPoolExecutor);
    server.start();
+   System.out.println("Server Started!");
 
  }
 }

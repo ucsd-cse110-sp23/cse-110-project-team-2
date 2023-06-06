@@ -12,6 +12,9 @@ public class HistoryManager {
 
     private final String DELIMITER = "%%%%%%%";
 
+    private final String serverString = "Blah";
+    private final String hostString = "localhost";
+
     public HistoryManager(String historyFilePath){
         historyList = new ArrayList<Prompt>();
         historyFile = new File(historyFilePath);

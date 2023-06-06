@@ -138,8 +138,7 @@ public class HistoryManager {
     }
 
     public Prompt addToHistory(QNA question){
-        Prompt newPrompt = new Prompt(question);
-        setSelected(newPrompt);
+        
 
         /* 
         try{
@@ -158,7 +157,9 @@ public class HistoryManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+        question.setID(responseString);
+        Prompt newPrompt = new Prompt(question);
+        setSelected(newPrompt);
 
         return newPrompt;
     }

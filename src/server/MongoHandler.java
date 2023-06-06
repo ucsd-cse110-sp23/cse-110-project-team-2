@@ -72,7 +72,8 @@ public class MongoHandler {
         user.append("username", username)
             .append("password", password)
             .append("prompts", asList())
-            .append("emailInfo", emailInfo);
+            .append("emailInfo", emailInfo)
+            .append("_id", new ObjectId().toString());
 
         InsertOneResult ir = userInfoCollection.insertOne(user);
 
@@ -91,7 +92,7 @@ public class MongoHandler {
         ArrayList<Document> query = (ArrayList<Document>) userInfoCollection.find(filter).first().get("prompts");
         
         System.out.println(query.size());
-        
+
         return query;
     }
     
@@ -107,7 +108,7 @@ public class MongoHandler {
     public String addPrompt(String username, String promptType, String question, String answer){
         
         //make the new prompt object/document
-        ObjectId oid = new ObjectId(); 
+        String oid = new ObjectId().toString(); 
         Document newPrompt = new Document();
         newPrompt.append("_id", oid)
         .append("promptType", promptType)
@@ -128,7 +129,7 @@ public class MongoHandler {
             return null;
         }
         
-        return oid.toString();
+        return oid;
     }
     
 
@@ -204,7 +205,7 @@ public class MongoHandler {
         Bson userFilter = eq("username", username);
         
         //remove the document in the prompts array that has the id of promptID
-        Bson deleteOperation = pull("prompts", new Document().append("_id", new ObjectId(promptID)));
+        Bson deleteOperation = pull("prompts", new Document().append("_id", promptID));
         
         UpdateResult updateResult = userInfoCollection.updateOne(userFilter,deleteOperation);
         
@@ -220,7 +221,7 @@ public class MongoHandler {
      */
     public boolean modifyPromptAnswer(String username, String promptID, String newAnswer){
         Bson a = eq("username",username);
-        Bson b = eq("prompts._id", new ObjectId(promptID));
+        Bson b = eq("prompts._id", promptID);
         Bson q = combine(a,b);
         
         Bson setOperation = set("prompts.$.answer", newAnswer);
@@ -228,6 +229,10 @@ public class MongoHandler {
         UpdateResult ur = userInfoCollection.updateOne(q, setOperation);
         
         return ur.getModifiedCount() == 1;
+    }
+
+    public void dateToIdFix(Document d){
+
     }
 
     public static void main(String[] args){

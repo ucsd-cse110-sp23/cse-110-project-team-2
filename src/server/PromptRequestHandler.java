@@ -12,7 +12,9 @@ public class PromptRequestHandler implements HttpHandler {
     /**
      * Expected to set the dbHandler using a setter before a handleRequest method is called. 
      */
-    public PromptRequestHandler() { }
+    public PromptRequestHandler(MongoHandler dbHandler) {
+        this.dbHandler = dbHandler;
+     }
 
     /**
      * Setter for dbHandler. 
@@ -30,17 +32,18 @@ public class PromptRequestHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request received";
         String method = httpExchange.getRequestMethod();
-
+        System.out.print(method);
         try{
             if(method.equals("GET")){
-                response = handleGet(httpExchange);
+                System.out.println("We dont have a get endpoint you trolling");
+                //response = //handleGet(httpExchange);
             } else if (method.equals("POST")){
                 response = handlePost(httpExchange);
             } else if (method.equals("DELETE")){
                 response = handleDelete(httpExchange);
-            } //else if (method.equals("PUT")){
-                //response = handlePut(httpExchange);
-            //} 
+            } else if (method.equals("PUT")){
+                response = handlePut(httpExchange);
+            } 
             else {
                 throw new Exception("INVALID REQUEST");
             }
@@ -64,7 +67,8 @@ public class PromptRequestHandler implements HttpHandler {
      *          Each element is a JSON object that represents each prompt. 
      *          Otherwise, null returned. 
      */
-    private String handleGet(HttpExchange httpExchange) throws IOException {
+    private String handlePut(HttpExchange httpExchange) throws IOException {
+        System.out.println("prompt GET request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
@@ -89,6 +93,7 @@ public class PromptRequestHandler implements HttpHandler {
      *          Otherwise, null returned. 
      */
     private String handlePost(HttpExchange httpExchange) throws IOException {
+        System.out.println("prompt POST request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
@@ -113,6 +118,7 @@ public class PromptRequestHandler implements HttpHandler {
      *          Otherwise, return null
      */
     private String handleDelete(HttpExchange httpExchange) throws IOException {
+        System.out.println("prompt DELETE request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();

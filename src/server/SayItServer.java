@@ -22,8 +22,9 @@ public class SayItServer {
 
    HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),0);
 
-   server.createContext("/login/", new LoginRequestHandler());
-   server.createContext("/prompts/", new PromptRequestHandler());
+   MongoHandler dbHandler = new MongoHandler();
+   server.createContext("/login/", new LoginRequestHandler(dbHandler));
+   server.createContext("/prompts/", new PromptRequestHandler(dbHandler));
    server.setExecutor(threadPoolExecutor);
    server.start();
    System.out.println("Server Started!");

@@ -8,8 +8,8 @@ enum PromptType {
     SENDEMAIL,
     NOCOMMAND;
 
-    @Override
-    public String toString() {
+    
+    public String toDisplayString() {
         switch (this.ordinal()) {
             case 0:
                 return "Set Up Email";
@@ -29,5 +29,8 @@ enum PromptType {
                 return null;
         }
     }
+
+    
+
 }
 

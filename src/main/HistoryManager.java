@@ -3,6 +3,12 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.sun.mail.iap.Response;
+
 import java.io.File;
 
 public class HistoryManager {
@@ -10,16 +16,30 @@ public class HistoryManager {
     private File historyFile;
     private Prompt selected; 
 
+    private RequestHandler rh;
+    private String username;
+
     private final String DELIMITER = "%%%%%%%";
 
-    private final String serverString = "Blah";
-    private final String hostString = "localhost";
 
-    public HistoryManager(String historyFilePath){
+    private final String promptsEndpoint = "prompts";
+    private final String putString = "PUT";
+    private final String deleteString = "DELETE";
+    private final String postString = "POST";
+
+    public HistoryManager(String historyFilePath, String username){
         historyList = new ArrayList<Prompt>();
-        historyFile = new File(historyFilePath);
+
+        rh = new RequestHandler();
+        this.username = username;
         selected = null;
-        //Load a history file into a variable, build the readers/writers.
+        readDBintoArraylist();
+
+
+
+        //historyFile = new File(historyFilePath);
+        
+        /*Load a history file into a variable, build the readers/writers.
         try{
             if(!historyFile.exists()){
                 historyFile.createNewFile();
@@ -28,7 +48,12 @@ public class HistoryManager {
         }catch(Exception e){
             e.printStackTrace();
         }
+        */
         
+    }
+
+    public void setUsername(String username){
+        this.username = username;
     }
 
     public Prompt getSelected(){
@@ -50,10 +75,11 @@ public class HistoryManager {
         Prompt temp = selected;
         historyList.remove(temp);
         deleteFromHistory(temp);
+        selected = null;
         return temp;
     }
     
-    
+    /* 
     private void readFileIntoArrayList(){
         //Read the file into the ArrayList
 
@@ -83,6 +109,29 @@ public class HistoryManager {
             e.printStackTrace();
         }
     }
+    */
+    public void readDBintoArraylist() {
+        String body = rh.UsernameToJSON(username);
+        System.out.print(body);
+        String response = "";
+        try {
+            response = rh.sendHttpRequest(body, putString, promptsEndpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONArray jsonArray = new JSONArray(response);
+        QNA tempQNA;
+        JSONObject tempJsonObject;
+        for (int i = 0; i < jsonArray.length(); i++){
+            tempJsonObject = jsonArray.getJSONObject(i);
+            tempQNA = new QNA(tempJsonObject.get("_id").toString(), 
+                tempJsonObject.getString("question"), 
+                tempJsonObject.getString("answer"), 
+                PromptType.valueOf(tempJsonObject.getString("promptType")));
+            historyList.add(new Prompt(tempQNA));
+        }
+        
+    }
     
     public ArrayList<Prompt> getHistoryList(){
         return historyList;
@@ -92,6 +141,7 @@ public class HistoryManager {
         Prompt newPrompt = new Prompt(question);
         setSelected(newPrompt);
 
+        /* 
         try{
             FileWriter history = new FileWriter(historyFile, true);
             history.write(question.getQuestion() + DELIMITER + question.getAnswer() + DELIMITER);
@@ -100,12 +150,30 @@ public class HistoryManager {
         } catch(Exception e){
             e.printStackTrace();
         }
+        */
+        String body = rh.QNAToJSON(username, question);
+        String responseString = "";
+        try {
+            responseString = rh.sendHttpRequest(body, postString, promptsEndpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
 
         return newPrompt;
     }
 
     public void deleteFromHistory(Prompt question){
-        selected = null;
+        String body = rh.DeleteToJSON(username, question.getQNA().getID());
+        String responseString = "";
+        try {
+            responseString = rh.sendHttpRequest(body, deleteString, promptsEndpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+        /*
         FileWriter history;
         boolean deleted = false;
         try{
@@ -134,7 +202,8 @@ public class HistoryManager {
         }catch(Exception e){
 
         }
-        readFileIntoArrayList();
+        //readFileIntoArrayList();
+        */
         return;
     }
 
@@ -149,4 +218,5 @@ public class HistoryManager {
             e.printStackTrace();
         }
     }
+
 }

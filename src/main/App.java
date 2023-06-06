@@ -654,9 +654,11 @@ class AppFrame extends JFrame {
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
 
+        String username = "fpeng";
+
 
         GUIMediator guiMediator =  new GUIMediator();
-        HistoryManager historyManager = new HistoryManager("history.txt");
+        HistoryManager historyManager = new HistoryManager("history.txt", username);
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);

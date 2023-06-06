@@ -8,7 +8,7 @@ public class LoginRequestHandler implements HttpHandler {
 
     private MongoHandler dbHandler;
 
-    public LoginRequestHandler() {
+    public LoginRequestHandler(MongoHandler dbHandler) {
         this.dbHandler = dbHandler;
     }
 

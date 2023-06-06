@@ -10,7 +10,7 @@ public class QNA {
         this.question = question;
         this.answer = answer;
         this.promptType = command;
-        this.id = "CHANGE THE CONSTRUCTOR TO USE THE ID VERSION";
+        this.id = "empty for now";
     }
 
     public QNA(String id, String question, String answer, PromptType command){
@@ -23,6 +23,14 @@ public class QNA {
     public boolean equals(QNA otherQuestion){
         return this.question.equals(otherQuestion.getQuestion()) 
             && this.answer.equals(otherQuestion.getAnswer());
+    }
+
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return id;
     }
 
     public void setCommand(PromptType pt) {

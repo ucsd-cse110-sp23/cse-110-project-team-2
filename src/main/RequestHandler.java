@@ -77,4 +77,10 @@ public class RequestHandler {
         //TODO: check what we need for setup email MORE FIELDS
         return d.toJson();
     }
+
+    public static String statusMessageToJSON(String status, String message) {
+        Document d = new Document("status", status)
+                          .append("message", message);
+        return d.toJson();
+    }
 }

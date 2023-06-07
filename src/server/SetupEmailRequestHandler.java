@@ -43,7 +43,7 @@ public class SetupEmailRequestHandler implements HttpHandler {
 
     // Add method for adding new user info? 
 
- 
+    // 
     private String handlePost(HttpExchange httpExchange) throws IOException {
         //check if the provided username and password match with a user
         return "foo";

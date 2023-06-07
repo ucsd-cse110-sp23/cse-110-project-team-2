@@ -158,9 +158,11 @@ public class HistoryManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         question.setID(responseString);
         Prompt newPrompt = new Prompt(question);
         setSelected(newPrompt);
+        historyList.add(newPrompt);
 
         return newPrompt;
     }

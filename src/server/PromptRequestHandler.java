@@ -68,7 +68,7 @@ public class PromptRequestHandler implements HttpHandler {
      *          Otherwise, null returned. 
      */
     private String handlePut(HttpExchange httpExchange) throws IOException {
-        System.out.println("prompt GET request recieved");
+        System.out.println("prompt PUT request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();

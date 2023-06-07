@@ -18,6 +18,7 @@ public class RequestHandler {
         URL url = new URL(URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(httpMethod);
+
         if (!httpMethod.equals("GET")){
             conn.setDoOutput(true);
         }

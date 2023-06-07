@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleContext;
+
+import org.json.JSONObject;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -724,6 +727,7 @@ class LoginPanel extends JPanel {
     LoginWindow lw; 
     LoginDetailHandler loginDetailHandler;
     AppPresenter appPresenter;
+    RequestHandler requestHandler;
 
     LoginPanel(LoginWindow lw, AppPresenter appPresenter) {
         this.setPreferredSize(new Dimension(100,400));
@@ -745,6 +749,8 @@ class LoginPanel extends JPanel {
         keepMeLoggedInBox = new JCheckBox("Keep me logged in");
         keepMeLoggedInBox.setHorizontalAlignment(JCheckBox.CENTER);
         loginDetailHandler = new LoginDetailHandler();
+        requestHandler = new RequestHandler();
+
         this.appPresenter = appPresenter;
 
         this.add(usernameLabel);
@@ -761,8 +767,23 @@ class LoginPanel extends JPanel {
     }
 
     public boolean isValidLogin(String username, String password){
-        //TODO VALIDATE THE USER'S CREDENTIALS
-        return true;
+        String userJSON = requestHandler.CredentionalsToJSON(username, password);
+            try{
+                System.out.println("Sending the req w body" + userJSON);
+                String response = requestHandler.sendHttpRequest(userJSON, "POST", "login");
+                JSONObject responseJSON = new JSONObject(response);
+
+                System.out.println("RESPONSE \n" + response);
+
+                if(responseJSON.has("error")){
+                    throw new Exception(responseJSON.get("error").toString());
+                }
+
+                return true;
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
+        return false;
     }
 
     public boolean allFieldsFilledIn(){
@@ -795,8 +816,6 @@ class LoginPanel extends JPanel {
                 
                 System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
                 appPresenter.launchApp(new UserInfo(username, password));
-            } else {
-                JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
             }
         });
     }
@@ -813,7 +832,7 @@ class CreateAccountPanel extends JPanel {
     JLabel confirmPasswordLabel;
 
     JButton createAccountButton;
-
+    RequestHandler requestHandler;
     //MVP
     LoginWindow lw; 
 
@@ -829,6 +848,7 @@ class CreateAccountPanel extends JPanel {
         usernameField = new JTextField(20);
         passwordField = new JTextField(20);
         confirmPasswordField = new JTextField(20);
+        requestHandler = new RequestHandler();
 
         createAccountButton = new JButton("Create Account");
         usernameLabel = new JLabel("Username");
@@ -868,16 +888,27 @@ class CreateAccountPanel extends JPanel {
     public void addListeners(){
         createAccountButton.addActionListener((ActionEvent e) -> {
             
+            String username = usernameField.getText();
             String password = passwordField.getText();
             String passwordConfirmation = confirmPasswordField.getText();
 
             if(!password.equals(passwordConfirmation)){
-                //pop up an error
                 JOptionPane.showMessageDialog(null, "Error: The password and confirmation do not match, please try again.");
             } else if(!areAllFieldsFilled()){
                 JOptionPane.showMessageDialog(null, "Error: Make sure all Username/Password fields have been filled in."); 
             }else{
-                //TODO CREATE THE ACCOUNT HERE
+                try{
+                    String credentialsJSON = requestHandler.CredentionalsToJSON(username,password);
+                    String res = requestHandler.sendHttpRequest(credentialsJSON,"PUT","login");
+                    JSONObject responseJSON = new JSONObject(res);
+
+                    if(responseJSON.has("error")){
+                        throw new Exception(responseJSON.get("error").toString());
+                    }
+                }catch(Exception ex){
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                    return;
+                }
                 lw.switchToLogin();
                 JOptionPane.showMessageDialog(null, "The account was successfully created. You may now log in with your credentials."); 
             }

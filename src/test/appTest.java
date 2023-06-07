@@ -6,6 +6,10 @@ import java.util.Arrays;
 import org.json.JSONObject;
 
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.HttpServer;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -40,6 +44,18 @@ public class appTest {
      String MOCK_API_KEY = "f90q324j0j4359f90w";
      private static final String MODEL = "text-davinci-003";
      private static final int MAX_TOKENS = 100; 
+     public static HttpServer server;
+
+     @BeforeAll
+        public static void setup() throws IOException {
+            // Start the server
+            server = SayItServer.runServer();
+        }
+     @AfterAll
+        public static void teardown() {
+            // Stop the server
+            SayItServer.stopServer(server);
+        }
 
     @Test
     public void testTranscribeAudio() {

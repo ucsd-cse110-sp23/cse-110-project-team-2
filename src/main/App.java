@@ -9,9 +9,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.JList;
@@ -663,24 +665,240 @@ class HistoryButtonPanel extends JPanel {
  */
 class AppFrame extends JFrame {
 
-    AppFrame() {
+    AppFrame(UserInfo userInfo) {
         this.setTitle("Application");
         this.setSize(800, 800);
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
 
-        String username = "fpeng";
-
+        System.out.println("CONSTRUCTING WITH USER" + userInfo); 
 
         GUIMediator guiMediator =  new GUIMediator();
-        HistoryManager historyManager = new HistoryManager(username);
+        HistoryManager historyManager = new HistoryManager(userInfo.getUsername());
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
         this.setVisible(true); // Make visible
+
+    }
+}
+
+//Kinda MVP, Model is the Login/Create account windows, Kinda does both the View/Presenter job.
+class LoginWindow extends JFrame {
+    
+    JLabel title;
+    LoginPanel loginPanel;
+    CreateAccountPanel createAccountPanel;
+    LoginDetailHandler loginDetailHandler;
+    AppPresenter appPresenter;
+
+    LoginWindow(AppPresenter appPresenter) {
+        
+        this.setSize(500,500);
+        this.setBackground(Color.DARK_GRAY);
+        this.setTitle("Log Into SayIt!");
+
+        GridLayout gl = new GridLayout(1, 1);
+        this.setLayout(gl);
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //Observe the panels for when the user changes what they wanna do
+        loginPanel = new LoginPanel(this, appPresenter);
+        createAccountPanel = new CreateAccountPanel(this);
+
+        this.add(loginPanel); 
+        this.setVisible(true);
+    }
+
+    public void switchToCreateAccount(){
+        this.remove(loginPanel);
+        this.add(createAccountPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchToLogin(){
+        this.remove(createAccountPanel);
+        this.add(loginPanel);
+        revalidate();
+        repaint();
+    }
+}
+
+class LoginPanel extends JPanel {
+    JTextField usernameField; 
+    JTextField passwordField;
+    JLabel usernameLabel;
+    JLabel passwordLabel;
+    JButton loginButton;
+    JButton createAccountButton;
+    JCheckBox keepMeLoggedInBox;
+    LoginWindow lw; 
+    LoginDetailHandler loginDetailHandler;
+    AppPresenter appPresenter;
+
+    LoginPanel(LoginWindow lw, AppPresenter appPresenter) {
+        this.setPreferredSize(new Dimension(100,400));
+
+        GridLayout layout = new GridLayout(7,1);
+        layout.setVgap(5);
+        layout.setHgap(10);
+
+        this.setLayout(layout);
+
+        usernameField = new JTextField(20);
+        passwordField = new JTextField(20);
+        loginButton = new JButton("Log In");
+        createAccountButton = new JButton("Create Account");
+        usernameLabel = new JLabel("Username");
+        passwordLabel = new JLabel("Password");
+        usernameLabel.setHorizontalAlignment(JLabel.CENTER);
+        passwordLabel.setHorizontalAlignment(JLabel.CENTER);
+        keepMeLoggedInBox = new JCheckBox("Keep me logged in");
+        keepMeLoggedInBox.setHorizontalAlignment(JCheckBox.CENTER);
+        loginDetailHandler = new LoginDetailHandler();
+        this.appPresenter = appPresenter;
+
+        this.add(usernameLabel);
+        this.add(usernameField);
+        this.add(passwordLabel);
+        this.add(passwordField);
+        this.add(loginButton);
+        this.add(createAccountButton);
+        this.add(keepMeLoggedInBox);
+
+        this.lw = lw;
+
+        addListeners();
+    }
+
+    public boolean isValidLogin(String username, String password){
+        //TODO VALIDATE THE USER'S CREDENTIALS
+        return true;
+    }
+
+    public boolean allFieldsFilledIn(){
+        return (!usernameField.getText().equals("") &&
+        !passwordField.getText().equals(""));
+    }
+
+    public void addListeners(){
+        createAccountButton.addActionListener((ActionEvent e) -> {
+            lw.switchToCreateAccount();
+        });
+
+        loginButton.addActionListener((ActionEvent e) -> {
+
+            if(!allFieldsFilledIn()){
+                JOptionPane.showMessageDialog(null, "Error: Make sure all fields are filled in.");
+                return;
+            }
+
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            //validate login and save credentials to login.txt if they opted into it.
+            if(isValidLogin(username, password)){
+
+                if(keepMeLoggedInBox.isSelected()){
+                    loginDetailHandler.saveLoginDetails(username, password);
+                    System.out.println("Saved login details as \n" + loginDetailHandler.getUserInfoFromFile());
+                }
+                
+                System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
+                appPresenter.launchApp(new UserInfo(username, password));
+            } else {
+                JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
+            }
+        });
+    }
+}
+
+class CreateAccountPanel extends JPanel {
+
+    JTextField usernameField; 
+    JTextField passwordField;
+    JTextField confirmPasswordField; 
+
+    JLabel usernameLabel;
+    JLabel passwordLabel;
+    JLabel confirmPasswordLabel;
+
+    JButton createAccountButton;
+
+    //MVP
+    LoginWindow lw; 
+
+    CreateAccountPanel(LoginWindow lw) {
+        this.setPreferredSize(new Dimension(100,400));
+
+        GridLayout layout = new GridLayout(7,1);
+        layout.setVgap(5);
+        layout.setHgap(10);
+
+        this.setLayout(layout);
+
+        usernameField = new JTextField(20);
+        passwordField = new JTextField(20);
+        confirmPasswordField = new JTextField(20);
+
+        createAccountButton = new JButton("Create Account");
+        usernameLabel = new JLabel("Username");
+        passwordLabel = new JLabel("Password");
+        confirmPasswordLabel = new JLabel("Confirm Password");
+        usernameLabel.setHorizontalAlignment(JLabel.CENTER);
+        passwordLabel.setHorizontalAlignment(JLabel.CENTER);
+        confirmPasswordLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        this.add(usernameLabel);
+        this.add(usernameField);
+        this.add(passwordLabel);
+        this.add(passwordField);
+        this.add(confirmPasswordLabel);
+        this.add(confirmPasswordField);
+
+        this.add(createAccountButton);
+
+        this.lw = lw;
+        addListeners();
+    }
+
+    public String getPasswordFieldText(){
+        return passwordField.getText();
+    }
+
+    public String getConfirmPasswordFieldText(){
+        return confirmPasswordField.getText();
+    }
+
+    public boolean areAllFieldsFilled(){
+        return (!confirmPasswordField.getText().equals("") &&
+        !passwordField.getText().equals("") &&
+        !usernameField.getText().equals(""));
+    }
+
+    public void addListeners(){
+        createAccountButton.addActionListener((ActionEvent e) -> {
+            
+            String password = passwordField.getText();
+            String passwordConfirmation = confirmPasswordField.getText();
+
+            if(!password.equals(passwordConfirmation)){
+                //pop up an error
+                JOptionPane.showMessageDialog(null, "Error: The password and confirmation do not match, please try again.");
+            } else if(!areAllFieldsFilled()){
+                JOptionPane.showMessageDialog(null, "Error: Make sure all Username/Password fields have been filled in."); 
+            }else{
+                //TODO CREATE THE ACCOUNT HERE
+                lw.switchToLogin();
+                JOptionPane.showMessageDialog(null, "The account was successfully created. You may now log in with your credentials."); 
+            }
+            
+        });
     }
 }
 
@@ -760,12 +978,11 @@ class Prompt extends JPanel {
     }
 }
 
-
 /*
  * Run the app!
  */
 public class App {
     public static void main(String[] args) throws Exception {
-        new AppFrame();
+        new AppPresenter();
     }
 }

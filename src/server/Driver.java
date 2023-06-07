@@ -2,7 +2,7 @@ public class Driver {
     public static void main(String[] args){
         MongoHandler mongo = new MongoHandler(); 
         // mongo.addUser("foo","bar");
-         mongo.addUser("fpeng","uwu");
+         mongo.addUser("testusername","testpassword");
         // mongo.addPrompt("foo","question","hi there", "abc");
         // mongo.addPrompt("foo","question","hi there", "abc");
         // mongo.addPrompt("foo","question","hi there", "abc");

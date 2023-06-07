@@ -204,6 +204,12 @@ class QnaPanel extends JPanel {
                 guiMediator.changeQnaDisplayText(gptPrompt);
                 return;
             }
+            else if(gptPrompt.getCommand() == PromptType.DELETEALL) {
+                guiMediator.clearQNADisplayText();
+                guiMediator.deleteAllPrompts();
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                return;
+            }
 
             //update the display to show the qna
             guiMediator.changeQnaDisplayText(gptPrompt);
@@ -507,6 +513,15 @@ class HistoryList extends JPanel {
             this.removePrompt(toDelete);
             repaint();
             revalidate();
+        }
+    }
+
+    public void deleteAllPrompts() {
+        for (Component prompt : this.getComponents()) {
+            if (prompt instanceof Prompt) {
+                historyManager.setSelected((Prompt) prompt);
+                deletePrompt();
+            }
         }
     }
 

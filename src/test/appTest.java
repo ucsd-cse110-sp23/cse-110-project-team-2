@@ -127,7 +127,7 @@ public class appTest {
     @Test
     public void testAddToHistory() {
         String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "tempusername");
+        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
 
         // Create a sample QNA
         QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);

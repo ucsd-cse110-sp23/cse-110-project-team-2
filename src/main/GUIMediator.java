@@ -42,4 +42,7 @@ public class GUIMediator {
         historyList.deletePrompt();
     }
 
+    public void deleteAllPrompts(){
+        historyList.deleteAllPrompts();
+    }
 }

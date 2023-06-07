@@ -119,6 +119,7 @@ public class HistoryManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.print(response);
         JSONArray jsonArray = new JSONArray(response);
         QNA tempQNA;
         JSONObject tempJsonObject;

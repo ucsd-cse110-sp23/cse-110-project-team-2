@@ -48,14 +48,15 @@ public class LoginRequestHandler implements HttpHandler {
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
+        //create account
 
-        
 
         return "foo";
     }   
     private String handlePut(HttpExchange httpExchange) throws IOException {
         //check if the provided username and password match with a user
         return "foo";
+        //check login
     }   
     
 }

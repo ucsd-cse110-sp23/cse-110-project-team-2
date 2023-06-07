@@ -78,7 +78,6 @@ public class LoginRequestHandler implements HttpHandler {
             }
         }
         else {
-            System.out.println("User already exists in database.");
             status = FALSE;
             message = "User "+username+" already exists in database.";
         }

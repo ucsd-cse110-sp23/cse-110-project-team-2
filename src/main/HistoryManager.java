@@ -212,8 +212,18 @@ public class HistoryManager {
     }
 
     public void clearHistory() {
-            historyList.clear();
-            selected = null;
+        for (Prompt p : historyList) {
+            String body = rh.DeleteToJSON(username, p.getQNA().getID());
+            String responseString = "";
+            try {
+                responseString = rh.sendHttpRequest(body, deleteString, promptsEndpoint);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        historyList.clear();
+        selected = null;
     }
 
 }

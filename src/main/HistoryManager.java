@@ -113,13 +113,16 @@ public class HistoryManager {
     public void readDBintoArraylist() {
         String body = rh.UsernameToJSON(username);
         System.out.print(body);
-        String response = "";
+        String statusMessage = "";
         try {
-            response = rh.sendHttpRequest(body, putString, promptsEndpoint);
+            statusMessage = rh.sendHttpRequest(body, putString, promptsEndpoint);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.print(response);
+        System.out.print(statusMessage);
+        JSONObject statusMessageJSON = new JSONObject(statusMessage);
+        String status = statusMessageJSON.getString("status");
+        String response = statusMessageJSON.getString("message");
         JSONArray jsonArray = new JSONArray(response);
         QNA tempQNA;
         JSONObject tempJsonObject;

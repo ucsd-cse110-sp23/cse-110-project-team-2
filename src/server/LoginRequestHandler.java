@@ -40,7 +40,6 @@ public class LoginRequestHandler implements HttpHandler {
     } 
 
     // Add method for adding new user info? 
-
     private String handlePost(HttpExchange httpExchange) throws IOException {
         System.out.println("prompt GET request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());

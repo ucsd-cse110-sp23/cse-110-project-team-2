@@ -25,6 +25,7 @@ public class SayItServer {
    MongoHandler dbHandler = new MongoHandler();
    server.createContext("/login/", new LoginRequestHandler(dbHandler));
    server.createContext("/prompts/", new PromptRequestHandler(dbHandler));
+   server.createContext("/email/", new EmailRequestHandler(dbHandler));
    server.setExecutor(threadPoolExecutor);
    server.start();
    System.out.println("Server Started!");

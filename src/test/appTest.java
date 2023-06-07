@@ -338,7 +338,7 @@ public class appTest {
 
      @Test
      public void testPromptToEmail(){
-        EmailSetupPanel esp = new EmailSetupPanel();
+        EmailSetupPanel esp = new EmailSetupPanel("fpeng");
         MailSendingHandler msh; 
         MailBuilder mb = new MailBuilder();
         QNA sendEmailQNA = new QNA("send email to fpeng at ucsd.edu", null, PromptType.SENDEMAIL);

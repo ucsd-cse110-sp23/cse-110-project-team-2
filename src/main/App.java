@@ -98,17 +98,18 @@ class QnaPanel extends JPanel {
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
-    EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
+    EmailSetupPanel emailSetupPanel;
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
 */
-    QnaPanel() {
+    QnaPanel(String username) {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
+        this.emailSetupPanel = new EmailSetupPanel(username); 
     }
     
     HistoryManager historyManager;
@@ -119,12 +120,13 @@ class QnaPanel extends JPanel {
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
 
-    QnaPanel(GUIMediator guiM, HistoryManager histManager) {
+    QnaPanel(GUIMediator guiM, HistoryManager histManager, String username) {
         this.setPreferredSize(new Dimension(600, 300));
 
         this.setLayout(new BorderLayout());
         this.setBackground(yellow);
 
+        this.emailSetupPanel = new EmailSetupPanel(username);
 
         qnaDisplay = new QnaDisplay(guiM);
         recordPanel = new RecordPanel();
@@ -270,18 +272,36 @@ class ContentPanel extends JPanel {
 }
 
 class EmailSetupPanel extends JPanel{
+    private JTextField firstNameField;
+    private JTextField lastNameField;
+    private JTextField displayNameField;
     private JTextField smtpHostField;
     private JTextField smtpPortField;
     private JTextField emailField;
     private JTextField passwordField;
+    private RequestHandler requestHandler;
+    private String username;
 
-    public EmailSetupPanel(){
-        this.setLayout(new GridLayout(4,1));
+    public EmailSetupPanel(String username){
+        this.setLayout(new GridLayout(7,1));
         smtpHostField = new JTextField(20);
         smtpPortField = new JTextField(20);
         emailField = new JTextField(20);
         passwordField = new JTextField(20);
+        firstNameField = new JTextField(20);
+        lastNameField = new JTextField(20);
+        displayNameField = new JTextField(20);
+        this.username = username;
+        requestHandler = new RequestHandler();
 
+        checkDBForEmailCredentials();
+
+        this.add(new JLabel("FIRST NAME"));
+        this.add(firstNameField);
+        this.add(new JLabel("LAST NAME"));
+        this.add(lastNameField);
+        this.add(new JLabel("DISPLAY NAME"));
+        this.add(displayNameField);
         this.add(new JLabel("SMTP HOST"));
         this.add(smtpHostField);
         this.add(new JLabel("SMTP PORT"));
@@ -308,6 +328,19 @@ class EmailSetupPanel extends JPanel{
         return passwordField.getText();
     }
 
+    public String getFirstNameFieldContent(){
+        return firstNameField.getText();
+    }
+
+    public String getLastNameFieldContent(){
+        return lastNameField.getText();
+    }
+
+    public String getDisplayNameFieldContent(){
+        return displayNameField.getText();
+    }
+
+
     public void setSmtpHostFieldContent(String s){
         smtpHostField.setText(s);
     }
@@ -324,23 +357,86 @@ class EmailSetupPanel extends JPanel{
         passwordField.setText(s);
     }
 
-    public boolean isEmailSetup(){
-        String EMPTY_STRING = "";
-        return !getSmtpHostFieldContent().equals(EMPTY_STRING) && !getSmtpPortFieldContent().equals(EMPTY_STRING) && !getEmailFieldContent().equals(EMPTY_STRING) && !getPasswordFieldContent().equals(EMPTY_STRING);
+    public void setFirstNameFieldContent(String s){
+        firstNameField.setText(s);
     }
 
-    
+    public void setLastNameFieldContent(String s){
+        lastNameField.setText(s);
+    }
+
+    public void setDisplaynameFieldContent(String s){
+        displayNameField.setText(s);
+    }
+
+
+
+    public boolean isEmailSetup(){
+        String EMPTY_STRING = "";
+        return !getSmtpHostFieldContent().equals(EMPTY_STRING) 
+        && !getSmtpPortFieldContent().equals(EMPTY_STRING) 
+        && !getEmailFieldContent().equals(EMPTY_STRING) 
+        && !getPasswordFieldContent().equals(EMPTY_STRING)
+        && !getFirstNameFieldContent().equals(EMPTY_STRING)
+        && !getLastNameFieldContent().equals(EMPTY_STRING)
+        && !getDisplayNameFieldContent().equals(EMPTY_STRING);
+    }
+
+    public void checkDBForEmailCredentials(){
+        
+        try{
+            String usernameJSON = requestHandler.UsernameToJSON(username);
+            String userInfo = requestHandler.sendHttpRequest(usernameJSON, "POST", "email");
+
+            System.out.println(userInfo);
+
+            JSONObject emailInfoJSON = new JSONObject(userInfo);
+
+            setFirstNameFieldContent(emailInfoJSON.get("firstName").toString());
+            setLastNameFieldContent(emailInfoJSON.get("lastName").toString());
+            setDisplaynameFieldContent(emailInfoJSON.get("displayName").toString());
+            setSmtpHostFieldContent(emailInfoJSON.get("smtpHost").toString());
+            setSmtpPortFieldContent(emailInfoJSON.get("smtpPort").toString());
+            setEmailFieldContent(emailInfoJSON.get("email").toString());
+            setPasswordFieldContent(emailInfoJSON.get("emailPassword").toString());
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void setupEmail(){
         String oldSmtpHost = getSmtpHostFieldContent();
         String oldSmtpPort = getSmtpPortFieldContent();
         String oldEmail = getEmailFieldContent();
-        String oldPassword = getEmailFieldContent();
+        String oldPassword = getPasswordFieldContent();
 
         int result = JOptionPane.showConfirmDialog(null, this, "setup email", JOptionPane.OK_CANCEL_OPTION);
                 
         if(result == JOptionPane.OK_OPTION){
-            //idk
+            System.out.println("CLICKED OK");
+            if(isEmailSetup()){
+                System.out.println("all fields were filled");
+                String emailDetailsJSON = requestHandler.SetupEmailToJSON(
+                    username, 
+                    getFirstNameFieldContent(), 
+                    getLastNameFieldContent(), 
+                    getDisplayNameFieldContent(), 
+                    getSmtpHostFieldContent(), 
+                    getSmtpPortFieldContent(), 
+                    getEmailFieldContent(), 
+                    getPasswordFieldContent());
+
+                System.out.println("json?\n" + emailDetailsJSON);
+                
+                try{
+                    requestHandler.sendHttpRequest(emailDetailsJSON, "PUT", "email");
+                } catch(Exception e){
+
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Some fields were left empty, email has not been fully set up.");
+            }
         } else{
             //user canceled setup, reverting to old info
             setSmtpHostFieldContent(oldSmtpHost);
@@ -665,7 +761,7 @@ class AppFrame extends JFrame {
         HistoryManager historyManager = new HistoryManager("history.txt", userInfo.getUsername());
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
-        QnaPanel qp = new QnaPanel(guiMediator, historyManager);
+        QnaPanel qp = new QnaPanel(guiMediator, historyManager, userInfo.getUsername());
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
         this.setVisible(true); // Make visible

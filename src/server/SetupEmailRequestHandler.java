@@ -4,11 +4,11 @@ import java.net.*;
 import java.util.*;
 
 
-public class LoginRequestHandler implements HttpHandler {
+public class SetupEmailRequestHandler implements HttpHandler {
 
     private MongoHandler dbHandler;
 
-    public LoginRequestHandler(MongoHandler dbHandler) {
+    public SetupEmailRequestHandler(MongoHandler dbHandler) {
         this.dbHandler = dbHandler;
     }
 
@@ -41,22 +41,17 @@ public class LoginRequestHandler implements HttpHandler {
         outStream.close();
     } 
 
-    
+    // Add method for adding new user info? 
 
+ 
     private String handlePost(HttpExchange httpExchange) throws IOException {
-        System.out.println("login POST request recieved");
-        Scanner scnr = new Scanner(httpExchange.getRequestBody());
-        String requestBody = scnr.nextLine(); 
-        scnr.close();
-
-        
-
+        //check if the provided username and password match with a user
         return "foo";
     }   
+ 
     private String handlePut(HttpExchange httpExchange) throws IOException {
         //check if the provided username and password match with a user
         return "foo";
     }   
-    
 }
 

@@ -10,8 +10,67 @@ import org.json.JSONObject;
 public class DriverServer {
     public static void main(String[] args) throws Exception{ 
 
-        test1();
+        test6();
 
+    }
+
+    public static void test6() throws Exception{
+        RequestHandler rh = new RequestHandler();
+        String username = "bruh";
+        String firstName = "Bruh";
+        String lastName = "Chan";
+        String displayName = "BidenBlast";
+        String smtpHost = "smtpHost";
+        String smtpPort = "smtpPort";
+        String email = "bruhchan@ucsd.edu";
+        String emailPassword = "FakeNews";
+
+        String credentials = rh.SetupEmailToJSON(username, firstName, 
+                lastName, displayName, smtpHost, smtpPort, email, emailPassword);
+        
+        String URL = "http://localhost:8100/setupEmail/";
+        URL url = new URL(URL);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(
+              conn.getOutputStream()
+        );
+        out.write(credentials);
+        out.flush();
+        out.close();
+        BufferedReader in = new BufferedReader(
+            new InputStreamReader(conn.getInputStream())
+        );
+        String response = in.readLine();
+        in.close();
+        System.out.print(response);
+    }
+
+    public static void test5() throws Exception{
+        RequestHandler rh = new RequestHandler();
+        String username = "basd";
+        String password = "lmao";
+
+        String credentials = rh.CredentionalsToJSON(username, password);
+        
+        String URL = "http://localhost:8100/login/";
+        URL url = new URL(URL);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("PUT");
+        conn.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(
+              conn.getOutputStream()
+        );
+        out.write(credentials);
+        out.flush();
+        out.close();
+        BufferedReader in = new BufferedReader(
+            new InputStreamReader(conn.getInputStream())
+        );
+        String response = in.readLine();
+        in.close();
+        System.out.print(response);
     }
 
     public static void test1() throws Exception{

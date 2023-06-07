@@ -36,14 +36,14 @@ public class MongoHandler {
     private MongoClient mongoClient;
     private MongoDatabase db; 
     private MongoCollection<Document> userInfoCollection;
-    private MongoCollection<Document> promptCollection; // ?
+    //private MongoCollection<Document> promptCollection; // ?
 
     public MongoHandler(){
         mongoClient = MongoClients.create(connectionUri);
         db = mongoClient.getDatabase("SayIt");
 
         userInfoCollection = db.getCollection("UserInfo");
-        promptCollection = db.getCollection("Prompts"); 
+        //promptCollection = db.getCollection("Prompts");  // looks like it's not being used
     }
 
 
@@ -146,7 +146,8 @@ public class MongoHandler {
      * @param displayName
      * @return true if the info was successfully updated, and false if something went wrong
      */
-    public boolean updateUserEmailInfo(String username, String smtpHost, String smtpPort, String email, String emailPassword, String firstName, String lastName, String displayName){
+    public boolean updateUserEmailInfo(String username, String smtpHost, String smtpPort, String email, 
+            String emailPassword, String firstName, String lastName, String displayName){
         
         //Instead of changing one field I'm just gonna replace the
         //email document in the user entirely
@@ -231,6 +232,7 @@ public class MongoHandler {
         return ur.getModifiedCount() == 1;
     }
 
+    // ?
     public void dateToIdFix(Document d){
 
     }

@@ -65,7 +65,8 @@ public class RequestHandler {
         return d.toJson();
     }
 
-    public String SetupEmailToJSON(String username, String firstName, String lastName, String displayName, String smtpHost, String smtpPort, String email, String emailPassword){
+    public String SetupEmailToJSON(String username, String firstName, String lastName, 
+            String displayName, String smtpHost, String smtpPort, String email, String emailPassword){
         Document d = new Document("username", username)
             .append( "firstName", firstName)
             .append("lastName", lastName)
@@ -75,6 +76,12 @@ public class RequestHandler {
             .append("email", email)
             .append("emailPassword", emailPassword);
         //TODO: check what we need for setup email MORE FIELDS
+        return d.toJson();
+    }
+
+    public static String statusMessageToJSON(String status, String message) {
+        Document d = new Document("status", status)
+                          .append("message", message);
         return d.toJson();
     }
 }

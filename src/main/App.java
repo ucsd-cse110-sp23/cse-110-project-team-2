@@ -649,24 +649,24 @@ class HistoryButtonPanel extends JPanel {
  */
 class AppFrame extends JFrame {
 
-    AppFrame() {
+    AppFrame(UserInfo userInfo) {
         this.setTitle("Application");
         this.setSize(800, 800);
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
 
-        String username = "fpeng";
-
+        System.out.println("CONSTRUCTING WITH USER" + userInfo); 
 
         GUIMediator guiMediator =  new GUIMediator();
-        HistoryManager historyManager = new HistoryManager("history.txt", username);
+        HistoryManager historyManager = new HistoryManager("history.txt", userInfo.getUsername());
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
         this.setVisible(true); // Make visible
+
     }
 }
 
@@ -676,9 +676,11 @@ class LoginWindow extends JFrame {
     JLabel title;
     LoginPanel loginPanel;
     CreateAccountPanel createAccountPanel;
+    LoginDetailHandler loginDetailHandler;
+    AppPresenter appPresenter;
 
-
-    LoginWindow() {
+    LoginWindow(AppPresenter appPresenter) {
+        
         this.setSize(500,500);
         this.setBackground(Color.DARK_GRAY);
         this.setTitle("Log Into SayIt!");
@@ -689,7 +691,7 @@ class LoginWindow extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Observe the panels for when the user changes what they wanna do
-        loginPanel = new LoginPanel(this);
+        loginPanel = new LoginPanel(this, appPresenter);
         createAccountPanel = new CreateAccountPanel(this);
 
         this.add(loginPanel); 
@@ -720,8 +722,10 @@ class LoginPanel extends JPanel {
     JButton createAccountButton;
     JCheckBox keepMeLoggedInBox;
     LoginWindow lw; 
+    LoginDetailHandler loginDetailHandler;
+    AppPresenter appPresenter;
 
-    LoginPanel(LoginWindow lw) {
+    LoginPanel(LoginWindow lw, AppPresenter appPresenter) {
         this.setPreferredSize(new Dimension(100,400));
 
         GridLayout layout = new GridLayout(7,1);
@@ -740,6 +744,8 @@ class LoginPanel extends JPanel {
         passwordLabel.setHorizontalAlignment(JLabel.CENTER);
         keepMeLoggedInBox = new JCheckBox("Keep me logged in");
         keepMeLoggedInBox.setHorizontalAlignment(JCheckBox.CENTER);
+        loginDetailHandler = new LoginDetailHandler();
+        this.appPresenter = appPresenter;
 
         this.add(usernameLabel);
         this.add(usernameField);
@@ -750,12 +756,18 @@ class LoginPanel extends JPanel {
         this.add(keepMeLoggedInBox);
 
         this.lw = lw;
+
         addListeners();
     }
 
     public boolean isValidLogin(String username, String password){
         //TODO VALIDATE THE USER'S CREDENTIALS
-        return false;
+        return true;
+    }
+
+    public boolean allFieldsFilledIn(){
+        return (!usernameField.getText().equals("") &&
+        !passwordField.getText().equals(""));
     }
 
     public void addListeners(){
@@ -764,11 +776,25 @@ class LoginPanel extends JPanel {
         });
 
         loginButton.addActionListener((ActionEvent e) -> {
+
+            if(!allFieldsFilledIn()){
+                JOptionPane.showMessageDialog(null, "Error: Make sure all fields are filled in.");
+                return;
+            }
+
             String username = usernameField.getText();
             String password = passwordField.getText();
 
+            //validate login and save credentials to login.txt if they opted into it.
             if(isValidLogin(username, password)){
-                //TODO Log the user into the app
+
+                if(keepMeLoggedInBox.isSelected()){
+                    loginDetailHandler.saveLoginDetails(username, password);
+                    System.out.println("Saved login details as \n" + loginDetailHandler.getUserInfoFromFile());
+                }
+                
+                System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
+                appPresenter.launchApp(new UserInfo(username, password));
             } else {
                 JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
             }
@@ -936,16 +962,11 @@ class Prompt extends JPanel {
     }
 }
 
-
 /*
  * Run the app!
  */
 public class App {
     public static void main(String[] args) throws Exception {
-        if(false){
-            new AppFrame();
-        } else {
-            new LoginWindow();
-        }
+        new AppPresenter();
     }
 }

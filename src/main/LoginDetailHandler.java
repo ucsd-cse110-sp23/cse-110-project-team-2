@@ -13,18 +13,18 @@ public class LoginDetailHandler {
     
     LoginDetailHandler(){
         loginFile = new File("./login.txt");
-    }
 
-    public void saveLoginDetails(String username, String password){
-        
         try{
             if(!loginFile.exists()){
+                System.out.println("login file dne");
                 loginFile.createNewFile();
             } 
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
 
+    public void saveLoginDetails(String username, String password){
         try{
             FileWriter loginWriter = new FileWriter(loginFile, false);
             loginWriter.write(username + "\n" + password);
@@ -34,9 +34,6 @@ public class LoginDetailHandler {
         }
     }
 
-    public boolean doesLoginFileExist(){
-        return loginFile.exists();
-    }
 
     public UserInfo getUserInfoFromFile(){
 

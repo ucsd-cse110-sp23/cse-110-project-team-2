@@ -523,6 +523,7 @@ class HistoryList extends JPanel {
                 deletePrompt();
             }
         }
+        historyManager.clearHistory();
     }
 
     /*

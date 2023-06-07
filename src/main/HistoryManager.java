@@ -176,7 +176,7 @@ public class HistoryManager {
             e.printStackTrace();
         }
         
-        
+        historyList.remove(question);
         /*
         FileWriter history;
         boolean deleted = false;
@@ -212,15 +212,8 @@ public class HistoryManager {
     }
 
     public void clearHistory() {
-        try{
-            FileWriter history = new FileWriter(historyFile);
-            history.write("");
-            history.close();
             historyList.clear();
             selected = null;
-        } catch(Exception e){
-            e.printStackTrace();
-        }
     }
 
 }

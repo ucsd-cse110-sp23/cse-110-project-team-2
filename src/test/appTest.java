@@ -149,7 +149,7 @@ public class appTest {
     @Test
     public void testDeleteFromHistory() {
         String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "tempusername");
+        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
 
         // Create sample QNAs
         QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
@@ -178,7 +178,7 @@ public class appTest {
     @Test
     public void testClearHistory() throws IOException {
         String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "tempusername");
+        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
 
         // Create sample QNAs
         QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
@@ -218,7 +218,7 @@ public class appTest {
     @Test
     public void testUserStory3() {
         String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "tempusername");
+        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
 
         // Create sample QNAs
         QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);

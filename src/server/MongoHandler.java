@@ -213,7 +213,7 @@ public class MongoHandler {
     }
     
     /**
-     * Modifies the bnody of a prompt
+     * Modifies the body of a prompt
      * @param username
      * @param promptID
      * @param newAnswer - the new body to replace the old body
@@ -235,9 +235,9 @@ public class MongoHandler {
 
     }
 
-    public static void main(String[] args){
-        MongoHandler mongo = new MongoHandler(); 
-        mongo.addUser("foo","bar");
-        mongo.addUser("baz","buzz");
-    }
+    // public static void main(String[] args){
+    //     MongoHandler mongo = new MongoHandler(); 
+    //     mongo.addUser("foo","bar");
+    //     mongo.addUser("baz","buzz");
+    // }
 }

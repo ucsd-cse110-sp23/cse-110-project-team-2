@@ -35,7 +35,6 @@ public class MockHistoryManager {
         selected = null;
         readDBintoArraylist();
 
-        
     }
 
     public void setUsername(String username){

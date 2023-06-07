@@ -13,13 +13,13 @@ import java.io.File;
 
 public class HistoryManager {
     private ArrayList<Prompt> historyList;
-    private File historyFile;
+    //private File historyFile;
     private Prompt selected; 
 
     private RequestHandler rh;
     private String username;
 
-    private final String DELIMITER = "%%%%%%%";
+    //private final String DELIMITER = "%%%%%%%";
 
 
     private final String promptsEndpoint = "prompts";
@@ -27,7 +27,7 @@ public class HistoryManager {
     private final String deleteString = "DELETE";
     private final String postString = "POST";
 
-    public HistoryManager(String historyFilePath, String username){
+    public HistoryManager(String username){
         historyList = new ArrayList<Prompt>();
 
         rh = new RequestHandler();

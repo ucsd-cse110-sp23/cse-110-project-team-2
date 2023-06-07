@@ -674,7 +674,7 @@ class AppFrame extends JFrame {
 
 
         GUIMediator guiMediator =  new GUIMediator();
-        HistoryManager historyManager = new HistoryManager("history.txt", username);
+        HistoryManager historyManager = new HistoryManager(username);
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);

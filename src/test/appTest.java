@@ -2,6 +2,7 @@
 import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.bson.Document;
 
 import org.json.JSONObject;
 
@@ -142,8 +143,7 @@ public class appTest {
     
     @Test
     public void testAddToHistory() {
-        String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
+        HistoryManager historyManager = new HistoryManager( "testusername");
 
         // Create a sample QNA
         QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
@@ -157,15 +157,11 @@ public class appTest {
         // Ensure the prompt was added to the history list
         assertTrue(historyList.contains(addedPrompt));
 
-        // Cleanup: Delete the file created during the test
-        File historyFile = new File(historyFilePath);
-        historyFile.delete();
     }
 
     @Test
     public void testDeleteFromHistory() {
-        String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
+        HistoryManager historyManager = new HistoryManager("testusername");
 
         // Create sample QNAs
         QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
@@ -185,16 +181,11 @@ public class appTest {
 
         // Ensure the prompt was removed from the history list
         assertFalse(historyList.contains(promptToDelete));
-
-        // Cleanup: Delete the file created during the test
-        File historyFile = new File(historyFilePath);
-        historyFile.delete();
     }
 
     @Test
     public void testClearHistory() throws IOException {
-        String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
+        HistoryManager historyManager = new HistoryManager("testusername");
 
         // Create sample QNAs
         QNA qna1 = new QNA("Answer 1", "Question 1", PromptType.QUESTION);
@@ -217,13 +208,6 @@ public class appTest {
 
         // Ensure the selected prompt is null
         assertNull(historyManager.getSelectedToDelete());
-
-        // Ensure the history file is empty
-        File historyFile = new File(historyFilePath);
-        assertEquals(0, historyFile.length());
-
-        // Cleanup: Delete the file created during the test
-        historyFile.delete();
     }
 
     @Test
@@ -233,8 +217,7 @@ public class appTest {
 
     @Test
     public void testUserStory3() {
-        String historyFilePath = "testhistory.txt";
-        HistoryManager historyManager = new HistoryManager(historyFilePath, "testusername");
+        HistoryManager historyManager = new HistoryManager("testusername");
 
         // Create sample QNAs
         QNA sampleQNA = new QNA("Sample Answer", "Sample Question", PromptType.QUESTION);
@@ -276,13 +259,6 @@ public class appTest {
 
         // Ensure the selected prompt is null
         assertNull(historyManager.getSelectedToDelete());
-
-        // Ensure the history file is empty
-        File historyFile = new File(historyFilePath);
-        assertEquals(0, historyFile.length());
-
-        // Cleanup: Delete the file created during the test
-        historyFile.delete();
     }
 
 
@@ -323,7 +299,6 @@ public class appTest {
 
     }
 
-
     @Test
     public void testAudioToReply() {
         QNA qna = mockAPIHandler.audioToReply();
@@ -332,6 +307,7 @@ public class appTest {
         assertEquals("What is the meaning of life?", qna.getQuestion());
         assertTrue(Arrays.asList("42", "The meaning of life is 42", "42 is the meaning of life").contains(qna.getAnswer()));
     }
+
     @Test
     public void testSendEmail() {
 
@@ -378,11 +354,8 @@ public class appTest {
         
         assertEquals(mail.toString(), msh.getMail().toString());
         
-
-    
-
-        
      }
+    
 
 }
     

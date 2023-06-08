@@ -7,8 +7,9 @@
 2. Unzip
 3. Open the folder in the IDE of your choice
     - Make sure you are in the correct directory
-4. On the command line type `./run.sh`
+4. On the command line type `./run.sh` if you are on MacOS
     - For macOS, you may need to run `chmod +x ./run.sh` first.
+5. On the command line type `./run.bat` if you are on Windows.
 6. Enjoy!
 
 ## How to Use

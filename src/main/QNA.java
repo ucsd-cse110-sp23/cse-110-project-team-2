@@ -4,16 +4,33 @@ public class QNA {
     private String question;
     private String answer;
     private PromptType promptType = PromptType.NOCOMMAND;
+    private String id;
 
     public QNA(String question, String answer, PromptType command){
         this.question = question;
         this.answer = answer;
         this.promptType = command;
+        this.id = "empty for now";
+    }
+
+    public QNA(String id, String question, String answer, PromptType command){
+        this.question = question;
+        this.answer = answer;
+        this.promptType = command;
+        this.id = id;
     }
 
     public boolean equals(QNA otherQuestion){
         return this.question.equals(otherQuestion.getQuestion()) 
             && this.answer.equals(otherQuestion.getAnswer());
+    }
+
+    public void setID(String id){
+        this.id = id;
+    }
+
+    public String getID(){
+        return id;
     }
 
     public void setCommand(PromptType pt) {

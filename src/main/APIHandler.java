@@ -89,6 +89,12 @@ public class APIHandler {
         return new QNA(promptT,answer,PromptType.DELETEPROMPT);
     }
 
+    public QNA deleteAllPromptType() {
+        String promptT = "";
+        String answer = "All prompts were deleted.";
+        return new QNA(promptT,answer,PromptType.DELETEALL);
+    }
+
 
     public QNA setupEmailPromptType(String promptString){
         return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
@@ -122,6 +128,11 @@ public class APIHandler {
         return new QNA(promptString,null,PromptType.SENDEMAIL);
     }
 
+    public QNA handNoCommandPromptType(String promptString){
+        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
+    }
+
+
     public QNA audioToReply(){
         String promptString = audioToQuestion(); //turn the current audio file into str
 
@@ -137,18 +148,22 @@ public class APIHandler {
                 return questionPromptType(promptString);
             case DELETEPROMPT:
                 return deletePromptType();
+            case DELETEALL:
+                return deleteAllPromptType();
             case SETUPEMAIL:
                 return setupEmailPromptType(promptString); 
             case CREATEEMAIL:
                 return createEmailPromptType(promptString);
             case SENDEMAIL:
                 return handleSendEmailPromptType(promptString);
+            case NOCOMMAND:
+                return handNoCommandPromptType(promptString);
             default:
                 break;
         }
         
 
-        return new QNA("NO COMMAND DETECTED PLEASE TRY AGAIN", "YOUR TEXT WAS " + promptString, PromptType.NOCOMMAND);
+        return handNoCommandPromptType(promptString);
     }
 
     public String parseSendEmailString(String s){
@@ -170,9 +185,14 @@ public class APIHandler {
         if (checkPunctuationEquals(strArr[0], "question")){
             return PromptType.QUESTION;
         }
+
+        if (strArr.length == 1){
+            return PromptType.NOCOMMAND;
+        }
+
         //Email Setup prompt case-
         String wordTuple = strArr[0] + " " + strArr[1];
-        if(wordTuple.toLowerCase().equals("create email")){
+        if(checkPunctuationEquals(wordTuple.toLowerCase(), "create email")){
             return PromptType.CREATEEMAIL;
         }
 
@@ -202,6 +222,10 @@ public class APIHandler {
             return PromptType.DELETEPROMPT;
         }
 
+        // Delete all case
+        if(checkPunctuationEquals(strArr[0], "delete") && checkPunctuationEquals(strArr[1], "all")){
+            return PromptType.DELETEALL;
+        }
 
         return PromptType.NOCOMMAND;
         

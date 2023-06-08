@@ -204,6 +204,12 @@ class QnaPanel extends JPanel {
                 guiMediator.changeQnaDisplayText(gptPrompt);
                 return;
             }
+            else if(gptPrompt.getCommand() == PromptType.DELETEALL) {
+                guiMediator.clearQNADisplayText();
+                guiMediator.deleteAllPrompts();
+                guiMediator.changeQnaDisplayText(gptPrompt);
+                return;
+            }
 
             //update the display to show the qna
             guiMediator.changeQnaDisplayText(gptPrompt);
@@ -510,6 +516,16 @@ class HistoryList extends JPanel {
         }
     }
 
+    public void deleteAllPrompts() {
+        for (Component prompt : this.getComponents()) {
+            if (prompt instanceof Prompt) {
+                historyManager.setSelected((Prompt) prompt);
+                deletePrompt();
+            }
+        }
+        historyManager.clearHistory();
+    }
+
     /*
      * Load all the prompts from the history.txt file. delegates to history manager
      */
@@ -654,9 +670,11 @@ class AppFrame extends JFrame {
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close on exit
 
+        String username = "fpeng";
+
 
         GUIMediator guiMediator =  new GUIMediator();
-        HistoryManager historyManager = new HistoryManager("history.txt");
+        HistoryManager historyManager = new HistoryManager(username);
 
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
         QnaPanel qp = new QnaPanel(guiMediator, historyManager);

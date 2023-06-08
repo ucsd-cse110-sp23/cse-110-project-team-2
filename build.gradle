@@ -15,7 +15,7 @@ repositories {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main']
+            srcDirs = ['src/main','src/server']
         }
     }
     test {
@@ -34,7 +34,10 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     implementation "org.json:json:20210307"
+    implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
     implementation "javax.mail:mail:1.4.7"
+    
+
 }
 
 test {

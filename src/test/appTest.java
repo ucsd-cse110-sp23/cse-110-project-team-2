@@ -362,12 +362,10 @@ public class appTest {
         
         assertEquals(mail.toString(), msh.getMail().toString());
         
-
-    
-
-        
      }
 
+
+     
 }
     
 

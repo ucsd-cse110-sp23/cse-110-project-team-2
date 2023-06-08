@@ -1,5 +1,5 @@
 import java.io.File;
-
+import org.json.*;
 
 //API Handler class that serves as an interface for the 3 different API's we use
 public class APIHandler {
@@ -8,11 +8,13 @@ public class APIHandler {
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
+    private RequestHandler rh;
 
     APIHandler() {
         audioHandler = new AudioHandler();
         gptHandler = new GPTHandler(APIKey);
         whisperHandler = new WhisperHandler(APIKey);
+        rh = new RequestHandler();
     }
 
     public void startRecording() {
@@ -65,8 +67,8 @@ public class APIHandler {
      * in: transcription String
      * out: answer String
      */
-    public QNA audioToAnswer() {
-        return audioToReply();
+    public QNA audioToAnswer(String username) {
+        return audioToReply(username);
     }
 
     public QNA questionPromptType(String promptString){
@@ -94,7 +96,7 @@ public class APIHandler {
         return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
     }
 
-    public QNA createEmailPromptType(String promptString){
+    public QNA createEmailPromptType(String promptString, String username){
 
         boolean tempIsDisplayNameSetup = true;
 
@@ -103,9 +105,19 @@ public class APIHandler {
             return new QNA(promptString, "email creation unsuccessful - email not setup", PromptType.SETUPEMAIL);
         }
 
+        String emailInfo = "";
+        try {
+            emailInfo = rh.sendHttpRequest(rh.UsernameToJSON(username), "POST", "email");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.out.println("oopsie woopsie poopsie");
+        }
+        String displayName = (new JSONObject(emailInfo)).getString("displayName");
+
         //this is just a fancy question type, asks gpt to generate
         //we also ask it to sign it using our name
-        String displayName = "QUANDALE";
+        //String displayName = "QUANDALE";
         String signatureRequest = ", sign my name with Best Regards, and my first name" + displayName + ". DO NOT CREATE A SUBJECT LINE.";
         String signedPromptString = promptString + signatureRequest;
 
@@ -127,7 +139,7 @@ public class APIHandler {
     }
 
 
-    public QNA audioToReply(){
+    public QNA audioToReply(String username){
         String promptString = audioToQuestion(); //turn the current audio file into str
 
         if (promptString.equals("")){
@@ -145,7 +157,7 @@ public class APIHandler {
             case SETUPEMAIL:
                 return setupEmailPromptType(promptString); 
             case CREATEEMAIL:
-                return createEmailPromptType(promptString);
+                return createEmailPromptType(promptString, username);
             case SENDEMAIL:
                 return handleSendEmailPromptType(promptString);
             case NOCOMMAND:

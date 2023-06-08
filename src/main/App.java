@@ -120,6 +120,8 @@ class QnaPanel extends JPanel {
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
 
+    private String username;
+
     QnaPanel(GUIMediator guiM, HistoryManager histManager, String username) {
         this.setPreferredSize(new Dimension(600, 300));
 
@@ -133,6 +135,7 @@ class QnaPanel extends JPanel {
         this.add(qnaDisplay, BorderLayout.CENTER);
         this.add(recordPanel, BorderLayout.SOUTH);
 
+        this.username = username;
 
         startButton = recordPanel.getStartButton();
         stopButton = recordPanel.getStopButton();
@@ -163,7 +166,7 @@ class QnaPanel extends JPanel {
             recordPanel.hideRecording();
             apiHandler.stopRecording();
             //audioHandler.stopRecording();
-            QNA gptPrompt = apiHandler.audioToAnswer();
+            QNA gptPrompt = apiHandler.audioToAnswer(username);
             System.out.println(gptPrompt.getQuestion());
 
             if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){

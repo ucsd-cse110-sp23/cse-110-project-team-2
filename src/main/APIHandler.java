@@ -137,6 +137,7 @@ public class APIHandler {
     }
 
     public QNA handleSendEmailPromptType(String promptString){
+        
         return new QNA(promptString,null,PromptType.SENDEMAIL);
     }
 

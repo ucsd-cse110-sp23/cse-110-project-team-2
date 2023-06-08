@@ -934,9 +934,6 @@ class LoginPanel extends JPanel {
                 System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
                 appPresenter.launchApp(new UserInfo(username, password));
 
-            } else {
-                JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
-
             }
         });
     }
@@ -1127,7 +1124,6 @@ class Prompt extends JPanel {
  */
 public class App {
     public static void main(String[] args) throws Exception {
-        SayItServer.runServer();
         new AppPresenter();
     }
 }

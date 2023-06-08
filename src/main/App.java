@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleContext;
+
+import org.json.JSONObject;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -95,17 +98,18 @@ class QnaPanel extends JPanel {
     RecordPanel recordPanel;
 
     APIHandler apiHandler;
-    EmailSetupPanel emailSetupPanel = new EmailSetupPanel();
+    EmailSetupPanel emailSetupPanel;
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
     private static String APIKey = "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";
 */
-    QnaPanel() {
+    QnaPanel(String username) {
         this.setPreferredSize(new Dimension(600, 800));
         this.setLayout(new BorderLayout());
         this.setBackground(Color.RED);
+        this.emailSetupPanel = new EmailSetupPanel(username); 
     }
     
     HistoryManager historyManager;
@@ -116,18 +120,22 @@ class QnaPanel extends JPanel {
     Color turquoise = new Color(57, 174, 169);
     Color blue = new Color(85, 123, 131);
 
-    QnaPanel(GUIMediator guiM, HistoryManager histManager) {
+    private String username;
+
+    QnaPanel(GUIMediator guiM, HistoryManager histManager, String username) {
         this.setPreferredSize(new Dimension(600, 300));
 
         this.setLayout(new BorderLayout());
         this.setBackground(yellow);
 
+        this.emailSetupPanel = new EmailSetupPanel(username);
 
         qnaDisplay = new QnaDisplay(guiM);
         recordPanel = new RecordPanel();
         this.add(qnaDisplay, BorderLayout.CENTER);
         this.add(recordPanel, BorderLayout.SOUTH);
 
+        this.username = username;
 
         startButton = recordPanel.getStartButton();
         stopButton = recordPanel.getStopButton();
@@ -158,7 +166,7 @@ class QnaPanel extends JPanel {
             recordPanel.hideRecording();
             apiHandler.stopRecording();
             //audioHandler.stopRecording();
-            QNA gptPrompt = apiHandler.audioToAnswer();
+            QNA gptPrompt = apiHandler.audioToAnswer(username);
             System.out.println(gptPrompt.getQuestion());
 
             if(gptPrompt.getCommand() == PromptType.SETUPEMAIL){
@@ -273,18 +281,36 @@ class ContentPanel extends JPanel {
 }
 
 class EmailSetupPanel extends JPanel{
+    private JTextField firstNameField;
+    private JTextField lastNameField;
+    private JTextField displayNameField;
     private JTextField smtpHostField;
     private JTextField smtpPortField;
     private JTextField emailField;
     private JTextField passwordField;
+    private RequestHandler requestHandler;
+    private String username;
 
-    public EmailSetupPanel(){
-        this.setLayout(new GridLayout(4,1));
+    public EmailSetupPanel(String username){
+        this.setLayout(new GridLayout(7,1));
         smtpHostField = new JTextField(20);
         smtpPortField = new JTextField(20);
         emailField = new JTextField(20);
         passwordField = new JTextField(20);
+        firstNameField = new JTextField(20);
+        lastNameField = new JTextField(20);
+        displayNameField = new JTextField(20);
+        this.username = username;
+        requestHandler = new RequestHandler();
 
+        checkDBForEmailCredentials();
+
+        this.add(new JLabel("FIRST NAME"));
+        this.add(firstNameField);
+        this.add(new JLabel("LAST NAME"));
+        this.add(lastNameField);
+        this.add(new JLabel("DISPLAY NAME"));
+        this.add(displayNameField);
         this.add(new JLabel("SMTP HOST"));
         this.add(smtpHostField);
         this.add(new JLabel("SMTP PORT"));
@@ -311,6 +337,19 @@ class EmailSetupPanel extends JPanel{
         return passwordField.getText();
     }
 
+    public String getFirstNameFieldContent(){
+        return firstNameField.getText();
+    }
+
+    public String getLastNameFieldContent(){
+        return lastNameField.getText();
+    }
+
+    public String getDisplayNameFieldContent(){
+        return displayNameField.getText();
+    }
+
+
     public void setSmtpHostFieldContent(String s){
         smtpHostField.setText(s);
     }
@@ -327,23 +366,86 @@ class EmailSetupPanel extends JPanel{
         passwordField.setText(s);
     }
 
-    public boolean isEmailSetup(){
-        String EMPTY_STRING = "";
-        return !getSmtpHostFieldContent().equals(EMPTY_STRING) && !getSmtpPortFieldContent().equals(EMPTY_STRING) && !getEmailFieldContent().equals(EMPTY_STRING) && !getPasswordFieldContent().equals(EMPTY_STRING);
+    public void setFirstNameFieldContent(String s){
+        firstNameField.setText(s);
     }
 
-    
+    public void setLastNameFieldContent(String s){
+        lastNameField.setText(s);
+    }
+
+    public void setDisplaynameFieldContent(String s){
+        displayNameField.setText(s);
+    }
+
+
+
+    public boolean isEmailSetup(){
+        String EMPTY_STRING = "";
+        return !getSmtpHostFieldContent().equals(EMPTY_STRING) 
+        && !getSmtpPortFieldContent().equals(EMPTY_STRING) 
+        && !getEmailFieldContent().equals(EMPTY_STRING) 
+        && !getPasswordFieldContent().equals(EMPTY_STRING)
+        && !getFirstNameFieldContent().equals(EMPTY_STRING)
+        && !getLastNameFieldContent().equals(EMPTY_STRING)
+        && !getDisplayNameFieldContent().equals(EMPTY_STRING);
+    }
+
+    public void checkDBForEmailCredentials(){
+        
+        try{
+            String usernameJSON = requestHandler.UsernameToJSON(username);
+            String userInfo = requestHandler.sendHttpRequest(usernameJSON, "POST", "email");
+
+            System.out.println(userInfo);
+
+            JSONObject emailInfoJSON = new JSONObject(userInfo);
+
+            setFirstNameFieldContent(emailInfoJSON.get("firstName").toString());
+            setLastNameFieldContent(emailInfoJSON.get("lastName").toString());
+            setDisplaynameFieldContent(emailInfoJSON.get("displayName").toString());
+            setSmtpHostFieldContent(emailInfoJSON.get("smtpHost").toString());
+            setSmtpPortFieldContent(emailInfoJSON.get("smtpPort").toString());
+            setEmailFieldContent(emailInfoJSON.get("email").toString());
+            setPasswordFieldContent(emailInfoJSON.get("emailPassword").toString());
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void setupEmail(){
         String oldSmtpHost = getSmtpHostFieldContent();
         String oldSmtpPort = getSmtpPortFieldContent();
         String oldEmail = getEmailFieldContent();
-        String oldPassword = getEmailFieldContent();
+        String oldPassword = getPasswordFieldContent();
 
         int result = JOptionPane.showConfirmDialog(null, this, "setup email", JOptionPane.OK_CANCEL_OPTION);
                 
         if(result == JOptionPane.OK_OPTION){
-            //idk
+            System.out.println("CLICKED OK");
+            if(isEmailSetup()){
+                System.out.println("all fields were filled");
+                String emailDetailsJSON = requestHandler.SetupEmailToJSON(
+                    username, 
+                    getFirstNameFieldContent(), 
+                    getLastNameFieldContent(), 
+                    getDisplayNameFieldContent(), 
+                    getSmtpHostFieldContent(), 
+                    getSmtpPortFieldContent(), 
+                    getEmailFieldContent(), 
+                    getPasswordFieldContent());
+
+                System.out.println("json?\n" + emailDetailsJSON);
+                
+                try{
+                    requestHandler.sendHttpRequest(emailDetailsJSON, "PUT", "email");
+                } catch(Exception e){
+
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Some fields were left empty, email has not been fully set up.");
+            }
         } else{
             //user canceled setup, reverting to old info
             setSmtpHostFieldContent(oldSmtpHost);
@@ -676,9 +778,8 @@ class AppFrame extends JFrame {
 
         GUIMediator guiMediator =  new GUIMediator();
         HistoryManager historyManager = new HistoryManager(userInfo.getUsername());
-
         HistoryPanel hp = new HistoryPanel(guiMediator, historyManager);
-        QnaPanel qp = new QnaPanel(guiMediator, historyManager);
+        QnaPanel qp = new QnaPanel(guiMediator, historyManager, userInfo.getUsername());
         this.add(hp, BorderLayout.WEST);
         this.add(qp, BorderLayout.CENTER);
         this.setVisible(true); // Make visible
@@ -741,6 +842,9 @@ class LoginPanel extends JPanel {
     LoginDetailHandler loginDetailHandler;
     AppPresenter appPresenter;
 
+    RequestHandler requestHandler;
+
+
     LoginPanel(LoginWindow lw, AppPresenter appPresenter) {
         this.setPreferredSize(new Dimension(100,400));
 
@@ -761,6 +865,9 @@ class LoginPanel extends JPanel {
         keepMeLoggedInBox = new JCheckBox("Keep me logged in");
         keepMeLoggedInBox.setHorizontalAlignment(JCheckBox.CENTER);
         loginDetailHandler = new LoginDetailHandler();
+
+        requestHandler = new RequestHandler();
+
         this.appPresenter = appPresenter;
 
         this.add(usernameLabel);
@@ -777,8 +884,23 @@ class LoginPanel extends JPanel {
     }
 
     public boolean isValidLogin(String username, String password){
-        //TODO VALIDATE THE USER'S CREDENTIALS
-        return true;
+        String userJSON = requestHandler.CredentionalsToJSON(username, password);
+            try{
+                System.out.println("Sending the req w body" + userJSON);
+                String response = requestHandler.sendHttpRequest(userJSON, "POST", "login");
+                JSONObject responseJSON = new JSONObject(response);
+
+                System.out.println("RESPONSE \n" + response);
+
+                if(responseJSON.has("error")){
+                    throw new Exception(responseJSON.get("error").toString());
+                }
+
+                return true;
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
+        return false;
     }
 
     public boolean allFieldsFilledIn(){
@@ -811,8 +933,10 @@ class LoginPanel extends JPanel {
                 
                 System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
                 appPresenter.launchApp(new UserInfo(username, password));
+
             } else {
                 JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
+
             }
         });
     }
@@ -830,6 +954,8 @@ class CreateAccountPanel extends JPanel {
 
     JButton createAccountButton;
 
+    RequestHandler requestHandler;
+
     //MVP
     LoginWindow lw; 
 
@@ -845,6 +971,8 @@ class CreateAccountPanel extends JPanel {
         usernameField = new JTextField(20);
         passwordField = new JTextField(20);
         confirmPasswordField = new JTextField(20);
+
+        requestHandler = new RequestHandler();
 
         createAccountButton = new JButton("Create Account");
         usernameLabel = new JLabel("Username");
@@ -884,16 +1012,32 @@ class CreateAccountPanel extends JPanel {
     public void addListeners(){
         createAccountButton.addActionListener((ActionEvent e) -> {
             
+
+            String username = usernameField.getText();
+
             String password = passwordField.getText();
             String passwordConfirmation = confirmPasswordField.getText();
 
             if(!password.equals(passwordConfirmation)){
-                //pop up an error
+
                 JOptionPane.showMessageDialog(null, "Error: The password and confirmation do not match, please try again.");
             } else if(!areAllFieldsFilled()){
                 JOptionPane.showMessageDialog(null, "Error: Make sure all Username/Password fields have been filled in."); 
             }else{
-                //TODO CREATE THE ACCOUNT HERE
+
+                try{
+                    String credentialsJSON = requestHandler.CredentionalsToJSON(username,password);
+                    String res = requestHandler.sendHttpRequest(credentialsJSON,"PUT","login");
+                    JSONObject responseJSON = new JSONObject(res);
+
+                    if(responseJSON.has("error")){
+                        throw new Exception(responseJSON.get("error").toString());
+                    }
+                }catch(Exception ex){
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                    return;
+                }
+
                 lw.switchToLogin();
                 JOptionPane.showMessageDialog(null, "The account was successfully created. You may now log in with your credentials."); 
             }

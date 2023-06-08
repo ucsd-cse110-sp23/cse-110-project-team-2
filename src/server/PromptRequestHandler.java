@@ -8,6 +8,7 @@ import org.json.*;
 public class PromptRequestHandler implements HttpHandler {
 
     private MongoHandler dbHandler;
+    private String TRUE = "true", FALSE = "false";
 
     /**
      * Expected to set the dbHandler using a setter before a handleRequest method is called. 
@@ -63,12 +64,12 @@ public class PromptRequestHandler implements HttpHandler {
      * Gets the given user's prompt history. 
      * @param httpExchange Contains the request bodyString
      * @require bodyString syntax: {"username": "amongus"}
-     * @returns If user exists in database, <username>'s prompt history in JSON array formatted string. 
-     *          Each element is a JSON object that represents each prompt. 
-     *          Otherwise, null returned. 
+     * @returns statusMessage syntax: if successful, {"status": "true", "message": "blahblah"}
+     *                                otherwise, {"status": "false", "message": "Some error"}
+     * @returns message contains JSON array of user prompt history if successful
      */
     private String handlePut(HttpExchange httpExchange) throws IOException {
-        System.out.println("prompt GET request recieved");
+        System.out.println("prompt PUT request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
@@ -78,8 +79,19 @@ public class PromptRequestHandler implements HttpHandler {
 
         List<Document> promptList = dbHandler.getAllUserPrompts(username);
 
-        if (promptList != null) return (new JSONArray(promptList)).toString();
-        else                    return null;
+        String status = "";
+        String message = "";
+        
+        if (promptList != null) {
+            message = (new JSONArray(promptList)).toString();
+            status = TRUE;
+        } 
+        else {
+            message = "User "+username+" not found.";
+            status = FALSE;
+        }
+
+        return RequestHandler.statusMessageToJSON(status, message);
     }   
 
     /**
@@ -89,14 +101,17 @@ public class PromptRequestHandler implements HttpHandler {
      *                              "promptType": "Send Email", 
      *                              "question": "Send email to shitass@ucsd.edu", 
      *                              "answer": "SMTP Error"}
-     * @returns If user exists in database, id of created prompt is returned. 
-     *          Otherwise, null returned. 
+     * @returns statusMessage syntax: if successful, {"status": "true", "message": "blahblah"}
+     *                                otherwise, {"status": "false", "message": "Some error"}
+     * @returns message contains promptID of inserted prompt if successful
      */
     private String handlePost(HttpExchange httpExchange) throws IOException {
         System.out.println("prompt POST request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
+
+        
         
         JSONObject jsonRequest = new JSONObject(requestBody);
         String username = jsonRequest.getString("username");
@@ -104,8 +119,20 @@ public class PromptRequestHandler implements HttpHandler {
         String question = jsonRequest.getString("question");
         String answer = jsonRequest.getString("answer");
 
+        String status = "";
+        String message = "";
+
         String promptID = dbHandler.addPrompt(username, promptType, question, answer);
-        return promptID; // addPrompt returns null if user not found
+        if (promptID == null) {
+            status = FALSE;
+            message = "User " + username + " not found.";
+        }
+        else {
+            status = TRUE;
+            message = promptID;
+        }
+
+        return RequestHandler.statusMessageToJSON(status, message);
     }
 
     /**
@@ -114,8 +141,9 @@ public class PromptRequestHandler implements HttpHandler {
      * @require bodyString syntax: {"username": "amongus", 
      *                              "promptID": "507c7f79bcf86cd7994f6c0e"}
      * @require <username> exists in database
-     * @returns If prompt exists in database, return id. 
-     *          Otherwise, return null
+     * @returns statusMessage syntax: if successful, {"status": "true", "message": "blahblah"}
+     *                                otherwise, {"status": "false", "message": "Some error"}
+     * @returns message contains prompt id if successful
      */
     private String handleDelete(HttpExchange httpExchange) throws IOException {
         System.out.println("prompt DELETE request recieved");
@@ -127,8 +155,19 @@ public class PromptRequestHandler implements HttpHandler {
         String username = jsonRequest.getString("username");
         String promptID = jsonRequest.getString("promptID");
 
-        if (dbHandler.deletePrompt(username, promptID)) return promptID;
-        else                                            return null;
+        String status = "";
+        String message = "";
+
+        if (dbHandler.deletePrompt(username, promptID)) {
+            status = TRUE;
+            message = promptID;
+        }
+        else {
+            status = FALSE;
+            message = "User " + username + " not found.";
+        }
+
+        return RequestHandler.statusMessageToJSON(status, message);
     }
 }
 

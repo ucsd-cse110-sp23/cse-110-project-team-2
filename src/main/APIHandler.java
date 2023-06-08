@@ -91,6 +91,12 @@ public class APIHandler {
         return new QNA(promptT,answer,PromptType.DELETEPROMPT);
     }
 
+    public QNA deleteAllPromptType() {
+        String promptT = "";
+        String answer = "All prompts were deleted.";
+        return new QNA(promptT,answer,PromptType.DELETEALL);
+    }
+
 
     public QNA setupEmailPromptType(String promptString){
         return new QNA("open the email setup lol", "open the email setup lol", PromptType.SETUPEMAIL);
@@ -154,6 +160,8 @@ public class APIHandler {
                 return questionPromptType(promptString);
             case DELETEPROMPT:
                 return deletePromptType();
+            case DELETEALL:
+                return deleteAllPromptType();
             case SETUPEMAIL:
                 return setupEmailPromptType(promptString); 
             case CREATEEMAIL:
@@ -226,6 +234,10 @@ public class APIHandler {
             return PromptType.DELETEPROMPT;
         }
 
+        // Delete all case
+        if(checkPunctuationEquals(strArr[0], "delete") && checkPunctuationEquals(strArr[1], "all")){
+            return PromptType.DELETEALL;
+        }
 
         return PromptType.NOCOMMAND;
         

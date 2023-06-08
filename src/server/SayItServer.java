@@ -15,21 +15,28 @@ public class SayItServer {
 
 
  public static void main(String[] args) throws IOException {
-    // create a thread pool to handle requests
-   ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+   runServer();
+ }
 
-   Map<String, String> data = new HashMap<>();
+ public static HttpServer runServer() throws IOException{
+      // create a thread pool to handle requests
+      ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
-   HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),0);
+      Map<String, String> data = new HashMap<>();
+   
+      HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),0);
 
-   MongoHandler dbHandler = new MongoHandler();
-   server.createContext("/login/", new LoginRequestHandler(dbHandler));
-   server.createContext("/prompts/", new PromptRequestHandler(dbHandler));
-   server.createContext("/email/", new EmailRequestHandler(dbHandler));
-   server.setExecutor(threadPoolExecutor);
-   server.start();
-   System.out.println("Server Started!");
-
+      MongoHandler dbHandler = new MongoHandler();
+      server.createContext("/login/", new LoginRequestHandler(dbHandler));
+      server.createContext("/prompts/", new PromptRequestHandler(dbHandler));
+      server.createContext("/email/", new EmailRequestHandler(dbHandler));
+      server.setExecutor(threadPoolExecutor);
+      server.start();
+      System.out.println("Server Started!");
+ }
+ 
+ public static void stopServer(HttpServer server){
+   server.stop(0);
  }
 }
 

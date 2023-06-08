@@ -5,11 +5,13 @@ import java.util.*;
 import org.bson.Document;
 import org.bson.json.JsonObject;
 import org.json.JSONObject;
-
+import org.json.*;
 
 public class LoginRequestHandler implements HttpHandler {
 
     private MongoHandler dbHandler;
+    private String TRUE = "true", FALSE = "false";
+
 
     public LoginRequestHandler(MongoHandler dbHandler) {
         this.dbHandler = dbHandler;
@@ -21,11 +23,17 @@ public class LoginRequestHandler implements HttpHandler {
         System.out.println("METHOD IS" + method);
 
         try{
-            if(method.equals("POST")){
+            if(method.equals("GET")){
+                System.out.println("We dont have a get method for this endpoint you trolling");
+                //response = //handleGet(httpExchange);
+            } else if (method.equals("POST")){
                 response = handlePost(httpExchange);
+            } else if (method.equals("DELETE")){
+                System.out.println("We dont have a delete method for this endpoint you trolling");
             } else if (method.equals("PUT")){
                 response = handlePut(httpExchange);
-            } else {
+            } 
+            else {
                 throw new Exception("INVALID REQUEST");
             }
         }catch(Exception e){
@@ -102,5 +110,6 @@ public class LoginRequestHandler implements HttpHandler {
             return errorResponse.toString();
         }
     }   
+
 }
 

@@ -11,15 +11,15 @@ import com.sun.mail.iap.Response;
 
 import java.io.File;
 
-public class HistoryManager {
+public class MockHistoryManager {
     private ArrayList<Prompt> historyList;
-    //private File historyFile;
+    private File historyFile;
     private Prompt selected; 
 
     private RequestHandler rh;
     private String username;
 
-    //private final String DELIMITER = "%%%%%%%";
+    private final String DELIMITER = "%%%%%%%";
 
 
     private final String promptsEndpoint = "prompts";
@@ -27,7 +27,7 @@ public class HistoryManager {
     private final String deleteString = "DELETE";
     private final String postString = "POST";
 
-    public HistoryManager(String username){
+    public MockHistoryManager(String historyFilePath, String username){
         historyList = new ArrayList<Prompt>();
 
         rh = new RequestHandler();
@@ -35,21 +35,6 @@ public class HistoryManager {
         selected = null;
         readDBintoArraylist();
 
-
-
-        //historyFile = new File(historyFilePath);
-        
-        /*Load a history file into a variable, build the readers/writers.
-        try{
-            if(!historyFile.exists()){
-                historyFile.createNewFile();
-            }
-            readFileIntoArrayList();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        */
-        
     }
 
     public void setUsername(String username){
@@ -113,16 +98,13 @@ public class HistoryManager {
     public void readDBintoArraylist() {
         String body = rh.UsernameToJSON(username);
         System.out.print(body);
-        String statusMessage = "";
+        String response = "";
         try {
-            statusMessage = rh.sendHttpRequest(body, putString, promptsEndpoint);
+            response = rh.sendHttpRequest(body, putString, promptsEndpoint);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.print(statusMessage);
-        JSONObject statusMessageJSON = new JSONObject(statusMessage);
-        String status = statusMessageJSON.getString("status");
-        String response = statusMessageJSON.getString("message");
+        System.out.print(response);
         JSONArray jsonArray = new JSONArray(response);
         QNA tempQNA;
         JSONObject tempJsonObject;
@@ -215,18 +197,8 @@ public class HistoryManager {
     }
 
     public void clearHistory() {
-        for (Prompt p : historyList) {
-            String body = rh.DeleteToJSON(username, p.getQNA().getID());
-            String responseString = "";
-            try {
-                responseString = rh.sendHttpRequest(body, deleteString, promptsEndpoint);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        
-        historyList.clear();
-        selected = null;
+            historyList.clear();
+            selected = null;
     }
 
 }

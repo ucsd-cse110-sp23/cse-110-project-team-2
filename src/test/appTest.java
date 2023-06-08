@@ -3,7 +3,8 @@ import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.bson.Document;
-
+import org.bson.json.JsonObject;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.junit.jupiter.api.Test;
@@ -352,12 +353,117 @@ public class appTest {
 
         msh = new MailSendingHandler(createEmailQNA, sendEmailQNA, esp);
         
+        //test to see if the mail object is created correctly
         assertEquals(mail.toString(), msh.getMail().toString());
         
      }
     
+     @Test
+     public void testLogin() {
+        RequestHandler rh = new RequestHandler();
+        String user = "testusername";
+        String pass = "testpassword";
+        String invalidUser = "invalidusername";
+        String invalidPass = "invalidpassword";
+        String loginResponse = null;
+        String invalidLoginResponse = null;
+        try {
+            loginResponse = rh.sendHttpRequest(rh.CredentionalsToJSON(user, pass), "POST", "login");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        
+        JSONObject loginResponseJSON = new JSONObject(loginResponse);
+
+        // Test case for correct login
+        assertEquals(loginResponseJSON.get("username").toString(), user);
+        assertEquals(loginResponseJSON.get("password").toString(), pass);
 
 
+        try {
+            invalidLoginResponse = rh.sendHttpRequest(rh.CredentionalsToJSON(invalidUser, invalidPass), "POST", "login");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        JSONObject invalidLoginResponseJSON = new JSONObject(invalidLoginResponse);
+
+        // Test case for incorrect login
+        assertTrue(invalidLoginResponseJSON.has("error"));
+
+     }
+
+     @Test
+     public void testCreateAccount() {
+        String user = "testusername";
+        String pass = "testpassword";
+
+        RequestHandler rh = new RequestHandler();
+        String createAccountResponse = null;
+
+        try {
+            createAccountResponse = rh.sendHttpRequest(rh.CredentionalsToJSON(user, pass), "PUT", "login");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        JSONObject createAccountResponseJSON = new JSONObject(createAccountResponse);
+
+        // Test for error (duplicate account)
+        assertTrue(createAccountResponseJSON.has("error"));
+
+     }
+
+     @Test
+     public void testEmailSetup() {
+        String user = "testusername";
+        // String pass = "testpassword";
+        String firstname = "testfirstname";
+        String lastname = "testlastname";
+        String displayName = "test-kun";
+        String smtpHost = "testhost";
+        String smtpPort = "testport";
+        String email = "testemail";
+        String emailPassword = "testemailpassword";
+
+        RequestHandler rh = new RequestHandler();
+        String emailSetupResponse = null;
+        String retrieveEmail = null;
+        JSONObject retrieveEmailJSON = null;
+
+        String SetupEmailJSON = rh.SetupEmailToJSON(user, firstname, lastname, 
+                                                    displayName, smtpHost, smtpPort,
+                                                    email, emailPassword);
+
+
+        try {
+            emailSetupResponse = rh.sendHttpRequest(SetupEmailJSON, "PUT", "email");
+                                                                   
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
+            retrieveEmail = rh.sendHttpRequest(rh.UsernameToJSON(user), "POST", "email");
+            retrieveEmailJSON = new JSONObject(retrieveEmail);
+            retrieveEmailJSON.put("username", user);
+        } catch (Exception e) {
+            e.printStackTrace();   
+        }
+
+        assertTrue(retrieveEmailJSON.get("username").toString().equals(user));
+        assertTrue(retrieveEmailJSON.get("firstName").toString().equals(firstname));
+        assertTrue(retrieveEmailJSON.get("lastName").toString().equals(lastname));
+        assertTrue(retrieveEmailJSON.get("displayName").toString().equals(displayName));
+        assertTrue(retrieveEmailJSON.get("smtpHost").toString().equals(smtpHost));
+        assertTrue(retrieveEmailJSON.get("smtpPort").toString().equals(smtpPort));
+        assertTrue(retrieveEmailJSON.get("email").toString().equals(email));
+        assertTrue(retrieveEmailJSON.get("emailPassword").toString().equals(emailPassword));
+     }
      
 }
     

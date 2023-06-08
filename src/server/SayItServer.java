@@ -33,6 +33,8 @@ public class SayItServer {
       server.setExecutor(threadPoolExecutor);
       server.start();
       System.out.println("Server Started!");
+
+      return server;
  }
  
  public static void stopServer(HttpServer server){

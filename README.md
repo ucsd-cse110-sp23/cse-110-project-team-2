@@ -8,7 +8,8 @@
 3. Open the folder in the IDE of your choice
     - Make sure you are in the correct directory
 4. On the command line type `./run.sh`
-5. Enjoy!
+    - For macOS, you may need to run `chmod +x ./run.sh` first.
+6. Enjoy!
 
 ## How to Use
 1. Press the record button

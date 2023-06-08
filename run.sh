@@ -1,17 +1,14 @@
 #!/bin/bash
 
-# clean before compiling and running
-#find bin/ -name "*.class" -type f -delete
+# Change to the project directory
+cd /path/to/your/project
 
-# compile
-javac -cp lib/json-20230227.jar:. -d bin src/server/*.java
-javac -cp lib/json-20230227.jar:. -d bin src/main/*.java
+# Check if build has already been executed by looking for the build directory
+if [ ! -d "build" ]; then
+    echo "Building the project..."
+    ./gradlew build
+fi
 
-# run
-cd bin
-java -cp ../lib/json-20230227.jar:. SayItServer
-java -cp ../lib/json-20230227.jar:. App
-cd ..
-
-# clean after compiling and running
-find bin/ -name "*.class" -type f -delete
+# Run the application
+echo "Running the application..."
+./gradlew run

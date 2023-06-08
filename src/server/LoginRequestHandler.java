@@ -72,7 +72,7 @@ public class LoginRequestHandler implements HttpHandler {
         } else if (user.get("password").toString().equals(password)) {
             return new JSONObject(user.toJson()).toString();
         } else {
-            errorResponse.append("error", "passwords do not match");
+            errorResponse.append("error", "Invalid Login Credentials, please double check your username and password");
             return errorResponse.toString();
         }
     }   

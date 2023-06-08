@@ -2,8 +2,10 @@ import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import org.json.*;
 import org.bson.Document;
+import org.bson.json.JsonObject;
+import org.json.JSONObject;
+import org.json.*;
 
 public class LoginRequestHandler implements HttpHandler {
 
@@ -16,8 +18,9 @@ public class LoginRequestHandler implements HttpHandler {
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
-        String response = "Request received";
         String method = httpExchange.getRequestMethod();
+        String response = "request received";
+        System.out.println("METHOD IS" + method);
 
         try{
             if(method.equals("GET")){
@@ -44,94 +47,69 @@ public class LoginRequestHandler implements HttpHandler {
         outStream.close();
     } 
 
-    
-    /**
-     * Adds a user document given user credentials. 
-     * @param httpExchange Contains the request bodyString
-     * @require bodyString syntax: {"username": "amongus", 
-     *                              "password": "sus"}
-     * @returns statusMessage syntax: if successful, {"status": "true", "message": "blahblah"}
-     *                                otherwise, {"status": "false", "message": "Some error"}
-     */
+    // Add method for adding new user info? 
     private String handlePost(HttpExchange httpExchange) throws IOException {
-        System.out.println("Login POST request recieved.");
+        System.out.println("prompt GET request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
-
+        
         JSONObject jsonRequest = new JSONObject(requestBody);
+
+        System.out.println(jsonRequest.toString());
+
         String username = jsonRequest.getString("username");
         String password = jsonRequest.getString("password");
 
-        String status = "";
-        String message = "";
+        Document user = dbHandler.getUser(username);
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.append("status", 404);
 
-        if (dbHandler.getUser(username) == null) {
-            boolean userAdded = dbHandler.addUser(username, password);
-            if (userAdded) {
-                status = TRUE;
-                message = "User " + username + " was successfully added.";
-            }
-            else {
-                status = FALSE;
-                message = "Username "+username+" was valid but adding user in database went wrong.";
-            }
-        }
-        else {
-            status = FALSE;
-            message = "User "+username+" already exists in database.";
-        }
 
-        log(message);
-        return RequestHandler.statusMessageToJSON(status, message);
+        if(user == null){
+            errorResponse.append("error","no such user was found");
+            return errorResponse.toString();
+        } else if (user.get("password").toString().equals(password)) {
+            return new JSONObject(user.toJson()).toString();
+        } else {
+            errorResponse.append("error", "passwords do not match");
+            return errorResponse.toString();
+        }
     }   
 
-    /**
-     * Compare credentials. 
-     * @param httpExchange Contains the request bodyString
-     * @require bodyString syntax: {"username": "amongus", 
-     *                              "password": "sus"}
-     * @returns statusMessage syntax: if successful, {"status": "true", "message": "blahblah"}
-     *                                otherwise, {"status": "false", "message": "Some error"}
-     */
+    //Create a user
     private String handlePut(HttpExchange httpExchange) throws IOException {
-        System.out.println("Login PUT request recieved.");
+        System.out.println("prompt PUT request recieved");
         Scanner scnr = new Scanner(httpExchange.getRequestBody());
         String requestBody = scnr.nextLine(); 
         scnr.close();
-
+        
         JSONObject jsonRequest = new JSONObject(requestBody);
+
+        System.out.println(jsonRequest.toString());
+
         String username = jsonRequest.getString("username");
         String password = jsonRequest.getString("password");
+        Document user = dbHandler.getUser(username);
 
-        Document userDoc = dbHandler.getUser(username);
 
-        String status = "";
-        String message = "";
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.append("status", 404);
 
-        if (userDoc != null) {
-            JSONObject userJson = new JSONObject(userDoc);
-            String dbPassword = userJson.getString("password");
-            if (password.equals(dbPassword)) {
-                message = "User " + username + " successfully logged in.";
-                status = TRUE;
-            }
-            else {
-                message = "Password incorrect for " + username + ".";
-                status = FALSE;
-            }
+        //user DNE
+        if(user == null){
+
+            dbHandler.addUser(username,password);
+
+            JSONObject successResponse = new JSONObject();
+            successResponse.append("status",200);
+            return successResponse.toString();
+        } else {
+            //A user with the username already exists
+            errorResponse.append("error","A user with that username already exists");
+            return errorResponse.toString();
         }
-        else {
-            message = "User " + username + " not found.";
-            status = FALSE;
-        }
-
-        log(message);
-        return RequestHandler.statusMessageToJSON(status, message);
     }   
-    
-    private static void log(String msg) {
-        System.out.println(msg);
-    }
+
 }
 

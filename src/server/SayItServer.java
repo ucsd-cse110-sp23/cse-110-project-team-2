@@ -25,18 +25,18 @@ public class SayItServer {
       Map<String, String> data = new HashMap<>();
    
       HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),0);
-   
+
       MongoHandler dbHandler = new MongoHandler();
       server.createContext("/login/", new LoginRequestHandler(dbHandler));
       server.createContext("/prompts/", new PromptRequestHandler(dbHandler));
-      server.createContext("/setupEmail/", new SetupEmailRequestHandler(dbHandler));
+      server.createContext("/email/", new EmailRequestHandler(dbHandler));
       server.setExecutor(threadPoolExecutor);
       server.start();
       System.out.println("Server Started!");
 
       return server;
  }
-
+ 
  public static void stopServer(HttpServer server){
    server.stop(0);
  }

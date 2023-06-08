@@ -18,6 +18,6 @@
     - To setup your email, start by saying "setup email" then a window will pop up to enter in your email info. Once your email is setup, you         can save your settings.
     - To compose an email, start by saying "create email", then proceed with who it is to and what the email should be about.
     - To send an email, start by saying "send email", then say the email you would like to send the email to.
-2. When finished with the question, press stop
+2. When finished with the prompt, press stop
 3. Wait for the AI to respond
 4. Read your response!

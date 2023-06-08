@@ -841,7 +841,9 @@ class LoginPanel extends JPanel {
     LoginWindow lw; 
     LoginDetailHandler loginDetailHandler;
     AppPresenter appPresenter;
+
     RequestHandler requestHandler;
+
 
     LoginPanel(LoginWindow lw, AppPresenter appPresenter) {
         this.setPreferredSize(new Dimension(100,400));
@@ -863,6 +865,7 @@ class LoginPanel extends JPanel {
         keepMeLoggedInBox = new JCheckBox("Keep me logged in");
         keepMeLoggedInBox.setHorizontalAlignment(JCheckBox.CENTER);
         loginDetailHandler = new LoginDetailHandler();
+
         requestHandler = new RequestHandler();
 
         this.appPresenter = appPresenter;
@@ -930,6 +933,10 @@ class LoginPanel extends JPanel {
                 
                 System.out.println("launching app with" + new UserInfo(username,password).getUsername().length());
                 appPresenter.launchApp(new UserInfo(username, password));
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Error: Invalid Login Credentials inputted.");
+
             }
         });
     }
@@ -946,7 +953,9 @@ class CreateAccountPanel extends JPanel {
     JLabel confirmPasswordLabel;
 
     JButton createAccountButton;
+
     RequestHandler requestHandler;
+
     //MVP
     LoginWindow lw; 
 
@@ -962,6 +971,7 @@ class CreateAccountPanel extends JPanel {
         usernameField = new JTextField(20);
         passwordField = new JTextField(20);
         confirmPasswordField = new JTextField(20);
+
         requestHandler = new RequestHandler();
 
         createAccountButton = new JButton("Create Account");
@@ -1002,15 +1012,19 @@ class CreateAccountPanel extends JPanel {
     public void addListeners(){
         createAccountButton.addActionListener((ActionEvent e) -> {
             
+
             String username = usernameField.getText();
+
             String password = passwordField.getText();
             String passwordConfirmation = confirmPasswordField.getText();
 
             if(!password.equals(passwordConfirmation)){
+
                 JOptionPane.showMessageDialog(null, "Error: The password and confirmation do not match, please try again.");
             } else if(!areAllFieldsFilled()){
                 JOptionPane.showMessageDialog(null, "Error: Make sure all Username/Password fields have been filled in."); 
             }else{
+
                 try{
                     String credentialsJSON = requestHandler.CredentionalsToJSON(username,password);
                     String res = requestHandler.sendHttpRequest(credentialsJSON,"PUT","login");
@@ -1023,6 +1037,7 @@ class CreateAccountPanel extends JPanel {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                     return;
                 }
+
                 lw.switchToLogin();
                 JOptionPane.showMessageDialog(null, "The account was successfully created. You may now log in with your credentials."); 
             }

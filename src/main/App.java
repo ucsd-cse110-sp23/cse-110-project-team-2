@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.InputStream;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,6 +30,8 @@ import org.json.JSONObject;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import javax.sound.sampled.*;
 
 /*
  * Recording panel with buttons start and stop,with recording label
@@ -99,6 +103,7 @@ class QnaPanel extends JPanel {
 
     APIHandler apiHandler;
     EmailSetupPanel emailSetupPanel;
+
 /*
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
@@ -203,12 +208,18 @@ class QnaPanel extends JPanel {
 
             }
 
-            else if(gptPrompt.getCommand() == PromptType.QUESTION) {
+            else if(gptPrompt.getCommand() == PromptType.QUESTION){
                 guiMediator.changeQnaDisplayText(gptPrompt);
                  //add the prompt to the history manager/get prompt to display in history
                 Prompt newPrompt = historyManager.addToHistory(gptPrompt);
-                guiMediator.addHistoryListPrompt(newPrompt);            
+                guiMediator.addHistoryListPrompt(newPrompt);
+                try {
+                    apiHandler.textToSpeech(gptPrompt);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();  
+
                 return;
             }
             else if(gptPrompt.getCommand() == PromptType.DELETEPROMPT) {
@@ -770,6 +781,8 @@ class HistoryButtonPanel extends JPanel {
  */
 class AppFrame extends JFrame {
 
+    PlaySound playSound;
+
     AppFrame(UserInfo userInfo) {
         this.setTitle("Application");
         this.setSize(800, 800);
@@ -787,7 +800,16 @@ class AppFrame extends JFrame {
         this.add(qp, BorderLayout.CENTER);
         this.setVisible(true); // Make visible
 
+        playSound = new PlaySound();
+
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                playSound.close();
+            }
+        });
     }
+
 }
 
 //Kinda MVP, Model is the Login/Create account windows, Kinda does both the View/Presenter job.
@@ -1121,6 +1143,7 @@ class Prompt extends JPanel {
       revalidate();
     }
 }
+
 
 /*
  * Run the app!

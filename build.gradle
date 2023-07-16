@@ -42,7 +42,11 @@ dependencies {
     implementation "org.json:json:20210307"
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
     implementation "javax.mail:mail:1.4.7"
+    implementation 'com.google.cloud:google-cloud-texttospeech:2.22.0'
     
+    // https://mvnrepository.com/artifact/javazoom/jlayer
+    implementation group: 'javazoom', name: 'jlayer', version: '1.0.1'
+
 
 }
 

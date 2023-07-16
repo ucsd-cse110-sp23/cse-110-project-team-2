@@ -7,14 +7,18 @@ public class APIHandler {
     private AudioHandler audioHandler;
     private GPTHandler gptHandler;
     private WhisperHandler whisperHandler;
-    private static String APIKey = "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";
+    private static String APIKey = "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";
     private RequestHandler rh;
-
+    private TTSHandler ttsHandler;
+    PlaySound ps;
+ 
     APIHandler() {
         audioHandler = new AudioHandler();
         gptHandler = new GPTHandler(APIKey);
         whisperHandler = new WhisperHandler(APIKey);
         rh = new RequestHandler();
+        ttsHandler = new TTSHandler();
+        ps = new PlaySound();
     }
 
     public void startRecording() {
@@ -43,6 +47,22 @@ public class APIHandler {
             return "Return a message that only has the text: \"There was an error in audio transcription\"";
         }
         return whisperResponse;
+    }
+
+    /*
+     * Sends the answer to TTS API, then recieves the audio file. Delegates to TTS API handler
+     * in: answer String
+     * out: audio file
+     */
+    public void textToSpeech(QNA answer) throws Exception {
+        try {
+            ttsHandler.textToSpeech(answer.getAnswer());
+            ps.playSound();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        
     }
 
     /*
